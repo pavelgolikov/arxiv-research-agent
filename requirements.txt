@@ -1,0 +1,6 @@
+arxiv
+google-genai
+langgraph
+pydantic
+pymupdf
+python-dotenv
