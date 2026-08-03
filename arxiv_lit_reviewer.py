@@ -4,8 +4,9 @@ from __future__ import annotations
 import arxiv
 import argparse
 import os
+import time
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, TypedDict
 
 from dotenv import load_dotenv
 from google import genai
@@ -64,6 +65,13 @@ class LiteratureReview(BaseModel):
     suggested_reading_order: list[str]
 
 
+class SearchNodeState(TypedDict, total=False):
+    user_query: str
+    max_results: int
+    search_queries: list[str]
+    found_papers: list[PaperMetadata]
+
+
 def gemini_client() -> genai.Client:
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -93,6 +101,16 @@ def generate_structured(prompt: str, result_type: type[T]) -> T:
     if response.parsed is not None:
         return result_type.model_validate(response.parsed)
     return result_type.model_validate_json(response.text or "")
+
+
+def make_search_plan(user_query: str) -> SearchPlan:
+    prompt = (
+        "Convert this research question into 1 to 3 concise arXiv search queries. "
+        "Use technical keywords that are likely to appear in paper titles or abstracts. "
+        "Do not write explanations.\n\n"
+        f"Research question: {user_query}"
+    )
+    return generate_structured(prompt, SearchPlan)
 
 
 def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
@@ -128,6 +146,37 @@ def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
         )
 
     return papers
+
+
+def search_node(state: SearchNodeState) -> SearchNodeState:
+    user_query = state["user_query"]
+    max_results = state.get("max_results", 10)
+    search_plan = make_search_plan(user_query)
+    arxiv_queries = [query.strip() for query in search_plan.queries if query.strip()]
+
+    if not arxiv_queries:
+        arxiv_queries = [user_query]
+
+    found_papers: list[PaperMetadata] = []
+    seen_ids: set[str] = set()
+
+    for index, arxiv_query in enumerate(arxiv_queries):
+        if len(found_papers) >= max_results:
+            break
+        if index > 0:
+            time.sleep(3.0)
+
+        remaining = max_results - len(found_papers)
+        for paper in search_arxiv(arxiv_query, remaining):
+            if paper.arxiv_id in seen_ids:
+                continue
+            seen_ids.add(paper.arxiv_id)
+            found_papers.append(paper)
+
+    return {
+        "search_queries": arxiv_queries,
+        "found_papers": found_papers,
+    }
 
 
 def main() -> int:
