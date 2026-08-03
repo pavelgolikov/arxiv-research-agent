@@ -8,6 +8,8 @@ import time
 from pathlib import Path
 from typing import TypeVar, TypedDict
 
+import fitz
+import httpx
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -65,11 +67,14 @@ class LiteratureReview(BaseModel):
     suggested_reading_order: list[str]
 
 
-class SearchNodeState(TypedDict, total=False):
+class ReviewerState(TypedDict, total=False):
     user_query: str
     max_results: int
+    target_papers: int
     search_queries: list[str]
     found_papers: list[PaperMetadata]
+    current_paper_index: int
+    parsed_papers: dict[str, ParsedPaper]
 
 
 def gemini_client() -> genai.Client:
@@ -148,7 +153,7 @@ def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
     return papers
 
 
-def search_node(state: SearchNodeState) -> SearchNodeState:
+def search_node(state: ReviewerState) -> ReviewerState:
     user_query = state["user_query"]
     max_results = state.get("max_results", 10)
     search_plan = make_search_plan(user_query)
@@ -177,6 +182,30 @@ def search_node(state: SearchNodeState) -> SearchNodeState:
         "search_queries": arxiv_queries,
         "found_papers": found_papers,
     }
+
+
+def download_parse_node(state: ReviewerState) -> ReviewerState:
+    found_papers = state["found_papers"]
+    current_paper_index = state.get("current_paper_index", 0)
+    paper = found_papers[current_paper_index]
+    parsed_papers = dict(state.get("parsed_papers", {}))
+
+    if paper.arxiv_id in parsed_papers:
+        return {"parsed_papers": parsed_papers}
+
+    response = httpx.get(paper.pdf_url, follow_redirects=True, timeout=60)
+    response.raise_for_status()
+
+    with fitz.open(stream=response.content, filetype="pdf") as document:
+        text = "\n".join(page.get_text() for page in document)
+        page_count = document.page_count
+
+    parsed_papers[paper.arxiv_id] = ParsedPaper(
+        arxiv_id=paper.arxiv_id,
+        text=text,
+        page_count=page_count,
+    )
+    return {"parsed_papers": parsed_papers}
 
 
 def main() -> int:
