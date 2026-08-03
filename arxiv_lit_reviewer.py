@@ -5,9 +5,16 @@ import arxiv
 import argparse
 import os
 from pathlib import Path
+from typing import TypeVar
 
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 from pydantic import BaseModel, Field
+
+
+GEMINI_MODEL = "gemini-3.1-flash-lite"
+T = TypeVar("T", bound=BaseModel)
 
 
 class SearchPlan(BaseModel):
@@ -33,7 +40,7 @@ class ParsedPaper(BaseModel):
 class RelevanceDecision(BaseModel):
     arxiv_id: str
     is_relevant: bool
-    score: float = Field(ge=0.0, le=1.0)
+    score: int = Field(ge=1, le=5)
     reason: str
 
 
@@ -55,6 +62,37 @@ class LiteratureReview(BaseModel):
     themes: list[str]
     gaps: list[str]
     suggested_reading_order: list[str]
+
+
+def gemini_client() -> genai.Client:
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is not set.")
+    return genai.Client(api_key=api_key)
+
+
+def generate_text(prompt: str) -> str:
+    client = gemini_client()
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+    )
+    return response.text or ""
+
+
+def generate_structured(prompt: str, result_type: type[T]) -> T:
+    client = gemini_client()
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            responseMimeType="application/json",
+            responseSchema=result_type,
+        ),
+    )
+    if response.parsed is not None:
+        return result_type.model_validate(response.parsed)
+    return result_type.model_validate_json(response.text or "")
 
 
 def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
