@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 
 GEMINI_MODEL = "gemini-3.1-flash-lite"
+RELEVANCE_TEXT_CHARS = 12000
 T = TypeVar("T", bound=BaseModel)
 
 
@@ -75,6 +76,7 @@ class ReviewerState(TypedDict, total=False):
     found_papers: list[PaperMetadata]
     current_paper_index: int
     parsed_papers: dict[str, ParsedPaper]
+    relevance_decisions: dict[str, RelevanceDecision]
 
 
 def gemini_client() -> genai.Client:
@@ -206,6 +208,52 @@ def download_parse_node(state: ReviewerState) -> ReviewerState:
         page_count=page_count,
     )
     return {"parsed_papers": parsed_papers}
+
+
+def relevance_eval_node(state: ReviewerState) -> ReviewerState:
+    current_paper_index = state.get("current_paper_index", 0)
+    paper = state["found_papers"][current_paper_index]
+    parsed_paper = state["parsed_papers"][paper.arxiv_id]
+    relevance_decisions = dict(state.get("relevance_decisions", {}))
+
+    prompt = (
+        "Decide whether this arXiv paper is relevant to the user's research query.\n"
+        "Use this score rubric:\n"
+        "1 = unrelated.\n"
+        "2 = weakly related.\n"
+        "3 = possibly useful but not central.\n"
+        "4 = clearly relevant.\n"
+        "5 = highly relevant and should be included unless the paper is low quality.\n"
+        "Set is_relevant to true only when score is 4 or 5.\n\n"
+        f"User query: {state['user_query']}\n\n"
+        f"arXiv ID: {paper.arxiv_id}\n"
+        f"Title: {paper.title}\n"
+        f"Authors: {', '.join(paper.authors)}\n"
+        f"Published: {paper.published}\n"
+        f"Abstract: {paper.abstract}\n\n"
+        f"Paper text preview:\n{parsed_paper.text[:RELEVANCE_TEXT_CHARS]}"
+    )
+    decision = generate_structured(prompt, RelevanceDecision)
+    decision = decision.model_copy(
+        update={"arxiv_id": paper.arxiv_id, "is_relevant": decision.score >= 4}
+    )
+    relevance_decisions[paper.arxiv_id] = decision
+
+    return {"relevance_decisions": relevance_decisions}
+
+
+def route_after_relevance_eval(state: ReviewerState) -> str:
+    current_paper_index = state.get("current_paper_index", 0)
+    paper = state["found_papers"][current_paper_index]
+    decision = state["relevance_decisions"][paper.arxiv_id]
+
+    if decision.is_relevant:
+        return "extract_core"
+
+    state["current_paper_index"] = current_paper_index + 1
+    if state.get("current_paper_index", 0) < len(state.get("found_papers", [])):
+        return "download_parse"
+    return "write_markdown"
 
 
 def main() -> int:
