@@ -21,10 +21,12 @@ RELEVANCE_TEXT_CHARS = 12000
 T = TypeVar("T", bound=BaseModel)
 
 
+# SearchPlan stores the arXiv search queries generated from the user query.
 class SearchPlan(BaseModel):
     queries: list[str] = Field(min_length=1, max_length=3)
 
 
+# PaperMetadata stores normalized arXiv metadata for one candidate paper.
 class PaperMetadata(BaseModel):
     arxiv_id: str
     title: str
@@ -35,12 +37,14 @@ class PaperMetadata(BaseModel):
     entry_url: str
 
 
+# ParsedPaper stores the extracted text and page count for one PDF.
 class ParsedPaper(BaseModel):
     arxiv_id: str
     text: str
     page_count: int = Field(ge=1)
 
 
+# RelevanceDecision stores the model's relevance score and explanation.
 class RelevanceDecision(BaseModel):
     arxiv_id: str
     is_relevant: bool
@@ -48,6 +52,7 @@ class RelevanceDecision(BaseModel):
     reason: str
 
 
+# PaperAnalysis stores the detailed notes extracted from one relevant paper.
 class PaperAnalysis(BaseModel):
     arxiv_id: str
     title: str
@@ -59,6 +64,7 @@ class PaperAnalysis(BaseModel):
     relevance_to_query: str
 
 
+# LiteratureReview stores the structured content for a complete review.
 class LiteratureReview(BaseModel):
     title: str
     overview: str
@@ -68,18 +74,22 @@ class LiteratureReview(BaseModel):
     suggested_reading_order: list[str]
 
 
+# ReviewerState stores the shared fields that graph nodes read and update.
 class ReviewerState(TypedDict, total=False):
     user_query: str
     max_results: int
     target_papers: int
+    output: Path
     search_queries: list[str]
     found_papers: list[PaperMetadata]
     current_paper_index: int
     parsed_papers: dict[str, ParsedPaper]
     relevance_decisions: dict[str, RelevanceDecision]
     chosen_papers: dict[str, PaperAnalysis]
+    markdown: str
 
 
+# gemini_client creates a Gemini client from the configured API key.
 def gemini_client() -> genai.Client:
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -87,6 +97,7 @@ def gemini_client() -> genai.Client:
     return genai.Client(api_key=api_key)
 
 
+# generate_text sends a plain text prompt to Gemini and returns text.
 def generate_text(prompt: str) -> str:
     client = gemini_client()
     response = client.models.generate_content(
@@ -96,6 +107,7 @@ def generate_text(prompt: str) -> str:
     return response.text or ""
 
 
+# generate_structured sends a prompt to Gemini and validates a Pydantic result.
 def generate_structured(prompt: str, result_type: type[T]) -> T:
     client = gemini_client()
     response = client.models.generate_content(
@@ -111,6 +123,7 @@ def generate_structured(prompt: str, result_type: type[T]) -> T:
     return result_type.model_validate_json(response.text or "")
 
 
+# make_search_plan converts the user query into arXiv search queries.
 def make_search_plan(user_query: str) -> SearchPlan:
     prompt = (
         "Convert this research question into 1 to 3 concise arXiv search queries. "
@@ -121,6 +134,7 @@ def make_search_plan(user_query: str) -> SearchPlan:
     return generate_structured(prompt, SearchPlan)
 
 
+# search_arxiv runs one arXiv query and returns normalized paper metadata.
 def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
 
     client = arxiv.Client(page_size=max_results, delay_seconds=3.0, num_retries=3)
@@ -156,6 +170,7 @@ def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
     return papers
 
 
+# search_node generates arXiv queries, searches arXiv, and deduplicates papers.
 def search_node(state: ReviewerState) -> ReviewerState:
     user_query = state["user_query"]
     max_results = state.get("max_results", 10)
@@ -187,6 +202,7 @@ def search_node(state: ReviewerState) -> ReviewerState:
     }
 
 
+# download_parse_node downloads the current paper PDF and extracts its text.
 def download_parse_node(state: ReviewerState) -> ReviewerState:
     found_papers = state["found_papers"]
     current_paper_index = state.get("current_paper_index", 0)
@@ -211,6 +227,7 @@ def download_parse_node(state: ReviewerState) -> ReviewerState:
     return {"parsed_papers": parsed_papers}
 
 
+# relevance_eval_node scores the current paper against the user query.
 def relevance_eval_node(state: ReviewerState) -> ReviewerState:
     current_paper_index = state.get("current_paper_index", 0)
     paper = state["found_papers"][current_paper_index]
@@ -243,6 +260,7 @@ def relevance_eval_node(state: ReviewerState) -> ReviewerState:
     return {"relevance_decisions": relevance_decisions}
 
 
+# route_after_relevance_eval chooses extraction or paper advancement.
 def route_after_relevance_eval(state: ReviewerState) -> str:
     current_paper_index = state.get("current_paper_index", 0)
     paper = state["found_papers"][current_paper_index]
@@ -253,10 +271,12 @@ def route_after_relevance_eval(state: ReviewerState) -> str:
     return "advance_paper"
 
 
+# advance_paper_node moves the graph state to the next candidate paper.
 def advance_paper_node(state: ReviewerState) -> ReviewerState:
     return {"current_paper_index": state.get("current_paper_index", 0) + 1}
 
 
+# extract_core_node extracts structured notes from the current relevant paper.
 def extract_core_node(state: ReviewerState) -> ReviewerState:
     current_paper_index = state.get("current_paper_index", 0)
     paper = state["found_papers"][current_paper_index]
@@ -284,6 +304,7 @@ def extract_core_node(state: ReviewerState) -> ReviewerState:
     return {"chosen_papers": chosen_papers}
 
 
+# route_after_extract_core chooses whether to continue or write the review.
 def route_after_extract_core(state: ReviewerState) -> str:
     chosen_papers = state.get("chosen_papers", {})
     target_papers = state.get("target_papers", 4)
@@ -293,6 +314,7 @@ def route_after_extract_core(state: ReviewerState) -> str:
     return "advance_paper"
 
 
+# route_after_advance_paper chooses the next node after advancing papers.
 def route_after_advance_paper(state: ReviewerState) -> str:
     current_paper_index = state.get("current_paper_index", 0)
 
@@ -301,6 +323,109 @@ def route_after_advance_paper(state: ReviewerState) -> str:
     return "write_markdown"
 
 
+# write_markdown_node renders the selected paper analyses to Markdown.
+def write_markdown_node(state: ReviewerState) -> ReviewerState:
+    user_query = state["user_query"]
+    search_queries = state.get("search_queries", [])
+    found_papers = state.get("found_papers", [])
+    chosen_papers = state.get("chosen_papers", {})
+    output = state.get("output", Path("review.md"))
+
+    metadata_by_id = {paper.arxiv_id: paper for paper in found_papers}
+    analyses = list(chosen_papers.values())
+
+    lines = [
+        f"# Literature Review: {user_query}",
+        "",
+        "## Search Summary",
+        "",
+        f"- User query: {user_query}",
+        f"- arXiv queries: {', '.join(search_queries) if search_queries else 'None recorded'}",
+        f"- Candidate papers found: {len(found_papers)}",
+        f"- Relevant papers selected: {len(analyses)}",
+        "",
+        "## Overview",
+        "",
+    ]
+
+    if analyses:
+        lines.append(
+            f"This review summarizes {len(analyses)} paper"
+            f"{'' if len(analyses) == 1 else 's'} selected as relevant to the query."
+        )
+    else:
+        lines.append("No relevant papers were selected.")
+
+    lines.extend(["", "## Paper Notes", ""])
+
+    for analysis in analyses:
+        paper = metadata_by_id.get(analysis.arxiv_id)
+        authors = ", ".join(paper.authors) if paper else "Unknown authors"
+        published = paper.published if paper else "Unknown date"
+        entry_url = paper.entry_url if paper else ""
+
+        title = f"[{analysis.title}]({entry_url})" if entry_url else analysis.title
+        lines.extend(
+            [
+                f"### {title}",
+                "",
+                f"- arXiv ID: {analysis.arxiv_id}",
+                f"- Authors: {authors}",
+                f"- Published: {published}",
+                f"- Research problem: {analysis.research_problem}",
+                f"- Method: {analysis.method}",
+                f"- Experimental setup: {analysis.experimental_setup}",
+                f"- Main findings: {analysis.main_findings}",
+                f"- Limitations: {analysis.limitations}",
+                f"- Relevance to query: {analysis.relevance_to_query}",
+                "",
+            ]
+        )
+
+    lines.extend(
+        [
+            "## Comparison Table",
+            "",
+            "| Paper | Method | Main findings | Limitations |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+
+    for analysis in analyses:
+        title = analysis.title.replace("|", "\\|").replace("\n", " ")
+        method = analysis.method.replace("|", "\\|").replace("\n", " ")
+        findings = analysis.main_findings.replace("|", "\\|").replace("\n", " ")
+        limitations = analysis.limitations.replace("|", "\\|").replace("\n", " ")
+        lines.append(f"| {title} | {method} | {findings} | {limitations} |")
+
+    lines.extend(["", "## Research Themes", ""])
+    if analyses:
+        for analysis in analyses:
+            lines.append(f"- {analysis.title}: {analysis.relevance_to_query}")
+    else:
+        lines.append("No selected papers are available to summarize.")
+
+    lines.extend(["", "## Research Gaps", ""])
+    if analyses:
+        for analysis in analyses:
+            lines.append(f"- {analysis.title}: {analysis.limitations}")
+    else:
+        lines.append("No selected papers are available to summarize.")
+
+    lines.extend(["", "## Suggested Reading Order", ""])
+    if analyses:
+        for index, analysis in enumerate(analyses, start=1):
+            lines.append(f"{index}. {analysis.title}")
+    else:
+        lines.append("No selected papers are available to order.")
+
+    markdown = "\n".join(lines).rstrip() + "\n"
+    output.write_text(markdown, encoding="utf-8")
+
+    return {"markdown": markdown}
+
+
+# main validates command-line arguments and required environment variables.
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Run an arXiv literature reviewer and write a Markdown report."
