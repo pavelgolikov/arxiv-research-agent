@@ -7,13 +7,14 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import TypeVar, TypedDict
+from typing import Callable, TypeVar, TypedDict
 
 import fitz
 import httpx
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
 
@@ -130,6 +131,9 @@ def make_search_plan(user_query: str) -> SearchPlan:
     prompt = (
         "Convert this research question into 1 to 3 concise arXiv search queries. "
         "Use technical keywords that are likely to appear in paper titles or abstracts. "
+        "Keep each query focused on the user's research domain. "
+        "For language-model questions, each query should include LLM, language model, "
+        "AI alignment, or AI agent terminology. "
         "Do not write explanations.\n\n"
         f"Research question: {user_query}"
     )
@@ -194,17 +198,28 @@ def search_node(state: ReviewerState) -> ReviewerState:
             time.sleep(3.0)
 
         remaining = max_results - len(found_papers)
+        remaining_queries = len(arxiv_queries) - index
+        query_limit = max(1, (remaining + remaining_queries - 1) // remaining_queries)
         # Add papers from this query while removing duplicates across queries.
-        for paper in search_arxiv(arxiv_query, remaining):
+        for paper in search_arxiv(arxiv_query, query_limit):
             if paper.arxiv_id in seen_ids:
                 continue
             seen_ids.add(paper.arxiv_id)
             found_papers.append(paper)
+            if len(found_papers) >= max_results:
+                break
 
     return {
         "search_queries": arxiv_queries,
         "found_papers": found_papers,
     }
+
+
+# route_after_search chooses parsing or final writing after arXiv search.
+def route_after_search(state: ReviewerState) -> str:
+    if state.get("found_papers"):
+        return "download_parse"
+    return "write_markdown"
 
 
 # download_parse_node downloads the current paper PDF and extracts its text.
@@ -524,15 +539,107 @@ def save_checkpoint_node(state: ReviewerState) -> ReviewerState:
     return {"checkpoint": path}
 
 
+# checkpointed_node saves graph state after a regular graph node finishes.
+def checkpointed_node(
+    node_function: Callable[[ReviewerState], ReviewerState],
+) -> Callable[[ReviewerState], ReviewerState]:
+    # wrapped_node merges a node update into state before checkpointing.
+    def wrapped_node(state: ReviewerState) -> ReviewerState:
+        update = node_function(state)
+        merged_state = dict(state)
+        merged_state.update(update)
+        save_checkpoint_node(merged_state)
+        return update
+
+    return wrapped_node
+
+
+# build_graph assembles the LangGraph workflow from the node functions.
+def build_graph():
+    graph = StateGraph(ReviewerState)
+    graph.add_node("search", checkpointed_node(search_node))
+    graph.add_node("download_parse", checkpointed_node(download_parse_node))
+    graph.add_node("relevance_eval", checkpointed_node(relevance_eval_node))
+    graph.add_node("advance_paper", checkpointed_node(advance_paper_node))
+    graph.add_node("extract_core", checkpointed_node(extract_core_node))
+    graph.add_node("write_markdown", checkpointed_node(write_markdown_node))
+
+    graph.add_edge(START, "search")
+    graph.add_conditional_edges(
+        "search",
+        route_after_search,
+        {
+            "download_parse": "download_parse",
+            "write_markdown": "write_markdown",
+        },
+    )
+    graph.add_edge("download_parse", "relevance_eval")
+    graph.add_conditional_edges(
+        "relevance_eval",
+        route_after_relevance_eval,
+        {
+            "extract_core": "extract_core",
+            "advance_paper": "advance_paper",
+        },
+    )
+    graph.add_conditional_edges(
+        "extract_core",
+        route_after_extract_core,
+        {
+            "advance_paper": "advance_paper",
+            "write_markdown": "write_markdown",
+        },
+    )
+    graph.add_conditional_edges(
+        "advance_paper",
+        route_after_advance_paper,
+        {
+            "download_parse": "download_parse",
+            "write_markdown": "write_markdown",
+        },
+    )
+    graph.add_edge("write_markdown", END)
+    return graph.compile()
+
+
+# run_reviewer invokes the compiled graph with initial user settings.
+def run_reviewer(
+    user_query: str,
+    max_results: int,
+    target_papers: int,
+    output: Path,
+    checkpoint: Path | None,
+) -> ReviewerState:
+    state: ReviewerState = {
+        "user_query": user_query,
+        "max_results": max_results,
+        "target_papers": target_papers,
+        "output": output,
+        "current_paper_index": 0,
+        "parsed_papers": {},
+        "relevance_decisions": {},
+        "chosen_papers": {},
+    }
+    if checkpoint:
+        state["checkpoint"] = checkpoint
+
+    return build_graph().invoke(state)
+
+
 # main validates command-line arguments and required environment variables.
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Run an arXiv literature reviewer and write a Markdown report."
     )
-    parser.add_argument("--user-query", help="Research question or topic to review.")
+    parser.add_argument(
+        "--user-query",
+        required=True,
+        help="Research question or topic to review.",
+    )
     parser.add_argument("--max-results", type=int, default=10)
     parser.add_argument("--target-papers", type=int, default=4)
     parser.add_argument("--output", type=Path, default=Path("review.md"))
+    parser.add_argument("--checkpoint", type=Path)
     args = parser.parse_args()
 
     load_dotenv()
@@ -546,6 +653,13 @@ def main() -> int:
     if not (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")):
         parser.error("GEMINI_API_KEY or GOOGLE_API_KEY is not set.")
 
+    run_reviewer(
+        user_query=args.user_query,
+        max_results=args.max_results,
+        target_papers=args.target_papers,
+        output=args.output,
+        checkpoint=args.checkpoint,
+    )
     return 0
 
 
