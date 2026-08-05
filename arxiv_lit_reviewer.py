@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import arxiv
 import argparse
+import json
 import os
 import time
 from pathlib import Path
@@ -326,13 +327,12 @@ def route_after_advance_paper(state: ReviewerState) -> str:
     return "write_markdown"
 
 
-# write_markdown_node renders the selected paper analyses to Markdown.
-def write_markdown_node(state: ReviewerState) -> ReviewerState:
+# render_markdown_fallback renders selected paper analyses without an LLM call.
+def render_markdown_fallback(state: ReviewerState) -> str:
     user_query = state["user_query"]
     search_queries = state.get("search_queries", [])
     found_papers = state.get("found_papers", [])
     chosen_papers = state.get("chosen_papers", {})
-    output = state.get("output", Path("review.md"))
 
     metadata_by_id = {paper.arxiv_id: paper for paper in found_papers}
     analyses = list(chosen_papers.values())
@@ -428,8 +428,62 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
         lines.append("No selected papers are available to order.")
 
     markdown = "\n".join(lines).rstrip() + "\n"
-    output.write_text(markdown, encoding="utf-8")
+    return markdown
 
+
+# write_markdown_node asks Gemini to write the final Markdown review.
+def write_markdown_node(state: ReviewerState) -> ReviewerState:
+    output = state.get("output", Path("review.md"))
+    chosen_papers = state.get("chosen_papers", {})
+
+    if not chosen_papers:
+        markdown = render_markdown_fallback(state)
+        output.write_text(markdown, encoding="utf-8")
+        return {"markdown": markdown}
+
+    papers_for_prompt = []
+    metadata_by_id = {paper.arxiv_id: paper for paper in state.get("found_papers", [])}
+
+    # Build compact paper records for the final review prompt.
+    for analysis in chosen_papers.values():
+        paper = metadata_by_id.get(analysis.arxiv_id)
+        papers_for_prompt.append(
+            {
+                "metadata": paper.model_dump() if paper else {},
+                "analysis": analysis.model_dump(),
+            }
+        )
+
+    prompt = (
+        "Write a polished Markdown literature review from these structured paper notes. "
+        "Use only the facts provided here. Do not invent papers, claims, results, or citations. "
+        "Output Markdown only, with no code fences.\n\n"
+        "Required sections:\n"
+        "# Literature Review: <user query>\n"
+        "## Search Summary\n"
+        "## Overview\n"
+        "## Key Papers\n"
+        "## Comparison Table\n"
+        "## Research Themes\n"
+        "## Research Gaps\n"
+        "## Suggested Reading Order\n\n"
+        f"User query: {state['user_query']}\n"
+        f"arXiv search queries: {state.get('search_queries', [])}\n"
+        f"Candidate papers found: {len(state.get('found_papers', []))}\n"
+        f"Selected paper notes:\n{json.dumps(papers_for_prompt, indent=2)}"
+    )
+
+    try:
+        markdown = generate_text(prompt).strip()
+    except Exception:
+        markdown = ""
+
+    if not markdown:
+        markdown = render_markdown_fallback(state)
+    else:
+        markdown = markdown.rstrip() + "\n"
+
+    output.write_text(markdown, encoding="utf-8")
     return {"markdown": markdown}
 
 
