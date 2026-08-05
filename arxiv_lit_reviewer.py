@@ -147,6 +147,7 @@ def search_arxiv(arxiv_query: str, max_results: int) -> list[PaperMetadata]:
     papers: list[PaperMetadata] = []
     seen_ids: set[str] = set()
 
+    # Iterate through arXiv results and normalize each unseen paper.
     for result in client.results(search):
         arxiv_id = result.entry_id.rsplit("/", 1)[-1]
         if arxiv_id in seen_ids:
@@ -183,6 +184,7 @@ def search_node(state: ReviewerState) -> ReviewerState:
     found_papers: list[PaperMetadata] = []
     seen_ids: set[str] = set()
 
+    # Run each generated arXiv query until the overall result limit is reached.
     for index, arxiv_query in enumerate(arxiv_queries):
         if len(found_papers) >= max_results:
             break
@@ -190,6 +192,7 @@ def search_node(state: ReviewerState) -> ReviewerState:
             time.sleep(3.0)
 
         remaining = max_results - len(found_papers)
+        # Add papers from this query while removing duplicates across queries.
         for paper in search_arxiv(arxiv_query, remaining):
             if paper.arxiv_id in seen_ids:
                 continue
@@ -358,6 +361,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
 
     lines.extend(["", "## Paper Notes", ""])
 
+    # Render a detailed notes section for each selected paper.
     for analysis in analyses:
         paper = metadata_by_id.get(analysis.arxiv_id)
         authors = ", ".join(paper.authors) if paper else "Unknown authors"
@@ -391,6 +395,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
         ]
     )
 
+    # Render one comparison-table row for each selected paper.
     for analysis in analyses:
         title = analysis.title.replace("|", "\\|").replace("\n", " ")
         method = analysis.method.replace("|", "\\|").replace("\n", " ")
@@ -400,6 +405,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
 
     lines.extend(["", "## Research Themes", ""])
     if analyses:
+        # Summarize why each selected paper matters for the user query.
         for analysis in analyses:
             lines.append(f"- {analysis.title}: {analysis.relevance_to_query}")
     else:
@@ -407,6 +413,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
 
     lines.extend(["", "## Research Gaps", ""])
     if analyses:
+        # Reuse each paper's stated limitations as initial research gaps.
         for analysis in analyses:
             lines.append(f"- {analysis.title}: {analysis.limitations}")
     else:
@@ -414,6 +421,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
 
     lines.extend(["", "## Suggested Reading Order", ""])
     if analyses:
+        # List selected papers in the order they were accepted.
         for index, analysis in enumerate(analyses, start=1):
             lines.append(f"{index}. {analysis.title}")
     else:
