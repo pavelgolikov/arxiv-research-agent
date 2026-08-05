@@ -53,8 +53,8 @@ class PaperAnalysis(BaseModel):
     title: str
     research_problem: str
     method: str
-    evidence: str
-    findings: str
+    experimental_setup: str
+    main_findings: str
     limitations: str
     relevance_to_query: str
 
@@ -77,6 +77,7 @@ class ReviewerState(TypedDict, total=False):
     current_paper_index: int
     parsed_papers: dict[str, ParsedPaper]
     relevance_decisions: dict[str, RelevanceDecision]
+    chosen_papers: dict[str, PaperAnalysis]
 
 
 def gemini_client() -> genai.Client:
@@ -249,9 +250,53 @@ def route_after_relevance_eval(state: ReviewerState) -> str:
 
     if decision.is_relevant:
         return "extract_core"
+    return "advance_paper"
 
-    state["current_paper_index"] = current_paper_index + 1
-    if state.get("current_paper_index", 0) < len(state.get("found_papers", [])):
+
+def advance_paper_node(state: ReviewerState) -> ReviewerState:
+    return {"current_paper_index": state.get("current_paper_index", 0) + 1}
+
+
+def extract_core_node(state: ReviewerState) -> ReviewerState:
+    current_paper_index = state.get("current_paper_index", 0)
+    paper = state["found_papers"][current_paper_index]
+    parsed_paper = state["parsed_papers"][paper.arxiv_id]
+    chosen_papers = dict(state.get("chosen_papers", {}))
+
+    if paper.arxiv_id in chosen_papers:
+        return {"chosen_papers": chosen_papers}
+
+    prompt = (
+        "Extract structured literature-review notes from this arXiv paper.\n"
+        "Use the full paper text when possible. Be specific and concise.\n\n"
+        f"User query: {state['user_query']}\n\n"
+        f"arXiv ID: {paper.arxiv_id}\n"
+        f"Title: {paper.title}\n"
+        f"Authors: {', '.join(paper.authors)}\n"
+        f"Published: {paper.published}\n"
+        f"Abstract: {paper.abstract}\n\n"
+        f"Full paper text:\n{parsed_paper.text}"
+    )
+    analysis = generate_structured(prompt, PaperAnalysis)
+    analysis = analysis.model_copy(update={"arxiv_id": paper.arxiv_id, "title": paper.title})
+    chosen_papers[paper.arxiv_id] = analysis
+
+    return {"chosen_papers": chosen_papers}
+
+
+def route_after_extract_core(state: ReviewerState) -> str:
+    chosen_papers = state.get("chosen_papers", {})
+    target_papers = state.get("target_papers", 4)
+
+    if len(chosen_papers) >= target_papers:
+        return "write_markdown"
+    return "advance_paper"
+
+
+def route_after_advance_paper(state: ReviewerState) -> str:
+    current_paper_index = state.get("current_paper_index", 0)
+
+    if current_paper_index < len(state.get("found_papers", [])):
         return "download_parse"
     return "write_markdown"
 
