@@ -81,6 +81,7 @@ class ReviewerState(TypedDict, total=False):
     max_results: int
     target_papers: int
     output: Path
+    checkpoint: Path
     search_queries: list[str]
     found_papers: list[PaperMetadata]
     current_paper_index: int
@@ -485,6 +486,42 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
 
     output.write_text(markdown, encoding="utf-8")
     return {"markdown": markdown}
+
+
+# checkpoint_path returns the JSON checkpoint path for the current state.
+def checkpoint_path(state: ReviewerState) -> Path:
+    if "checkpoint" in state:
+        return state["checkpoint"]
+
+    output = state.get("output", Path("review.md"))
+    if output.suffix:
+        return output.with_suffix(f"{output.suffix}.checkpoint.json")
+    return output.with_name(f"{output.name}.checkpoint.json")
+
+
+# to_jsonable converts state values into JSON-compatible values.
+def to_jsonable(value: object) -> object:
+    if isinstance(value, BaseModel):
+        return value.model_dump()
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, dict):
+        return {str(key): to_jsonable(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [to_jsonable(item) for item in value]
+    return value
+
+
+# save_checkpoint_node writes the current graph state to a JSON file.
+def save_checkpoint_node(state: ReviewerState) -> ReviewerState:
+    path = checkpoint_path(state)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(to_jsonable(state), indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+    return {"checkpoint": path}
 
 
 # main validates command-line arguments and required environment variables.
