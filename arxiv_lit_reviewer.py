@@ -345,10 +345,10 @@ def render_markdown_fallback(state: ReviewerState) -> str:
     search_queries = state.get("search_queries", [])
     found_papers = state.get("found_papers", [])
     chosen_papers = state.get("chosen_papers", {})
-
+    
     metadata_by_id = {paper.arxiv_id: paper for paper in found_papers}
     analyses = list(chosen_papers.values())
-
+    
     lines = [
         f"# Literature Review: {user_query}",
         "",
@@ -397,7 +397,7 @@ def render_markdown_fallback(state: ReviewerState) -> str:
                 "",
             ]
         )
-
+    
     lines.extend(
         [
             "## Comparison Table",
@@ -406,7 +406,7 @@ def render_markdown_fallback(state: ReviewerState) -> str:
             "| --- | --- | --- | --- |",
         ]
     )
-
+    
     # Render one comparison-table row for each selected paper.
     for analysis in analyses:
         title = analysis.title.replace("|", "\\|").replace("\n", " ")
@@ -494,7 +494,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
         markdown = render_markdown_fallback(state)
     else:
         markdown = markdown.rstrip() + "\n"
-
+    
     output.write_text(markdown, encoding="utf-8")
     return {"markdown": markdown}
 
