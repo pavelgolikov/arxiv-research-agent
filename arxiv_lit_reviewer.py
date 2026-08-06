@@ -12,8 +12,7 @@ from typing import Callable, TypeVar, TypedDict
 import fitz
 import httpx
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
@@ -92,38 +91,35 @@ class ReviewerState(TypedDict, total=False):
     markdown: str
 
 
-# gemini_client creates a Gemini client from the configured API key.
-def gemini_client() -> genai.Client:
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+# gemini_llm creates a LangChain Gemini chat model from the configured API key.
+def gemini_llm() -> ChatGoogleGenerativeAI:
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is not set.")
-    return genai.Client(api_key=api_key)
+    return ChatGoogleGenerativeAI(model=GEMINI_MODEL, api_key=api_key)
 
 
 # generate_text sends a plain text prompt to Gemini and returns text.
 def generate_text(prompt: str) -> str:
-    client = gemini_client()
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-    )
-    return response.text or ""
+    response = gemini_llm().invoke(prompt)
+    if isinstance(response.content, str):
+        return response.content
+
+    text_parts = []
+    # Extract text from LangChain content blocks when the model returns a list.
+    for content_item in response.content:
+        if isinstance(content_item, str):
+            text_parts.append(content_item)
+        elif isinstance(content_item, dict) and content_item.get("type") == "text":
+            text_parts.append(str(content_item.get("text", "")))
+
+    return "\n".join(text_parts)
 
 
 # generate_structured sends a prompt to Gemini and validates a Pydantic result.
 def generate_structured(prompt: str, result_type: type[T]) -> T:
-    client = gemini_client()
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            responseMimeType="application/json",
-            responseSchema=result_type,
-        ),
-    )
-    if response.parsed is not None:
-        return result_type.model_validate(response.parsed)
-    return result_type.model_validate_json(response.text or "")
+    response = gemini_llm().with_structured_output(result_type).invoke(prompt)
+    return result_type.model_validate(response)
 
 
 # make_search_plan converts the user query into arXiv search queries.
