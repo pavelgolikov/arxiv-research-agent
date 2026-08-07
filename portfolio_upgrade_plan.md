@@ -2,7 +2,9 @@
 
 ## Summary
 
-Save this plan as `docs/portfolio_upgrade_plan.md` before implementation begins. The finished project will be a production-grade, installable CLI demonstrating credible LangChain and LangGraph engineering—not a web application.
+This is a plan to upgrade the arXiv Research Agent to a production-grade, installable CLI demonstrating credible
+LangChain and LangGraph engineering. The finished project will be a production-grade, installable CLI demonstrating
+credible LangChain and LangGraph engineering—not a web application.
 
 Success means:
 
