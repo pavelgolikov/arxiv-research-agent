@@ -9,7 +9,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from arxiv_reviewer import *  # noqa: F403
+from arxiv_reviewer import *
 
 
 def main() -> int:
@@ -40,7 +40,7 @@ def main() -> int:
     if not (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")):
         parser.error("GEMINI_API_KEY or GOOGLE_API_KEY is not set.")
 
-    run_reviewer(  # noqa: F405
+    run_reviewer(
         user_query=args.user_query,
         max_results=args.max_results,
         target_papers=args.target_papers,
