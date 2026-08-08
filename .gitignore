@@ -1,4 +1,6 @@
 .env
+.venv/
+.arxiv-reviewer/
 __pycache__/
 *.py[cod]
 .pytest_cache/

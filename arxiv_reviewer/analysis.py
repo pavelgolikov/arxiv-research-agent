@@ -30,7 +30,7 @@ def relevance_eval_node(state: ReviewerState) -> ReviewerState:
         f"Authors: {', '.join(paper.authors)}\n"
         f"Published: {paper.published}\n"
         f"Abstract: {paper.abstract}\n\n"
-        f"Paper text preview:\n{parsed_paper.text[:RELEVANCE_TEXT_CHARS]}"
+        f"Paper text preview:\n{parsed_paper.full_text[:RELEVANCE_TEXT_CHARS]}"
     )
     decision = generate_structured(prompt, RelevanceDecision)
     decision = decision.model_copy(
@@ -79,7 +79,7 @@ def extract_core_node(state: ReviewerState) -> ReviewerState:
         f"Authors: {', '.join(paper.authors)}\n"
         f"Published: {paper.published}\n"
         f"Abstract: {paper.abstract}\n\n"
-        f"Full paper text:\n{parsed_paper.text}"
+        f"Full paper text:\n{parsed_paper.full_text}"
     )
     analysis = generate_structured(prompt, PaperAnalysis)
     analysis = analysis.model_copy(

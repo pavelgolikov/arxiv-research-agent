@@ -106,16 +106,25 @@ def render_markdown_fallback(state: ReviewerState) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def write_atomically(output: Path, markdown: str) -> None:
+    """Write the report through a temporary file and replace the target."""
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(f"{output.name}.tmp")
+    temporary.write_text(markdown, encoding="utf-8")
+    temporary.replace(output)
+
+
 def write_markdown_node(state: ReviewerState) -> ReviewerState:
     """Ask Gemini to write the final Markdown review."""
 
-    output = state.get("output", Path("review.md"))
+    output = Path(state.get("output", "review.md"))
     chosen_papers = state.get("chosen_papers", {})
 
     if not chosen_papers:
         markdown = render_markdown_fallback(state)
-        output.write_text(markdown, encoding="utf-8")
-        return {"markdown": markdown}
+        write_atomically(output, markdown)
+        return {"markdown": markdown, "status": "empty"}
 
     papers_for_prompt = []
     metadata_by_id = {paper.arxiv_id: paper for paper in state.get("found_papers", [])}
@@ -155,8 +164,10 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
 
     if not markdown:
         markdown = render_markdown_fallback(state)
+        status = "partial"
     else:
         markdown = markdown.rstrip() + "\n"
+        status = "complete"
 
-    output.write_text(markdown, encoding="utf-8")
-    return {"markdown": markdown}
+    write_atomically(output, markdown)
+    return {"markdown": markdown, "status": status}

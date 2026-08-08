@@ -3,11 +3,17 @@
 import time
 
 import arxiv
-import fitz
 import httpx
+import pymupdf
 
 from .gemini_client import generate_structured
-from .review_types import PaperMetadata, ParsedPaper, ReviewerState, SearchPlan
+from .review_types import (
+    PaperMetadata,
+    ParsedPage,
+    ParsedPaper,
+    ReviewerState,
+    SearchPlan,
+)
 
 
 def make_search_plan(user_query: str) -> SearchPlan:
@@ -107,7 +113,7 @@ def route_after_search(state: ReviewerState) -> str:
 
 
 def download_parse_node(state: ReviewerState) -> ReviewerState:
-    """Download the current paper PDF and extract its text."""
+    """Download the current paper PDF and extract its text one page at a time."""
 
     found_papers = state["found_papers"]
     current_paper_index = state.get("current_paper_index", 0)
@@ -120,13 +126,16 @@ def download_parse_node(state: ReviewerState) -> ReviewerState:
     response = httpx.get(paper.pdf_url, follow_redirects=True, timeout=60)
     response.raise_for_status()
 
-    with fitz.open(stream=response.content, filetype="pdf") as document:
-        text = "\n".join(page.get_text() for page in document)
+    with pymupdf.open(stream=response.content, filetype="pdf") as document:
+        pages = [
+            ParsedPage(page_number=number, text=page.get_text())
+            for number, page in enumerate(document, start=1)
+        ]
         page_count = document.page_count
 
     parsed_papers[paper.arxiv_id] = ParsedPaper(
         arxiv_id=paper.arxiv_id,
-        text=text,
+        pages=pages,
         page_count=page_count,
     )
     return {"parsed_papers": parsed_papers}

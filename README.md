@@ -1,27 +1,57 @@
-# arXiv Literature Reviewer
+# arXiv Research Agent
 
-A LangGraph workflow that searches arXiv, evaluates papers against a research
-question, extracts structured notes, and writes a Markdown literature review
-with Gemini through LangChain.
+A LangGraph workflow that searches arXiv, indexes paper text into a vector store,
+evaluates papers against a research question, extracts structured notes, and writes
+a Markdown literature review with Gemini through LangChain.
 
 ## Repository layout
 
-- `arxiv_lit_reviewer.py` — backward-compatible command-line launcher.
+- `arxiv_lit_reviewer.py` — command-line entry point (`run`, `resume`, `status`).
 - `arxiv_reviewer/` — application package, split by responsibility.
+- `arxiv_reviewer/rag.py` — chunking, embedding, and retrieval over parsed papers.
 - `results/reviews/` — historical generated literature reviews.
-- `results/checkpoints/` — saved workflow state from historical runs.
 - `results/parsed/` — extracted paper text retained from development.
-- `portfolio_upgrade_plan.md` — roadmap for the production-grade portfolio version.
+- `PORTFOLIO_PLAN.md` — roadmap for the current upgrade.
+
+Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` holds
+LangGraph checkpoints and `chroma/` holds the persistent vector index.
+
+## Setup
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Set `GOOGLE_API_KEY` (or `GEMINI_API_KEY`) in a `.env` file at the repository root.
 
 ## Run
 
-Install the dependencies, configure `GEMINI_API_KEY` or `GOOGLE_API_KEY`, and run:
-
 ```bash
-pip install -r requirements.txt
-python arxiv_lit_reviewer.py \
-  --user-query "What is the latest and greatest in model self-improvement?"
+.venv/bin/python arxiv_lit_reviewer.py run \
+  --query "What is the latest and greatest in model self-improvement?"
 ```
 
-The existing CLI options and defaults are unchanged by the source-code
-reorganization.
+The command prints a thread ID before it starts work. Use it to inspect or continue
+the run:
+
+```bash
+.venv/bin/python arxiv_lit_reviewer.py status --thread-id THREAD_ID
+.venv/bin/python arxiv_lit_reviewer.py resume --thread-id THREAD_ID
+```
+
+`status` reads the checkpoint database only, so it needs no API key and makes no
+network calls. `resume` restarts at the last incomplete step, so papers that were
+already downloaded, indexed, or analyzed are not processed again.
+
+### Options
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `--query` | required | Research question to review. |
+| `--thread-id` | generated UUID | Name of the run. |
+| `--max-results` | 10 | Candidate papers to retrieve from arXiv. |
+| `--target-papers` | 4 | Relevant papers to include in the review. |
+| `--retriever` | `dense` | Retrieval strategy over indexed chunks. |
+| `--data-dir` | `.arxiv-reviewer` | Checkpoint and vector-store location. |
+| `--output` | `review.md` | Report path. |

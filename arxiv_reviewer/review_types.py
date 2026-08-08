@@ -1,6 +1,5 @@
 """Typed state and structured model outputs for the literature reviewer."""
 
-from pathlib import Path
 from typing import TypedDict
 
 from pydantic import BaseModel, Field
@@ -20,10 +19,21 @@ class PaperMetadata(BaseModel):
     entry_url: str
 
 
+class ParsedPage(BaseModel):
+    page_number: int = Field(ge=1)
+    text: str
+
+
 class ParsedPaper(BaseModel):
     arxiv_id: str
-    text: str
+    pages: list[ParsedPage]
     page_count: int = Field(ge=1)
+
+    @property
+    def full_text(self) -> str:
+        """Join every parsed page into a single string."""
+
+        return "\n".join(page.text for page in self.pages)
 
 
 class RelevanceDecision(BaseModel):
@@ -57,12 +67,16 @@ class ReviewerState(TypedDict, total=False):
     user_query: str
     max_results: int
     target_papers: int
-    output: Path
-    checkpoint: Path
+    output: str
+    thread_id: str
+    data_dir: str
+    retriever_kind: str
     search_queries: list[str]
     found_papers: list[PaperMetadata]
     current_paper_index: int
     parsed_papers: dict[str, ParsedPaper]
+    chunk_counts: dict[str, int]
     relevance_decisions: dict[str, RelevanceDecision]
     chosen_papers: dict[str, PaperAnalysis]
     markdown: str
+    status: str
