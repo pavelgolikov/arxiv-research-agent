@@ -20,22 +20,26 @@ from .rag import DEFAULT_DATA_DIR, DEFAULT_FETCH_K, DEFAULT_TOP_K, ingest_node
 from .reporting import write_markdown_node
 from .retrieval import download_parse_node, route_after_search, search_node
 from .review_types import (
-    PaperAnalysis,
+    EvidenceRef,
+    GroundedAnalysis,
     PaperMetadata,
     ParsedPage,
     ParsedPaper,
     RelevanceDecision,
     ReviewerState,
+    SupportedClaim,
 )
 
 RECURSION_LIMIT = 150
 
 CHECKPOINT_TYPES = (
-    PaperAnalysis,
+    EvidenceRef,
+    GroundedAnalysis,
     PaperMetadata,
     ParsedPage,
     ParsedPaper,
     RelevanceDecision,
+    SupportedClaim,
 )
 
 

@@ -75,3 +75,23 @@ Chroma index under `.arxiv-reviewer/chroma/`.
 `--multi-query` expands each question into paraphrases and retrieves for all of
 them. When reranking is enabled the expanded candidates are fused and rescored
 once, so the result still honours `--top-k`.
+
+## Grounding
+
+Papers are not summarized from their full text. Each selected paper is analyzed
+one facet at a time — research problem, method, experimental setup, main
+findings, limitations, and relevance to the query — and each facet is answered
+only from chunks retrieved for that facet, scoped to that paper.
+
+The model must return every statement as a claim carrying at least one citation,
+where a citation is a `chunk_id` plus an excerpt quoted from that chunk. Each
+citation is then checked without calling a model:
+
+1. the cited chunk must exist among the chunks the model was shown,
+2. it must belong to the paper being analyzed, and
+3. the quoted excerpt must actually occur in that chunk, ignoring whitespace and case.
+
+Citations failing any check are discarded, and a claim left with no surviving
+citation is discarded with it. The report records how many were dropped, so a
+paper whose analysis was partly rejected is visible rather than silently thinner.
+Surviving claims render as page-anchored links into the source PDF.

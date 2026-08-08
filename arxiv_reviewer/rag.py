@@ -133,14 +133,21 @@ def index_paper(
     return len(documents)
 
 
-def load_chunks(thread_id: str, data_dir: Path | None = None) -> list[Document]:
-    """Read every stored chunk back out of the vector store in a stable order."""
+def load_chunks(
+    thread_id: str,
+    arxiv_id: str | None = None,
+    data_dir: Path | None = None,
+) -> list[Document]:
+    """Read stored chunks back out of the vector store in a stable order."""
 
     store = Chroma(
         collection_name=collection_name(thread_id),
         persist_directory=str(chroma_dir(data_dir)),
     )
-    record = store.get(include=["documents", "metadatas"])
+    record = store.get(
+        where={"arxiv_id": arxiv_id} if arxiv_id else None,
+        include=["documents", "metadatas"],
+    )
 
     documents = [
         Document(page_content=text, metadata=dict(metadata))
@@ -168,27 +175,34 @@ class TopKRetriever(BaseRetriever):
 def dense_retriever(
     thread_id: str,
     k: int = DEFAULT_TOP_K,
+    arxiv_id: str | None = None,
     embeddings: Embeddings | None = None,
     data_dir: Path | None = None,
 ) -> BaseRetriever:
     """Build a semantic-similarity retriever over the stored chunks."""
 
     store = open_store(thread_id, embeddings=embeddings, data_dir=data_dir)
-    return store.as_retriever(search_kwargs={"k": k})
+    search_kwargs: dict[str, object] = {"k": k}
+    if arxiv_id:
+        search_kwargs["filter"] = {"arxiv_id": arxiv_id}
+
+    return store.as_retriever(search_kwargs=search_kwargs)
 
 
 def bm25_retriever(
     thread_id: str,
     k: int = DEFAULT_TOP_K,
+    arxiv_id: str | None = None,
     data_dir: Path | None = None,
 ) -> BaseRetriever:
     """Build a keyword-frequency retriever over the stored chunks."""
 
     from langchain_community.retrievers import BM25Retriever
 
-    documents = load_chunks(thread_id, data_dir=data_dir)
+    documents = load_chunks(thread_id, arxiv_id=arxiv_id, data_dir=data_dir)
     if not documents:
-        raise ValueError(f"No indexed chunks found for thread {thread_id!r}.")
+        scope = f"{thread_id!r}" if not arxiv_id else f"{thread_id!r}/{arxiv_id!r}"
+        raise ValueError(f"No indexed chunks found for {scope}.")
 
     retriever = BM25Retriever.from_documents(documents)
     retriever.k = k
@@ -199,6 +213,7 @@ def hybrid_retriever(
     thread_id: str,
     k: int = DEFAULT_TOP_K,
     fetch_k: int = DEFAULT_FETCH_K,
+    arxiv_id: str | None = None,
     embeddings: Embeddings | None = None,
     data_dir: Path | None = None,
 ) -> BaseRetriever:
@@ -209,9 +224,15 @@ def hybrid_retriever(
     ensemble = EnsembleRetriever(
         retrievers=[
             dense_retriever(
-                thread_id, k=fetch_k, embeddings=embeddings, data_dir=data_dir
+                thread_id,
+                k=fetch_k,
+                arxiv_id=arxiv_id,
+                embeddings=embeddings,
+                data_dir=data_dir,
             ),
-            bm25_retriever(thread_id, k=fetch_k, data_dir=data_dir),
+            bm25_retriever(
+                thread_id, k=fetch_k, arxiv_id=arxiv_id, data_dir=data_dir
+            ),
         ],
         weights=list(HYBRID_WEIGHTS),
     )
@@ -243,6 +264,7 @@ def rerank_retriever(
     thread_id: str,
     k: int = DEFAULT_TOP_K,
     fetch_k: int = DEFAULT_FETCH_K,
+    arxiv_id: str | None = None,
     embeddings: Embeddings | None = None,
     data_dir: Path | None = None,
 ) -> BaseRetriever:
@@ -252,6 +274,7 @@ def rerank_retriever(
         thread_id,
         k=fetch_k,
         fetch_k=fetch_k,
+        arxiv_id=arxiv_id,
         embeddings=embeddings,
         data_dir=data_dir,
     )
@@ -273,6 +296,7 @@ def get_retriever(
     kind: str = "dense",
     k: int = DEFAULT_TOP_K,
     fetch_k: int = DEFAULT_FETCH_K,
+    arxiv_id: str | None = None,
     multi_query: bool = False,
     embeddings: Embeddings | None = None,
     data_dir: Path | None = None,
@@ -289,16 +313,23 @@ def get_retriever(
     base_k = fetch_k if reranked else k
 
     if kind == "bm25":
-        retriever = bm25_retriever(thread_id, k=base_k, data_dir=data_dir)
+        retriever = bm25_retriever(
+            thread_id, k=base_k, arxiv_id=arxiv_id, data_dir=data_dir
+        )
     elif kind == "dense":
         retriever = dense_retriever(
-            thread_id, k=base_k, embeddings=embeddings, data_dir=data_dir
+            thread_id,
+            k=base_k,
+            arxiv_id=arxiv_id,
+            embeddings=embeddings,
+            data_dir=data_dir,
         )
     else:
         retriever = hybrid_retriever(
             thread_id,
             k=base_k,
             fetch_k=fetch_k,
+            arxiv_id=arxiv_id,
             embeddings=embeddings,
             data_dir=data_dir,
         )
