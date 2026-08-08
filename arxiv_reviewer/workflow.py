@@ -16,7 +16,7 @@ from .analysis import (
     route_after_extract_core,
     route_after_relevance_eval,
 )
-from .rag import DEFAULT_DATA_DIR, DEFAULT_TOP_K, ingest_node
+from .rag import DEFAULT_DATA_DIR, DEFAULT_FETCH_K, DEFAULT_TOP_K, ingest_node
 from .reporting import write_markdown_node
 from .retrieval import download_parse_node, route_after_search, search_node
 from .review_types import (
@@ -143,7 +143,10 @@ def run_reviewer(
     output: Path,
     thread_id: str,
     data_dir: Path = DEFAULT_DATA_DIR,
-    retriever_kind: str = "dense",
+    retriever_kind: str = "hybrid-rerank",
+    top_k: int = DEFAULT_TOP_K,
+    fetch_k: int = DEFAULT_FETCH_K,
+    multi_query: bool = False,
 ) -> ReviewerState:
     """Invoke the compiled graph with initial user settings."""
 
@@ -155,6 +158,9 @@ def run_reviewer(
         "thread_id": thread_id,
         "data_dir": str(data_dir),
         "retriever_kind": retriever_kind,
+        "top_k": top_k,
+        "fetch_k": fetch_k,
+        "multi_query": multi_query,
         "current_paper_index": 0,
         "parsed_papers": {},
         "chunk_counts": {},

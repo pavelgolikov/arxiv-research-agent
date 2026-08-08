@@ -71,6 +71,9 @@ class ReviewerState(TypedDict, total=False):
     thread_id: str
     data_dir: str
     retriever_kind: str
+    top_k: int
+    fetch_k: int
+    multi_query: bool
     search_queries: list[str]
     found_papers: list[PaperMetadata]
     current_paper_index: int

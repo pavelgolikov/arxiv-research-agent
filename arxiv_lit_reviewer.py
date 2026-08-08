@@ -13,6 +13,7 @@ EXIT_FAILED = 1
 EXIT_INVALID = 2
 
 DEFAULT_DATA_DIR = Path(".arxiv-reviewer")
+RETRIEVER_CHOICES = ["dense", "bm25", "hybrid", "hybrid-rerank"]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,7 +29,10 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--thread-id")
     run.add_argument("--max-results", type=int, default=10)
     run.add_argument("--target-papers", type=int, default=4)
-    run.add_argument("--retriever", default="dense", choices=["dense"])
+    run.add_argument("--retriever", default="hybrid-rerank", choices=RETRIEVER_CHOICES)
+    run.add_argument("--top-k", type=int, default=5)
+    run.add_argument("--fetch-k", type=int, default=20)
+    run.add_argument("--multi-query", action="store_true")
     run.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     run.add_argument("--output", type=Path, default=Path("review.md"))
 
@@ -80,6 +84,9 @@ def command_run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
         thread_id=thread_id,
         data_dir=args.data_dir,
         retriever_kind=args.retriever,
+        top_k=args.top_k,
+        fetch_k=args.fetch_k,
+        multi_query=args.multi_query,
     )
 
     print(f"resume with: --thread-id {thread_id}")

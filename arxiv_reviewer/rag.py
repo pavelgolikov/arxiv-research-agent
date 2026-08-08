@@ -2,9 +2,11 @@
 
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 
 from langchain_chroma import Chroma
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.retrievers import BaseRetriever
@@ -15,11 +17,14 @@ from .review_types import ParsedPage, ReviewerState
 
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
+RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 150
 DEFAULT_DATA_DIR = Path(".arxiv-reviewer")
 DEFAULT_TOP_K = 5
-RETRIEVER_KINDS = ("dense",)
+DEFAULT_FETCH_K = 20
+HYBRID_WEIGHTS = (0.5, 0.5)
+RETRIEVER_KINDS = ("dense", "bm25", "hybrid", "hybrid-rerank")
 
 _UNSAFE_COLLECTION_CHARS = re.compile(r"[^A-Za-z0-9_-]")
 
@@ -77,6 +82,7 @@ def chunk_pages(arxiv_id: str, pages: list[ParsedPage]) -> list[Document]:
     return documents
 
 
+@lru_cache(maxsize=1)
 def get_embeddings() -> Embeddings:
     """Create the configured Gemini embedding model."""
 
@@ -127,6 +133,38 @@ def index_paper(
     return len(documents)
 
 
+def load_chunks(thread_id: str, data_dir: Path | None = None) -> list[Document]:
+    """Read every stored chunk back out of the vector store in a stable order."""
+
+    store = Chroma(
+        collection_name=collection_name(thread_id),
+        persist_directory=str(chroma_dir(data_dir)),
+    )
+    record = store.get(include=["documents", "metadatas"])
+
+    documents = [
+        Document(page_content=text, metadata=dict(metadata))
+        for text, metadata in zip(record["documents"], record["metadatas"])
+    ]
+    documents.sort(key=lambda document: document.metadata["chunk_id"])
+    return documents
+
+
+class TopKRetriever(BaseRetriever):
+    """Return only the highest-ranked documents from a wrapped retriever."""
+
+    retriever: BaseRetriever
+    k: int = DEFAULT_TOP_K
+
+    def _get_relevant_documents(
+        self,
+        query: str,
+        *,
+        run_manager: CallbackManagerForRetrieverRun,
+    ) -> list[Document]:
+        return self.retriever.invoke(query)[: self.k]
+
+
 def dense_retriever(
     thread_id: str,
     k: int = DEFAULT_TOP_K,
@@ -139,22 +177,138 @@ def dense_retriever(
     return store.as_retriever(search_kwargs={"k": k})
 
 
+def bm25_retriever(
+    thread_id: str,
+    k: int = DEFAULT_TOP_K,
+    data_dir: Path | None = None,
+) -> BaseRetriever:
+    """Build a keyword-frequency retriever over the stored chunks."""
+
+    from langchain_community.retrievers import BM25Retriever
+
+    documents = load_chunks(thread_id, data_dir=data_dir)
+    if not documents:
+        raise ValueError(f"No indexed chunks found for thread {thread_id!r}.")
+
+    retriever = BM25Retriever.from_documents(documents)
+    retriever.k = k
+    return retriever
+
+
+def hybrid_retriever(
+    thread_id: str,
+    k: int = DEFAULT_TOP_K,
+    fetch_k: int = DEFAULT_FETCH_K,
+    embeddings: Embeddings | None = None,
+    data_dir: Path | None = None,
+) -> BaseRetriever:
+    """Fuse semantic and keyword rankings with reciprocal rank fusion."""
+
+    from langchain_classic.retrievers import EnsembleRetriever
+
+    ensemble = EnsembleRetriever(
+        retrievers=[
+            dense_retriever(
+                thread_id, k=fetch_k, embeddings=embeddings, data_dir=data_dir
+            ),
+            bm25_retriever(thread_id, k=fetch_k, data_dir=data_dir),
+        ],
+        weights=list(HYBRID_WEIGHTS),
+    )
+    return TopKRetriever(retriever=ensemble, k=k)
+
+
+@lru_cache(maxsize=1)
+def get_cross_encoder(model_name: str = RERANK_MODEL):
+    """Load and cache the cross-encoder used for reranking."""
+
+    from langchain_community.cross_encoders import HuggingFaceCrossEncoder
+
+    return HuggingFaceCrossEncoder(model_name=model_name)
+
+
+def apply_reranker(retriever: BaseRetriever, k: int = DEFAULT_TOP_K) -> BaseRetriever:
+    """Rescore a retriever's candidates with a cross-encoder and keep the best."""
+
+    from langchain_classic.retrievers import ContextualCompressionRetriever
+    from langchain_classic.retrievers.document_compressors import CrossEncoderReranker
+
+    return ContextualCompressionRetriever(
+        base_compressor=CrossEncoderReranker(model=get_cross_encoder(), top_n=k),
+        base_retriever=retriever,
+    )
+
+
+def rerank_retriever(
+    thread_id: str,
+    k: int = DEFAULT_TOP_K,
+    fetch_k: int = DEFAULT_FETCH_K,
+    embeddings: Embeddings | None = None,
+    data_dir: Path | None = None,
+) -> BaseRetriever:
+    """Rescore fused candidates with a cross-encoder and keep the best."""
+
+    base = hybrid_retriever(
+        thread_id,
+        k=fetch_k,
+        fetch_k=fetch_k,
+        embeddings=embeddings,
+        data_dir=data_dir,
+    )
+    return apply_reranker(base, k=k)
+
+
+def with_multi_query(retriever: BaseRetriever) -> BaseRetriever:
+    """Expand each question into paraphrases before retrieving."""
+
+    from langchain_classic.retrievers import MultiQueryRetriever
+
+    from .gemini_client import gemini_llm
+
+    return MultiQueryRetriever.from_llm(retriever=retriever, llm=gemini_llm())
+
+
 def get_retriever(
     thread_id: str,
     kind: str = "dense",
     k: int = DEFAULT_TOP_K,
+    fetch_k: int = DEFAULT_FETCH_K,
+    multi_query: bool = False,
     embeddings: Embeddings | None = None,
     data_dir: Path | None = None,
 ) -> BaseRetriever:
     """Build the requested retriever over the stored chunks."""
 
-    if kind == "dense":
-        return dense_retriever(
-            thread_id, k=k, embeddings=embeddings, data_dir=data_dir
+    if kind not in RETRIEVER_KINDS:
+        supported = ", ".join(RETRIEVER_KINDS)
+        raise ValueError(
+            f"Unsupported retriever kind {kind!r}. Supported: {supported}."
         )
 
-    supported = ", ".join(RETRIEVER_KINDS)
-    raise ValueError(f"Unsupported retriever kind {kind!r}. Supported: {supported}.")
+    reranked = kind == "hybrid-rerank"
+    base_k = fetch_k if reranked else k
+
+    if kind == "bm25":
+        retriever = bm25_retriever(thread_id, k=base_k, data_dir=data_dir)
+    elif kind == "dense":
+        retriever = dense_retriever(
+            thread_id, k=base_k, embeddings=embeddings, data_dir=data_dir
+        )
+    else:
+        retriever = hybrid_retriever(
+            thread_id,
+            k=base_k,
+            fetch_k=fetch_k,
+            embeddings=embeddings,
+            data_dir=data_dir,
+        )
+
+    if multi_query:
+        retriever = with_multi_query(retriever)
+    if reranked:
+        retriever = apply_reranker(retriever, k=k)
+
+    return retriever
 
 
 def ingest_node(state: ReviewerState) -> ReviewerState:

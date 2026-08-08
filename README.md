@@ -52,6 +52,26 @@ already downloaded, indexed, or analyzed are not processed again.
 | `--thread-id` | generated UUID | Name of the run. |
 | `--max-results` | 10 | Candidate papers to retrieve from arXiv. |
 | `--target-papers` | 4 | Relevant papers to include in the review. |
-| `--retriever` | `dense` | Retrieval strategy over indexed chunks. |
+| `--retriever` | `hybrid-rerank` | Retrieval strategy over indexed chunks. |
+| `--top-k` | 5 | Chunks returned per question. |
+| `--fetch-k` | 20 | Candidates fused before reranking. |
+| `--multi-query` | off | Expand each question into paraphrases first. |
 | `--data-dir` | `.arxiv-reviewer` | Checkpoint and vector-store location. |
 | `--output` | `review.md` | Report path. |
+
+## Retrieval
+
+Paper text is split into overlapping ~1000-character chunks that keep their page
+numbers, embedded with `models/gemini-embedding-001`, and stored in a persistent
+Chroma index under `.arxiv-reviewer/chroma/`.
+
+| `--retriever` | Strategy |
+| --- | --- |
+| `dense` | Embedding similarity only. |
+| `bm25` | Keyword frequency only. |
+| `hybrid` | Both, fused with reciprocal rank fusion. |
+| `hybrid-rerank` | Hybrid candidates rescored by a `ms-marco-MiniLM-L-6-v2` cross-encoder. |
+
+`--multi-query` expands each question into paraphrases and retrieves for all of
+them. When reranking is enabled the expanded candidates are fused and rescored
+once, so the result still honours `--top-k`.
