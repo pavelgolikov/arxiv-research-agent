@@ -33,12 +33,14 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--top-k", type=int, default=5)
     run.add_argument("--fetch-k", type=int, default=20)
     run.add_argument("--multi-query", action="store_true")
+    run.add_argument("--max-concurrency", type=int, default=3)
     run.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     run.add_argument("--output", type=Path, default=Path("review.md"))
 
     resume = commands.add_parser("resume", help="Continue an interrupted run.")
     resume.add_argument("--thread-id", required=True)
     resume.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
+    resume.add_argument("--max-concurrency", type=int, default=3)
 
     status = commands.add_parser("status", help="Report a run's recorded state.")
     status.add_argument("--thread-id", required=True)
@@ -87,6 +89,7 @@ def command_run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
         top_k=args.top_k,
         fetch_k=args.fetch_k,
         multi_query=args.multi_query,
+        max_concurrency=args.max_concurrency,
     )
 
     print(f"resume with: --thread-id {thread_id}")
@@ -101,7 +104,11 @@ def command_resume(args: argparse.Namespace, parser: argparse.ArgumentParser) ->
     require_api_key(parser)
 
     try:
-        resume_reviewer(args.thread_id, data_dir=args.data_dir)
+        resume_reviewer(
+            args.thread_id,
+            data_dir=args.data_dir,
+            max_concurrency=args.max_concurrency,
+        )
     except KeyError:
         print(f"Unknown thread: {args.thread_id}")
         return EXIT_INVALID

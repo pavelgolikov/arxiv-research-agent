@@ -1,21 +1,29 @@
-"""Paper relevance and grounded per-facet analysis graph nodes."""
+"""Candidate screening and grounded per-facet analysis branches."""
+
+from pathlib import Path
 
 from langchain_core.documents import Document
 
+from .failures import describe, with_retries
 from .gemini_client import generate_structured
-from .rag import DEFAULT_FETCH_K, DEFAULT_TOP_K, data_dir_path, get_retriever
+from .rag import DEFAULT_FETCH_K, DEFAULT_TOP_K, chunk_pages, get_retriever, index_paper
+from .retrieval import fetch_parsed_paper
 from .review_types import (
+    AnalysisOutcome,
+    AnalyzeTask,
     DraftClaim,
     EvidenceRef,
     FacetDraft,
     GroundedAnalysis,
     RelevanceDecision,
     ReviewerState,
+    ScreenOutcome,
+    ScreenTask,
     SupportedClaim,
 )
 
-RELEVANCE_TEXT_CHARS = 12000
 EVIDENCE_EXCERPT_CHARS = 300
+RELEVANCE_THRESHOLD = 4
 
 FACET_QUESTIONS = (
     ("research_problem", "What research problem does this paper address, and why?"),
@@ -26,16 +34,13 @@ FACET_QUESTIONS = (
 )
 
 
-def relevance_eval_node(state: ReviewerState) -> ReviewerState:
-    """Score the current paper against the user query."""
+def screen_candidate(task: ScreenTask) -> ScreenOutcome:
+    """Score one candidate against the user query using metadata only."""
 
-    current_paper_index = state.get("current_paper_index", 0)
-    paper = state["found_papers"][current_paper_index]
-    parsed_paper = state["parsed_papers"][paper.arxiv_id]
-    relevance_decisions = dict(state.get("relevance_decisions", {}))
-
+    paper = task["paper"]
     prompt = (
         "Decide whether this arXiv paper is relevant to the user's research query.\n"
+        "Judge only from the title, authors, date, and abstract below.\n"
         "Use this score rubric:\n"
         "1 = unrelated.\n"
         "2 = weakly related.\n"
@@ -43,39 +48,52 @@ def relevance_eval_node(state: ReviewerState) -> ReviewerState:
         "4 = clearly relevant.\n"
         "5 = highly relevant and should be included unless the paper is low quality.\n"
         "Set is_relevant to true only when score is 4 or 5.\n\n"
-        f"User query: {state['user_query']}\n\n"
+        f"User query: {task['user_query']}\n\n"
         f"arXiv ID: {paper.arxiv_id}\n"
         f"Title: {paper.title}\n"
         f"Authors: {', '.join(paper.authors)}\n"
         f"Published: {paper.published}\n"
-        f"Abstract: {paper.abstract}\n\n"
-        f"Paper text preview:\n{parsed_paper.full_text[:RELEVANCE_TEXT_CHARS]}"
+        f"Abstract: {paper.abstract}"
     )
     decision = generate_structured(prompt, RelevanceDecision)
-    decision = decision.model_copydroppe(
-        update={"arxiv_id": paper.arxiv_id, "is_relevant": decision.score >= 4}
+
+    return ScreenOutcome(
+        arxiv_id=paper.arxiv_id,
+        search_position=task["search_position"],
+        score=decision.score,
+        reason=decision.reason,
+        status="ok",
     )
-    relevance_decisions[paper.arxiv_id] = decision
-
-    return {"relevance_decisions": relevance_decisions}
 
 
-def route_after_relevance_eval(state: ReviewerState) -> str:
-    """Choose extraction or paper advancement after relevance evaluation."""
+def screen_candidate_node(task: ScreenTask) -> ReviewerState:
+    """Screen one candidate, recording failure instead of aborting the run."""
 
-    current_paper_index = state.get("current_paper_index", 0)
-    paper = state["found_papers"][current_paper_index]
-    decision = state["relevance_decisions"][paper.arxiv_id]
+    try:
+        evaluation = with_retries(lambda: screen_candidate(task))
+    except Exception as error:
+        evaluation = ScreenOutcome(
+            arxiv_id=task["paper"].arxiv_id,
+            search_position=task["search_position"],
+            status="failed",
+            error=describe(error),
+        )
 
-    if decision.is_relevant:
-        return "extract_core"
-    return "advance_paper"
+    return {"candidate_evaluations": [evaluation]}
 
 
-def advance_paper_node(state: ReviewerState) -> ReviewerState:
-    """Move the graph state to the next candidate paper."""
+def select_papers_node(state: ReviewerState) -> ReviewerState:
+    """Rank screened candidates deterministically and select the best."""
 
-    return {"current_paper_index": state.get("current_paper_index", 0) + 1}
+    evaluations = [
+        evaluation
+        for evaluation in state.get("candidate_evaluations", [])
+        if evaluation.status == "ok" and evaluation.score >= RELEVANCE_THRESHOLD
+    ]
+    evaluations.sort(key=lambda item: (-item.score, item.search_position))
+    target = state.get("target_papers", 4)
+
+    return {"selected_ids": [item.arxiv_id for item in evaluations[:target]]}
 
 
 def normalize(text: str) -> str:
@@ -135,20 +153,20 @@ def validate_claim(
 
 
 def analyze_facet(
-    state: ReviewerState,
-    arxiv_id: str,
+    task: AnalyzeTask,
     question: str,
 ) -> tuple[list[SupportedClaim], int, int]:
     """Retrieve evidence for one facet and keep only validated claims."""
 
+    arxiv_id = task["paper"].arxiv_id
     retriever = get_retriever(
-        state["thread_id"],
-        kind=state.get("retriever_kind", "hybrid-rerank"),
-        k=state.get("top_k", DEFAULT_TOP_K),
-        fetch_k=state.get("fetch_k", DEFAULT_FETCH_K),
+        task["thread_id"],
+        kind=task.get("retriever_kind", "hybrid-rerank"),
+        k=task.get("top_k", DEFAULT_TOP_K),
+        fetch_k=task.get("fetch_k", DEFAULT_FETCH_K),
         arxiv_id=arxiv_id,
-        multi_query=state.get("multi_query", False),
-        data_dir=data_dir_path(state),
+        multi_query=task.get("multi_query", False),
+        data_dir=Path(task["data_dir"]),
     )
     documents = retriever.invoke(question)
     if not documents:
@@ -187,57 +205,54 @@ def analyze_facet(
     return claims, dropped_claims, dropped_evidence
 
 
-def extract_core_node(state: ReviewerState) -> ReviewerState:
-    """Build a grounded, citation-checked analysis of the current paper."""
+def analyze_paper(task: AnalyzeTask) -> AnalysisOutcome:
+    """Download, index, and build a citation-checked analysis of one paper."""
 
-    current_paper_index = state.get("current_paper_index", 0)
-    paper = state["found_papers"][current_paper_index]
-    chosen_papers = dict(state.get("chosen_papers", {}))
-
-    if paper.arxiv_id in chosen_papers:
-        return {"chosen_papers": chosen_papers}
+    paper = task["paper"]
+    parsed_paper = fetch_parsed_paper(paper)
+    documents = chunk_pages(paper.arxiv_id, parsed_paper.pages)
+    chunk_count = index_paper(
+        task["thread_id"], documents, data_dir=Path(task["data_dir"])
+    )
 
     claims: dict[str, list[SupportedClaim]] = {}
     dropped_claims = 0
     dropped_evidence = 0
 
-    questions = list(FACET_QUESTIONS) + [("relevance_to_query", state["user_query"])]
+    questions = list(FACET_QUESTIONS) + [("relevance_to_query", task["user_query"])]
     for facet, question in questions:
-        facet_claims, facet_dropped, evidence_dropped = analyze_facet(
-            state, paper.arxiv_id, question
-        )
+        facet_claims, facet_dropped, evidence_dropped = analyze_facet(task, question)
         dropped_claims += facet_dropped
         dropped_evidence += evidence_dropped
         if facet_claims:
             claims[facet] = facet_claims
 
-    chosen_papers[paper.arxiv_id] = GroundedAnalysis(
+    return AnalysisOutcome(
         arxiv_id=paper.arxiv_id,
-        title=paper.title,
-        claims=claims,
-        dropped_claims=dropped_claims,
-        dropped_evidence=dropped_evidence,
+        search_position=task["search_position"],
+        status="ok",
+        chunk_count=chunk_count,
+        analysis=GroundedAnalysis(
+            arxiv_id=paper.arxiv_id,
+            title=paper.title,
+            claims=claims,
+            dropped_claims=dropped_claims,
+            dropped_evidence=dropped_evidence,
+        ),
     )
 
-    return {"chosen_papers": chosen_papers}
 
+def analyze_paper_node(task: AnalyzeTask) -> ReviewerState:
+    """Analyze one paper, recording failure instead of aborting the run."""
 
-def route_after_extract_core(state: ReviewerState) -> str:
-    """Choose whether to continue or write the review."""
+    try:
+        outcome = with_retries(lambda: analyze_paper(task))
+    except Exception as error:
+        outcome = AnalysisOutcome(
+            arxiv_id=task["paper"].arxiv_id,
+            search_position=task["search_position"],
+            status="failed",
+            error=describe(error),
+        )
 
-    chosen_papers = state.get("chosen_papers", {})
-    target_papers = state.get("target_papers", 4)
-
-    if len(chosen_papers) >= target_papers:
-        return "write_markdown"
-    return "advance_paper"
-
-
-def route_after_advance_paper(state: ReviewerState) -> str:
-    """Choose the next node after advancing papers."""
-
-    current_paper_index = state.get("current_paper_index", 0)
-
-    if current_paper_index < len(state.get("found_papers", [])):
-        return "download_parse"
-    return "write_markdown"
+    return {"analysis_outcomes": [outcome]}

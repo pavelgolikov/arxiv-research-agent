@@ -7,90 +7,130 @@ from typing import Any
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
+from langgraph.types import RetryPolicy, Send
 
 from .analysis import (
-    advance_paper_node,
-    extract_core_node,
-    relevance_eval_node,
-    route_after_advance_paper,
-    route_after_extract_core,
-    route_after_relevance_eval,
+    analyze_paper_node,
+    screen_candidate_node,
+    select_papers_node,
 )
-from .rag import DEFAULT_DATA_DIR, DEFAULT_FETCH_K, DEFAULT_TOP_K, ingest_node
+from .failures import is_retryable
+from .rag import DEFAULT_DATA_DIR, DEFAULT_FETCH_K, DEFAULT_TOP_K
 from .reporting import write_markdown_node
-from .retrieval import download_parse_node, route_after_search, search_node
+from .retrieval import search_node
 from .review_types import (
+    AnalysisOutcome,
+    AnalyzeTask,
     EvidenceRef,
     GroundedAnalysis,
     PaperMetadata,
-    ParsedPage,
-    ParsedPaper,
     RelevanceDecision,
     ReviewerState,
+    ScreenOutcome,
+    ScreenTask,
     SupportedClaim,
 )
 
 RECURSION_LIMIT = 150
+DEFAULT_MAX_CONCURRENCY = 3
+TERMINAL_STATUSES = frozenset({"complete", "partial", "empty"})
 
 CHECKPOINT_TYPES = (
+    AnalysisOutcome,
     EvidenceRef,
     GroundedAnalysis,
     PaperMetadata,
-    ParsedPage,
-    ParsedPaper,
     RelevanceDecision,
+    ScreenOutcome,
     SupportedClaim,
 )
+
+SEARCH_RETRY_POLICY = RetryPolicy(
+    max_attempts=3,
+    initial_interval=1.0,
+    backoff_factor=2.0,
+    jitter=True,
+    retry_on=is_retryable,
+)
+
+
+def fan_out_screening(state: ReviewerState) -> list[Send] | str:
+    """Send every candidate to its own screening branch."""
+
+    found_papers = state.get("found_papers", [])
+    if not found_papers:
+        return "write_markdown"
+
+    return [
+        Send(
+            "screen_candidate",
+            ScreenTask(
+                paper=paper,
+                search_position=position,
+                user_query=state["user_query"],
+            ),
+        )
+        for position, paper in enumerate(found_papers)
+    ]
+
+
+def fan_out_analysis(state: ReviewerState) -> list[Send] | str:
+    """Send every selected paper to its own analysis branch."""
+
+    selected_ids = state.get("selected_ids", [])
+    if not selected_ids:
+        return "write_markdown"
+
+    positions = {
+        paper.arxiv_id: position
+        for position, paper in enumerate(state.get("found_papers", []))
+    }
+    papers = {paper.arxiv_id: paper for paper in state.get("found_papers", [])}
+
+    return [
+        Send(
+            "analyze_paper",
+            AnalyzeTask(
+                paper=papers[arxiv_id],
+                search_position=positions[arxiv_id],
+                user_query=state["user_query"],
+                thread_id=state["thread_id"],
+                data_dir=state.get("data_dir", str(DEFAULT_DATA_DIR)),
+                retriever_kind=state.get("retriever_kind", "hybrid-rerank"),
+                top_k=state.get("top_k", DEFAULT_TOP_K),
+                fetch_k=state.get("fetch_k", DEFAULT_FETCH_K),
+                multi_query=state.get("multi_query", False),
+            ),
+        )
+        for arxiv_id in selected_ids
+    ]
 
 
 def build_graph(checkpointer: SqliteSaver | None = None):
     """Assemble and compile the LangGraph workflow."""
 
     graph = StateGraph(ReviewerState)
-    graph.add_node("search", search_node)
-    graph.add_node("download_parse", download_parse_node)
-    graph.add_node("ingest", ingest_node)
-    graph.add_node("relevance_eval", relevance_eval_node)
-    graph.add_node("advance_paper", advance_paper_node)
-    graph.add_node("extract_core", extract_core_node)
+    graph.add_node("search", search_node, retry_policy=SEARCH_RETRY_POLICY)
+    graph.add_node("screen_candidate", screen_candidate_node, input_schema=ScreenTask)
+    graph.add_node("select_papers", select_papers_node)
+    graph.add_node("analyze_paper", analyze_paper_node, input_schema=AnalyzeTask)
     graph.add_node("write_markdown", write_markdown_node)
 
     graph.add_edge(START, "search")
     graph.add_conditional_edges(
         "search",
-        route_after_search,
-        {
-            "download_parse": "download_parse",
-            "write_markdown": "write_markdown",
-        },
+        fan_out_screening,
+        ["screen_candidate", "write_markdown"],
     )
-    graph.add_edge("download_parse", "ingest")
-    graph.add_edge("ingest", "relevance_eval")
+    graph.add_edge("screen_candidate", "select_papers")
     graph.add_conditional_edges(
-        "relevance_eval",
-        route_after_relevance_eval,
-        {
-            "extract_core": "extract_core",
-            "advance_paper": "advance_paper",
-        },
+        "select_papers",
+        fan_out_analysis,
+        ["analyze_paper", "write_markdown"],
     )
-    graph.add_conditional_edges(
-        "extract_core",
-        route_after_extract_core,
-        {
-            "advance_paper": "advance_paper",
-            "write_markdown": "write_markdown",
-        },
-    )
-    graph.add_conditional_edges(
-        "advance_paper",
-        route_after_advance_paper,
-        {
-            "download_parse": "download_parse",
-            "write_markdown": "write_markdown",
-        },
-    )
+    graph.add_edge("analyze_paper", "write_markdown")
     graph.add_edge("write_markdown", END)
+
     return graph.compile(checkpointer=checkpointer)
 
 
@@ -118,12 +158,16 @@ def open_checkpointer(data_dir: Path) -> SqliteSaver:
     return checkpointer
 
 
-def thread_config(thread_id: str) -> dict[str, Any]:
+def thread_config(
+    thread_id: str,
+    max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
+) -> dict[str, Any]:
     """Build the invocation config that binds work to one run thread."""
 
     return {
         "configurable": {"thread_id": thread_id},
         "recursion_limit": RECURSION_LIMIT,
+        "max_concurrency": max_concurrency,
     }
 
 
@@ -151,6 +195,7 @@ def run_reviewer(
     top_k: int = DEFAULT_TOP_K,
     fetch_k: int = DEFAULT_FETCH_K,
     multi_query: bool = False,
+    max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
 ) -> ReviewerState:
     """Invoke the compiled graph with initial user settings."""
 
@@ -165,27 +210,30 @@ def run_reviewer(
         "top_k": top_k,
         "fetch_k": fetch_k,
         "multi_query": multi_query,
-        "current_paper_index": 0,
-        "parsed_papers": {},
-        "chunk_counts": {},
-        "relevance_decisions": {},
-        "chosen_papers": {},
+        "candidate_evaluations": [],
+        "analysis_outcomes": [],
         "status": "running",
     }
 
-    return persistent_graph(data_dir).invoke(state, config=thread_config(thread_id))
+    return persistent_graph(data_dir).invoke(
+        state, config=thread_config(thread_id, max_concurrency)
+    )
 
 
-def resume_reviewer(thread_id: str, data_dir: Path = DEFAULT_DATA_DIR) -> ReviewerState:
+def resume_reviewer(
+    thread_id: str,
+    data_dir: Path = DEFAULT_DATA_DIR,
+    max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
+) -> ReviewerState:
     """Continue an existing thread from its last recorded checkpoint."""
 
     graph = persistent_graph(data_dir)
-    config = thread_config(thread_id)
+    config = thread_config(thread_id, max_concurrency)
     snapshot = graph.get_state(config)
 
     if snapshot.created_at is None:
         raise KeyError(thread_id)
-    if not snapshot.next:
+    if snapshot.values.get("status") in TERMINAL_STATUSES:
         return snapshot.values
 
     return graph.invoke(None, config=config)
@@ -199,7 +247,9 @@ def read_status(thread_id: str, data_dir: Path = DEFAULT_DATA_DIR) -> dict[str, 
         raise KeyError(thread_id)
 
     values = snapshot.values
-    next_nodes = list(snapshot.next)
+    next_nodes = list(snapshot.next) or [task.name for task in snapshot.tasks]
+    evaluations = values.get("candidate_evaluations", [])
+    outcomes = values.get("analysis_outcomes", [])
 
     return {
         "thread_id": thread_id,
@@ -208,15 +258,12 @@ def read_status(thread_id: str, data_dir: Path = DEFAULT_DATA_DIR) -> dict[str, 
         "user_query": values.get("user_query", ""),
         "search_queries": values.get("search_queries", []),
         "candidate_papers": len(values.get("found_papers", [])),
-        "parsed_papers": len(values.get("parsed_papers", {})),
-        "indexed_chunks": sum(values.get("chunk_counts", {}).values()),
-        "selected_papers": len(values.get("chosen_papers", {})),
+        "screened_ok": sum(1 for item in evaluations if item.status == "ok"),
+        "screened_failed": sum(1 for item in evaluations if item.status != "ok"),
+        "selected_papers": len(values.get("selected_ids", [])),
+        "analyzed_ok": sum(1 for item in outcomes if item.status == "ok"),
+        "analyzed_failed": sum(1 for item in outcomes if item.status != "ok"),
+        "indexed_chunks": sum(item.chunk_count for item in outcomes),
         "output": values.get("output", ""),
         "updated_at": snapshot.created_at,
     }
-
-
-def retriever_defaults() -> tuple[str, int]:
-    """Return the default retriever kind and top-k."""
-
-    return "dense", DEFAULT_TOP_K

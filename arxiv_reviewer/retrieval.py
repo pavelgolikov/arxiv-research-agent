@@ -6,6 +6,7 @@ import arxiv
 import httpx
 import pymupdf
 
+from .failures import PaperUnusableError
 from .gemini_client import generate_structured
 from .review_types import (
     PaperMetadata,
@@ -14,6 +15,8 @@ from .review_types import (
     ReviewerState,
     SearchPlan,
 )
+
+MAX_PDF_BYTES = 50 * 1024 * 1024
 
 
 def make_search_plan(user_query: str) -> SearchPlan:
@@ -104,38 +107,52 @@ def search_node(state: ReviewerState) -> ReviewerState:
     }
 
 
-def route_after_search(state: ReviewerState) -> str:
-    """Choose parsing or final writing after arXiv search."""
-
-    if state.get("found_papers"):
-        return "download_parse"
-    return "write_markdown"
-
-
-def download_parse_node(state: ReviewerState) -> ReviewerState:
-    """Download the current paper PDF and extract its text one page at a time."""
-
-    found_papers = state["found_papers"]
-    current_paper_index = state.get("current_paper_index", 0)
-    paper = found_papers[current_paper_index]
-    parsed_papers = dict(state.get("parsed_papers", {}))
-
-    if paper.arxiv_id in parsed_papers:
-        return {"parsed_papers": parsed_papers}
+def download_paper(paper: PaperMetadata) -> bytes:
+    """Fetch one paper PDF, rejecting responses that are not usable PDFs."""
 
     response = httpx.get(paper.pdf_url, follow_redirects=True, timeout=60)
     response.raise_for_status()
+    content = response.content
 
-    with pymupdf.open(stream=response.content, filetype="pdf") as document:
-        pages = [
-            ParsedPage(page_number=number, text=page.get_text())
-            for number, page in enumerate(document, start=1)
-        ]
-        page_count = document.page_count
+    if len(content) > MAX_PDF_BYTES:
+        raise PaperUnusableError(
+            f"PDF for {paper.arxiv_id} is {len(content)} bytes, "
+            f"over the {MAX_PDF_BYTES} byte limit."
+        )
+    if not content.startswith(b"%PDF"):
+        raise PaperUnusableError(f"Response for {paper.arxiv_id} is not a PDF.")
 
-    parsed_papers[paper.arxiv_id] = ParsedPaper(
+    return content
+
+
+def parse_paper(paper: PaperMetadata, content: bytes) -> ParsedPaper:
+    """Extract text from a downloaded PDF one page at a time."""
+
+    try:
+        with pymupdf.open(stream=content, filetype="pdf") as document:
+            pages = [
+                ParsedPage(page_number=number, text=page.get_text())
+                for number, page in enumerate(document, start=1)
+            ]
+            page_count = document.page_count
+    except PaperUnusableError:
+        raise
+    except Exception as error:
+        raise PaperUnusableError(
+            f"Could not parse PDF for {paper.arxiv_id}: {error}"
+        ) from error
+
+    if not page_count or not any(page.text.strip() for page in pages):
+        raise PaperUnusableError(f"No extractable text in {paper.arxiv_id}.")
+
+    return ParsedPaper(
         arxiv_id=paper.arxiv_id,
         pages=pages,
         page_count=page_count,
     )
-    return {"parsed_papers": parsed_papers}
+
+
+def fetch_parsed_paper(paper: PaperMetadata) -> ParsedPaper:
+    """Download and parse one paper."""
+
+    return parse_paper(paper, download_paper(paper))

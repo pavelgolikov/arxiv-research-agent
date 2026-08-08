@@ -1,8 +1,9 @@
 # arXiv Research Agent
 
-A LangGraph workflow that searches arXiv, indexes paper text into a vector store,
-evaluates papers against a research question, extracts structured notes, and writes
-a Markdown literature review with Gemini through LangChain.
+A LangGraph workflow that searches arXiv, screens candidates against a research
+question, indexes the selected papers into a vector store, extracts claims that
+cite the pages they came from, and writes a Markdown literature review with Gemini
+through LangChain.
 
 ## Repository layout
 
@@ -56,6 +57,7 @@ already downloaded, indexed, or analyzed are not processed again.
 | `--top-k` | 5 | Chunks returned per question. |
 | `--fetch-k` | 20 | Candidates fused before reranking. |
 | `--multi-query` | off | Expand each question into paraphrases first. |
+| `--max-concurrency` | 3 | Branches processed in parallel. |
 | `--data-dir` | `.arxiv-reviewer` | Checkpoint and vector-store location. |
 | `--output` | `review.md` | Report path. |
 
@@ -75,6 +77,33 @@ Chroma index under `.arxiv-reviewer/chroma/`.
 `--multi-query` expands each question into paraphrases and retrieves for all of
 them. When reranking is enabled the expanded candidates are fused and rescored
 once, so the result still honours `--top-k`.
+
+## Pipeline
+
+```text
+search  ->  screen every candidate in parallel (abstract only, no PDF)
+        ->  rank by score then original search position, select target-papers
+        ->  analyze each selected paper in parallel (download, index, cite)
+        ->  synthesize the report
+```
+
+Screening reads only title, authors, date, and abstract, so PDFs are downloaded
+only for papers that survive selection. Both stages fan out with LangGraph `Send`
+and collect into reducer-backed lists, which arrive in completion order and are
+then sorted deterministically: identical reports come out at any
+`--max-concurrency`.
+
+A branch that fails does not stop its siblings. Transient failures (timeouts,
+connection errors, HTTP 408/425/429/5xx, provider `RESOURCE_EXHAUSTED` /
+`UNAVAILABLE` / `DEADLINE_EXCEEDED` / `INTERNAL`) are retried three times with
+exponential backoff and jitter. Anything else — an unparseable PDF, an
+oversized download, a schema violation — is recorded as a typed failure. The run
+finishes with whatever succeeded, the report is marked `partial`, and every
+failure is listed in a `Failures` section appended after synthesis so it cannot
+be omitted.
+
+Interrupted runs resume from the last checkpoint. Branches that already finished
+are not re-executed, so their downloads and model calls are not paid for twice.
 
 ## Grounding
 

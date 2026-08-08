@@ -1,6 +1,7 @@
 """Typed state and structured model outputs for the literature reviewer."""
 
-from typing import TypedDict
+import operator
+from typing import Annotated, TypedDict
 
 from pydantic import BaseModel, Field
 
@@ -110,6 +111,50 @@ class LiteratureReview(BaseModel):
     suggested_reading_order: list[str]
 
 
+class ScreenOutcome(BaseModel):
+    """One candidate's screening result, produced by a parallel branch."""
+
+    arxiv_id: str
+    search_position: int = Field(ge=0)
+    score: int = Field(default=0, ge=0, le=5)
+    reason: str = ""
+    status: str = "ok"
+    error: str | None = None
+
+
+class AnalysisOutcome(BaseModel):
+    """One selected paper's analysis result, produced by a parallel branch."""
+
+    arxiv_id: str
+    search_position: int = Field(ge=0)
+    status: str
+    analysis: GroundedAnalysis | None = None
+    chunk_count: int = 0
+    error: str | None = None
+
+
+class ScreenTask(TypedDict):
+    """Payload sent to one screening branch."""
+
+    paper: PaperMetadata
+    search_position: int
+    user_query: str
+
+
+class AnalyzeTask(TypedDict):
+    """Payload sent to one analysis branch."""
+
+    paper: PaperMetadata
+    search_position: int
+    user_query: str
+    thread_id: str
+    data_dir: str
+    retriever_kind: str
+    top_k: int
+    fetch_k: int
+    multi_query: bool
+
+
 class ReviewerState(TypedDict, total=False):
     user_query: str
     max_results: int
@@ -123,10 +168,8 @@ class ReviewerState(TypedDict, total=False):
     multi_query: bool
     search_queries: list[str]
     found_papers: list[PaperMetadata]
-    current_paper_index: int
-    parsed_papers: dict[str, ParsedPaper]
-    chunk_counts: dict[str, int]
-    relevance_decisions: dict[str, RelevanceDecision]
-    chosen_papers: dict[str, GroundedAnalysis]
+    candidate_evaluations: Annotated[list[ScreenOutcome], operator.add]
+    selected_ids: list[str]
+    analysis_outcomes: Annotated[list[AnalysisOutcome], operator.add]
     markdown: str
     status: str

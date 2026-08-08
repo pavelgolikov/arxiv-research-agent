@@ -2,6 +2,7 @@
 
 import os
 import re
+import threading
 from functools import lru_cache
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from .review_types import ParsedPage, ReviewerState
+from .review_types import ParsedPage
 
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
@@ -27,12 +28,30 @@ HYBRID_WEIGHTS = (0.5, 0.5)
 RETRIEVER_KINDS = ("dense", "bm25", "hybrid", "hybrid-rerank")
 
 _UNSAFE_COLLECTION_CHARS = re.compile(r"[^A-Za-z0-9_-]")
+_CLIENT_LOCK = threading.Lock()
+_CLIENTS: dict[str, object] = {}
 
 
-def data_dir_path(state: ReviewerState) -> Path:
-    """Return the working-data directory recorded in graph state."""
+def chroma_client(data_dir: Path | None = None):
+    """Return one shared Chroma client per directory.
 
-    return Path(state.get("data_dir", str(DEFAULT_DATA_DIR)))
+    Parallel analysis branches must not each build their own client: concurrent
+    first-time construction against the same directory races inside chromadb and
+    fails with a tenant lookup error.
+    """
+
+    import chromadb
+
+    directory = chroma_dir(data_dir)
+    key = str(directory)
+
+    with _CLIENT_LOCK:
+        client = _CLIENTS.get(key)
+        if client is None:
+            directory.mkdir(parents=True, exist_ok=True)
+            client = chromadb.PersistentClient(path=key)
+            _CLIENTS[key] = client
+        return client
 
 
 def chroma_dir(data_dir: Path | None = None) -> Path:
@@ -104,13 +123,10 @@ def open_store(
 ) -> Chroma:
     """Open the persistent vector store for one run thread."""
 
-    directory = chroma_dir(data_dir)
-    directory.mkdir(parents=True, exist_ok=True)
-
     return Chroma(
         collection_name=collection_name(thread_id),
         embedding_function=embeddings or get_embeddings(),
-        persist_directory=str(directory),
+        client=chroma_client(data_dir),
     )
 
 
@@ -142,7 +158,7 @@ def load_chunks(
 
     store = Chroma(
         collection_name=collection_name(thread_id),
-        persist_directory=str(chroma_dir(data_dir)),
+        client=chroma_client(data_dir),
     )
     record = store.get(
         where={"arxiv_id": arxiv_id} if arxiv_id else None,
@@ -340,24 +356,3 @@ def get_retriever(
         retriever = apply_reranker(retriever, k=k)
 
     return retriever
-
-
-def ingest_node(state: ReviewerState) -> ReviewerState:
-    """Chunk the current paper and add it to the run's vector store."""
-
-    current_paper_index = state.get("current_paper_index", 0)
-    paper = state["found_papers"][current_paper_index]
-    chunk_counts = dict(state.get("chunk_counts", {}))
-
-    if paper.arxiv_id in chunk_counts:
-        return {"chunk_counts": chunk_counts}
-
-    parsed_paper = state["parsed_papers"][paper.arxiv_id]
-    documents = chunk_pages(paper.arxiv_id, parsed_paper.pages)
-    chunk_counts[paper.arxiv_id] = index_paper(
-        state["thread_id"],
-        documents,
-        data_dir=data_dir_path(state),
-    )
-
-    return {"chunk_counts": chunk_counts}

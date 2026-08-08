@@ -4,7 +4,12 @@ import json
 from pathlib import Path
 
 from .gemini_client import generate_text
-from .review_types import GroundedAnalysis, ReviewerState, SupportedClaim
+from .review_types import (
+    AnalysisOutcome,
+    GroundedAnalysis,
+    ReviewerState,
+    SupportedClaim,
+)
 
 FACET_TITLES = {
     "research_problem": "Research problem",
@@ -14,6 +19,52 @@ FACET_TITLES = {
     "limitations": "Limitations",
     "relevance_to_query": "Relevance to the query",
 }
+
+
+def selected_analyses(state: ReviewerState) -> list[GroundedAnalysis]:
+    """Return successful analyses in original arXiv search order."""
+
+    outcomes = [
+        outcome
+        for outcome in state.get("analysis_outcomes", [])
+        if outcome.status == "ok" and outcome.analysis is not None
+    ]
+    outcomes.sort(key=lambda outcome: outcome.search_position)
+    return [outcome.analysis for outcome in outcomes]
+
+
+def failed_outcomes(state: ReviewerState) -> list[AnalysisOutcome]:
+    """Return analysis branches that did not complete, in search order."""
+
+    outcomes = [
+        outcome
+        for outcome in state.get("analysis_outcomes", [])
+        if outcome.status != "ok"
+    ]
+    outcomes.sort(key=lambda outcome: outcome.search_position)
+    return outcomes
+
+
+def failed_screenings(state: ReviewerState) -> list:
+    """Return screening branches that did not complete, in search order."""
+
+    evaluations = [
+        evaluation
+        for evaluation in state.get("candidate_evaluations", [])
+        if evaluation.status != "ok"
+    ]
+    evaluations.sort(key=lambda evaluation: evaluation.search_position)
+    return evaluations
+
+
+def run_status(state: ReviewerState) -> str:
+    """Classify the run from its branch outcomes."""
+
+    if not selected_analyses(state):
+        return "empty"
+    if failed_outcomes(state) or failed_screenings(state):
+        return "partial"
+    return "complete"
 
 
 def escape_cell(text: str) -> str:
@@ -56,11 +107,10 @@ def render_markdown_fallback(state: ReviewerState) -> str:
 
     user_query = state["user_query"]
     search_queries = state.get("search_queries", [])
-    found_papers = state.get("found_papers}", [])
-    chosen_papers = state.get("chosen_papers", {})
+    found_papers = state.get("found_papers", [])
 
     metadata_by_id = {paper.arxiv_id: paper for paper in found_papers}
-    analyses = list(chosen_papers.values())
+    analyses = selected_analyses(state)
     total_claims = sum(analysis.supported_claim_count for analysis in analyses)
     total_dropped = sum(analysis.dropped_claims for analysis in analyses)
 
@@ -72,7 +122,8 @@ def render_markdown_fallback(state: ReviewerState) -> str:
         f"- User query: {user_query}",
         f"- arXiv queries: {', '.join(search_queries) if search_queries else 'None recorded'}",
         f"- Candidate papers found: {len(found_papers)}",
-        f"- Relevant papers selected: {len(analyses)}",
+        f"- Papers selected: {len(state.get('selected_ids', []))}",
+        f"- Papers analyzed successfully: {len(analyses)}",
         f"- Retrieval strategy: {state.get('retriever_kind', 'dense')}",
         f"- Supported claims: {total_claims}",
         f"- Claims dropped in citation validation: {total_dropped}",
@@ -135,6 +186,13 @@ def render_markdown_fallback(state: ReviewerState) -> str:
                 ]
             )
 
+    failures = failed_outcomes(state) + failed_screenings(state)
+    if failures:
+        lines.extend(["## Failures", ""])
+        for failure in failures:
+            lines.append(f"- {failure.arxiv_id}: {failure.error}")
+        lines.append("")
+
     lines.extend(
         [
             "## Comparison Table",
@@ -187,7 +245,7 @@ def synthesis_payload(state: ReviewerState) -> list[dict]:
     metadata_by_id = {paper.arxiv_id: paper for paper in state.get("found_papers", [])}
     payload = []
 
-    for analysis in state.get("chosen_papers", {}).values():
+    for analysis in selected_analyses(state):
         paper = metadata_by_id.get(analysis.arxiv_id)
         payload.append(
             {
@@ -214,6 +272,23 @@ def synthesis_payload(state: ReviewerState) -> list[dict]:
     return payload
 
 
+def render_failures(state: ReviewerState) -> str:
+    """Render the failure notice appended to every partial report."""
+
+    failures = failed_outcomes(state) + failed_screenings(state)
+    if not failures:
+        return ""
+
+    lines = ["", "## Failures", ""]
+    lines.append(
+        f"{len(failures)} branch(es) did not complete. Their papers are absent "
+        "from the analysis above."
+    )
+    lines.append("")
+    lines.extend(f"- {failure.arxiv_id}: {failure.error}" for failure in failures)
+    return "\n".join(lines) + "\n"
+
+
 def write_atomically(output: Path, markdown: str) -> None:
     """Write the report through a temporary file and replace the target."""
 
@@ -227,9 +302,9 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
     """Ask Gemini to write the final Markdown review."""
 
     output = Path(state.get("output", "review.md"))
-    chosen_papers = state.get("chosen_papers", {})
+    status = run_status(state)
 
-    if not chosen_papers:
+    if status == "empty":
         markdown = render_markdown_fallback(state)
         write_atomically(output, markdown)
         return {"markdown": markdown, "status": "empty"}
@@ -266,8 +341,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
         markdown = render_markdown_fallback(state)
         status = "partial"
     else:
-        markdown = markdown.rstrip() + "\n"
-        status = "complete"
+        markdown = markdown.rstrip() + "\n" + render_failures(state)
 
     write_atomically(output, markdown)
     return {"markdown": markdown, "status": status}
