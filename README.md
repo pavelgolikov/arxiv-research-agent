@@ -5,13 +5,61 @@ question, indexes the selected papers into a vector store, extracts claims that
 cite the pages they came from, and writes a Markdown literature review with Gemini
 through LangChain.
 
+## Project status
+
+The pipeline runs end to end. The evaluation half of the project — the part that
+measures whether the retrieval stack actually helps — is not built yet.
+
+**Working today**
+
+| Area | State |
+| --- | --- |
+| Page-preserving PDF parsing, chunking with stable `chunk_id`s | done |
+| Chroma vector index, persisted per run thread | done |
+| Dense / BM25 / hybrid (RRF) / cross-encoder rerank retrieval | done |
+| Multi-query expansion | done |
+| Per-facet grounded analysis with deterministic citation validation | done |
+| Page-anchored citations in the report | done |
+| Parallel screening and analysis via LangGraph `Send` + reducers | done |
+| Deterministic ordering independent of concurrency | done |
+| Abstract-first screening (PDFs fetched only for selected papers) | done |
+| Retries, typed per-branch failures, partial reports | done |
+| SQLite checkpointing with real `run` / `resume` / `status` | done |
+
+**Not built yet**
+
+| Area | Notes |
+| --- | --- |
+| Labeled retrieval dataset | ~40-50 hand-labeled question to relevant-chunk pairs, frozen and committed |
+| Labeled screening dataset | ~5 queries of candidate metadata labeled irrelevant / related / central |
+| Retrieval ablation | recall@5, MRR, nDCG@10 across the four `--retriever` settings |
+| Groundedness metrics | citation referential integrity and claim-support rate over generated reports |
+| `evals/results/*.json` | machine-readable output; the only place performance numbers may come from |
+| Automated test suite | no `tests/` directory exists; see Verification below |
+| Verified example report | one report with every citation manually checked, committed under `examples/` |
+| Repository cleanup | `results/` still holds pre-rewrite artifacts |
+| Graceful top-level failure | `EXIT_FAILED` is defined but never returned; a mid-run crash prints a traceback |
+
+Deliberately out of scope for now: LangSmith tracing, human-in-the-loop
+`interrupt`, `pyproject.toml` packaging, CI, and any web UI or service.
+
+See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
+
 ## Repository layout
 
 - `arxiv_lit_reviewer.py` — command-line entry point (`run`, `resume`, `status`).
-- `arxiv_reviewer/` — application package, split by responsibility.
-- `arxiv_reviewer/rag.py` — chunking, embedding, and retrieval over parsed papers.
-- `results/reviews/` — historical generated literature reviews.
-- `results/parsed/` — extracted paper text retained from development.
+- `arxiv_reviewer/` — application package, split by responsibility:
+  - `workflow.py` — graph construction, fan-out, SQLite persistence, run/resume/status.
+  - `retrieval.py` — arXiv search, PDF download, page-preserving parsing.
+  - `rag.py` — chunking, embedding, Chroma index, retriever strategies.
+  - `analysis.py` — candidate screening and grounded per-facet analysis.
+  - `reporting.py` — Markdown synthesis, deterministic fallback rendering.
+  - `review_types.py` — Pydantic models and the typed graph state.
+  - `failures.py` — retry classification and retrying.
+  - `gemini_client.py` — model access through LangChain.
+- `results/` — artifacts from the **pre-rewrite prototype**, kept only for reference.
+  Its checkpoint JSON files use a state schema this code no longer has, and nothing
+  reads them. Slated for removal.
 - `PORTFOLIO_PLAN.md` — roadmap for the current upgrade.
 
 Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` holds
@@ -25,6 +73,10 @@ python3 -m venv .venv
 ```
 
 Set `GOOGLE_API_KEY` (or `GEMINI_API_KEY`) in a `.env` file at the repository root.
+
+The cross-encoder reranker pulls in `sentence-transformers` and `torch`, which
+dominate install size. Selecting a different `--retriever` avoids loading the
+model at runtime, but the dependency is still installed.
 
 ## Run
 
@@ -45,6 +97,10 @@ the run:
 network calls. `resume` restarts at the last incomplete step, so papers that were
 already downloaded, indexed, or analyzed are not processed again.
 
+Exit codes: `0` when a report was produced, `2` for invalid arguments or an
+unknown thread ID. A run that fails part-way currently surfaces as an unhandled
+traceback rather than a deliberate exit code; the thread is still resumable.
+
 ### Options
 
 | Option | Default | Meaning |
@@ -60,23 +116,6 @@ already downloaded, indexed, or analyzed are not processed again.
 | `--max-concurrency` | 3 | Branches processed in parallel. |
 | `--data-dir` | `.arxiv-reviewer` | Checkpoint and vector-store location. |
 | `--output` | `review.md` | Report path. |
-
-## Retrieval
-
-Paper text is split into overlapping ~1000-character chunks that keep their page
-numbers, embedded with `models/gemini-embedding-001`, and stored in a persistent
-Chroma index under `.arxiv-reviewer/chroma/`.
-
-| `--retriever` | Strategy |
-| --- | --- |
-| `dense` | Embedding similarity only. |
-| `bm25` | Keyword frequency only. |
-| `hybrid` | Both, fused with reciprocal rank fusion. |
-| `hybrid-rerank` | Hybrid candidates rescored by a `ms-marco-MiniLM-L-6-v2` cross-encoder. |
-
-`--multi-query` expands each question into paraphrases and retrieves for all of
-them. When reranking is enabled the expanded candidates are fused and rescored
-once, so the result still honours `--top-k`.
 
 ## Pipeline
 
@@ -102,8 +141,34 @@ finishes with whatever succeeded, the report is marked `partial`, and every
 failure is listed in a `Failures` section appended after synthesis so it cannot
 be omitted.
 
+Retrying happens inside each branch rather than through LangGraph's node-level
+`RetryPolicy`. In langgraph 1.2.10 a node `error_handler` runs but does not
+suppress the original exception for tasks dispatched by `Send`, so a single bad
+paper would still abort the whole run. `RetryPolicy` is kept on `search`, where
+failing the run and resuming later is the intended behavior.
+
 Interrupted runs resume from the last checkpoint. Branches that already finished
 are not re-executed, so their downloads and model calls are not paid for twice.
+
+## Retrieval
+
+Paper text is split into overlapping ~1000-character chunks that keep their page
+numbers, embedded with `models/gemini-embedding-001`, and stored in a persistent
+Chroma index under `.arxiv-reviewer/chroma/`.
+
+| `--retriever` | Strategy |
+| --- | --- |
+| `dense` | Embedding similarity only. |
+| `bm25` | Keyword frequency only. |
+| `hybrid` | Both, fused with reciprocal rank fusion. |
+| `hybrid-rerank` | Hybrid candidates rescored by a `ms-marco-MiniLM-L-6-v2` cross-encoder. |
+
+`--multi-query` expands each question into paraphrases and retrieves for all of
+them. When reranking is enabled the expanded candidates are fused and rescored
+once, so the result still honours `--top-k`.
+
+Which of these is actually better on this corpus is an open question until the
+ablation in `evals/` exists. No comparative claim is made here.
 
 ## Grounding
 
@@ -124,3 +189,28 @@ Citations failing any check are discarded, and a claim left with no surviving
 citation is discarded with it. The report records how many were dropped, so a
 paper whose analysis was partly rejected is visible rather than silently thinner.
 Surviving claims render as page-anchored links into the source PDF.
+
+## Verification
+
+There is **no committed test suite yet**. Behavior has been checked with throwaway
+scripts during development, covering: concurrency 1 versus 3 producing identical
+selection and rendered output, selection tie-breaking, injected permanent and
+transient branch failures, retry classification, citation validation against
+hallucinated chunk IDs and paraphrased excerpts, per-paper retrieval scoping,
+concurrent Chroma indexing, and interrupt-then-resume without repeating finished
+work. Turning these into `tests/` is outstanding work.
+
+No performance or quality numbers appear in this README on purpose. Once
+`evals/results/*.json` exists, the ablation table and groundedness figures will be
+generated from it, and any number quoted anywhere will come from that committed
+output rather than from a development run.
+
+## Limitations
+
+- arXiv is the only source; nothing outside it is searched.
+- Relevance screening is a model judgement over abstracts and is not yet measured.
+- PDF text extraction quality varies, especially for tables, figures, and formulae.
+- Citation validation proves an excerpt exists on the cited page. It does not prove
+  the excerpt supports the claim built on it.
+- arXiv results are not peer reviewed.
+- Runs cost model calls: one per candidate screened, plus six per selected paper.
