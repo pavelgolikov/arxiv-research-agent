@@ -265,12 +265,11 @@ truth. This is the only day whose output cannot be generated.
 | `evals/data/corpus_chunks.jsonl` | 570 chunks with stable `chunk_id`s |
 | `evals/data/retrieval_questions.json` | 50 questions (30 facet, 20 paper-specific) |
 | `evals/data/retrieval_pools.json` | 1096 pooled candidates to judge |
-| `evals/label_tool.html` | offline keyboard-driven labeling page |
-| `evals/verify_labels.py` | validates an export and writes the label files |
+| `evals/build/label_tool.html` | offline keyboard-driven labeling page |
+| `evals/build/verify_labels.py` | validates an export and writes the label files |
 
-Rebuild order (only if the corpus must change):
-`build_screening` -> `build_corpus` -> `build_questions` -> `build_pools` ->
-`make_label_tool`.
+Rebuild order (only if the corpus must change), all under `evals.build`:
+`screening` -> `corpus` -> `questions` -> `pools` -> `label_tool`.
 
 ### Method
 

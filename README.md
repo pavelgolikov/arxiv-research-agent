@@ -59,9 +59,13 @@ See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
   - `review_types.py` — Pydantic models and the typed graph state.
   - `failures.py` — retry classification and retrying.
   - `gemini_client.py` — model access through LangChain.
-- `evals/` — frozen datasets, hand labels, and metric runners. `build_index.py`
-  rebuilds the vector index from the committed chunks and verifies that the labels
-  still cover everything the retrievers return.
+- `evals/` — evaluation, split by direction of data flow:
+  - `build/` — dataset construction: arXiv search, corpus parsing, question
+    generation, candidate pooling, and the offline labeling page. Run rarely.
+  - `build_index.py` — rebuilds the vector index from the committed chunks and
+    verifies that the labels still cover everything the retrievers return.
+  - `data/`, `labels/`, `results/` — the frozen datasets, the hand labels, and the
+    metric output. All committed; `index/` is not.
 - `results/` — artifacts from the **pre-rewrite prototype**, kept only for reference.
   Its checkpoint JSON files use a state schema this code no longer has, and nothing
   reads them. Slated for removal.

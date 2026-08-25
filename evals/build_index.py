@@ -121,7 +121,7 @@ def pool_chunk_ids() -> dict[str, set[str]]:
 def retrieved_ids(question: dict, kind: str) -> list[str]:
     """Retrieve for one question with one strategy, at pool depth.
 
-    The retriever arguments must match `build_pools` exactly. If they drift, this
+    The retriever arguments must match `evals.build.pools` exactly. If they drift, this
     check compares a different ranking against the pool and means nothing.
     """
 
