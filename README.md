@@ -124,7 +124,7 @@ traceback rather than a deliberate exit code; the thread is still resumable.
 | --- | --- | --- |
 | `--query` | required | Research question to review. |
 | `--thread-id` | generated UUID | Name of the run. |
-| `--max-results` | 10 | Candidate papers to retrieve from arXiv. |
+| `--max-results` | 30 | Candidate papers to retrieve from arXiv, shared across the planned queries. |
 | `--target-papers` | 4 | Relevant papers to include in the review. |
 | `--retriever` | `hybrid-rerank` | Retrieval strategy over indexed chunks. |
 | `--top-k` | 5 | Chunks returned per question. |
@@ -292,8 +292,8 @@ Threshold sweep over the real `select_papers_node`, scored against the labels. F
 | --- | --- | --- | --- | --- | --- |
 | 1 | 0.786 | 0.964 | 0.683 | _0.730_ | 0 |
 | 2 | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
-| 3 (**recommended**) | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
-| 4 (current) | 0.810 | 1.000 | 0.611 | _0.730_ | 2 |
+| 3 (current, **recommended**) | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
+| 4 | 0.810 | 1.000 | 0.611 | _0.730_ | 2 |
 | 5 | 0.786 | 0.857 | 0.540 | _0.730_ | 2 |
 
 | Model score | labeled irrelevant | labeled related | labeled central |
@@ -310,7 +310,7 @@ scored above 2**, and every paper scoring 1 was labeled irrelevant — the rubri
 separates cleanly at the bottom. It separates poorly at the top: scores 4 and 5 mix
 related and central papers, which is why precision@4 plateaus rather than climbing.
 
-The sweep chose **3** over the shipped default of 4. Both give identical precision,
+The sweep chose **3**, which is now the shipped default; it was 4. Both give identical precision,
 but 3 recovers more central papers (0.683 against 0.611) and under-fills one fewer
 query. Thresholds 2 and 3 select identically on this data, so the stricter of the two
 is taken.
@@ -343,7 +343,7 @@ relevant papers from 3 to 8 — and the density barely moved, 25% to 27%. arXiv'
 relevance ranking is flat over the first ten results: ranks 4-9 yielded 5 of 18
 relevant against 3 of 12 for ranks 0-3. Searching deeper costs one cheap screening
 call per extra candidate and does not dilute quality, which makes it the fix for
-thin reviews.
+thin reviews. `--max-results` now defaults to 30 rather than 10 for that reason.
 
 ### Groundedness
 
@@ -468,13 +468,15 @@ output, never from a development run.
 - Screening is capped by arXiv search, not by the screener. A category filter was
   measured and rejected: the off-topic papers are cross-listed into the same
   categories as the relevant ones. Searching deeper is the fix that works.
-- `--max-results` is divided across the planned queries, so the default of 10 leaves
-  each query about four slots. Reviews come out thin for that reason, not because
-  screening is too strict.
+- `--max-results` is divided across the planned queries, so the default of 30 leaves
+  each query about ten slots. Lowering it makes reviews thin, and the cause is
+  search depth rather than screening being too strict.
 - The retrieval ablation has 50 questions. That is enough to separate BM25 from
   the rest and not enough to resolve differences of two or three points.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
 - Citation validation proves an excerpt exists on the cited page. It does not prove
   the excerpt supports the claim built on it.
 - arXiv results are not peer reviewed.
-- Runs cost model calls: one per candidate screened, plus six per selected paper.
+- Runs cost model calls: one per candidate screened (30 by default), plus six per
+  selected paper. Screening reads abstracts only, so a rejected candidate costs one
+  short call and no download.

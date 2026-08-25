@@ -8,7 +8,7 @@
       4,
       5
     ],
-    "current_default": 4,
+    "current_default": 3,
     "labels": "0 irrelevant, 1 related, 2 central",
     "model": "gemini-3.1-flash-lite"
   },

@@ -74,7 +74,7 @@ def search_node(state: ReviewerState) -> ReviewerState:
     """Generate arXiv queries, search arXiv, and deduplicate papers."""
 
     user_query = state["user_query"]
-    max_results = state.get("max_results", 10)
+    max_results = state.get("max_results", 30)
     search_plan = make_search_plan(user_query)
     arxiv_queries = [query.strip() for query in search_plan.queries if query.strip()]
 
@@ -90,6 +90,11 @@ def search_node(state: ReviewerState) -> ReviewerState:
         if index > 0:
             time.sleep(3.0)
 
+        # The budget is shared across the planned queries, so the total has to cover
+        # all of them: at 10 results and three queries each query saw about four hits,
+        # and reviews came out short. Measured at ten hits per query, relevant papers
+        # went from 3 to 8 with on-topic density flat, because arXiv's ranking is level
+        # over the first ten. See `evals/results/search_depth.json`.
         remaining = max_results - len(found_papers)
         remaining_queries = len(arxiv_queries) - index
         query_limit = max(1, (remaining + remaining_queries - 1) // remaining_queries)

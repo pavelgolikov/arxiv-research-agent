@@ -24,7 +24,13 @@ from .review_types import (
 )
 
 EVIDENCE_EXCERPT_CHARS = 300
-RELEVANCE_THRESHOLD = 4
+
+# Chosen by sweeping this value through `select_papers_node` against the labeled
+# screening set, not by guessing: see `evals/results/screening.json`. Thresholds 3 and
+# 4 score identical precision, but 3 recovers more central papers (0.683 against 0.611)
+# and leaves fewer reviews short of their target. Below 3 the model starts admitting
+# papers it scored "weakly related", and precision falls.
+RELEVANCE_THRESHOLD = 3
 
 FACET_QUESTIONS = (
     ("research_problem", "What research problem does this paper address, and why?"),

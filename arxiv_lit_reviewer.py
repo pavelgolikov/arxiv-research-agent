@@ -27,7 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
     run = commands.add_parser("run", help="Start a new review run.")
     run.add_argument("--query", "--user-query", dest="user_query", required=True)
     run.add_argument("--thread-id")
-    run.add_argument("--max-results", type=int, default=10)
+    run.add_argument("--max-results", type=int, default=30)
     run.add_argument("--target-papers", type=int, default=4)
     run.add_argument("--retriever", default="hybrid-rerank", choices=RETRIEVER_CHOICES)
     run.add_argument("--top-k", type=int, default=5)
