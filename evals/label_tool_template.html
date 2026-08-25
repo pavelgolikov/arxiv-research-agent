@@ -80,10 +80,24 @@ padding:0 5px;font-size:11.5px;font-family:ui-monospace,monospace}
 </main>
 <script>
 const DATA = __DATA__;
+// Labels already committed under evals/labels/. They seed anything the browser has
+// not got, so clearing site data or moving machines does not lose finished work.
+const SEED = __SEED__;
 const KEY = "arxiv-eval-labels-v1";
 let store = {retrieval:{}, screening:{}, reviewed:{retrieval:{}, screening:{}}};
 try{ const raw = localStorage.getItem(KEY); if(raw) store = JSON.parse(raw); }catch(e){}
-if(!store.reviewed) store.reviewed = {retrieval:{}, screening:{}};
+if(!store.reviewed) store.reviewed = {};
+for(const m of ["retrieval","screening"]){
+  if(!store[m]) store[m] = {};
+  if(!store.reviewed[m]) store.reviewed[m] = {};
+}
+// Never overwrite what the browser already holds: local edits are the newer copy.
+for(const m of ["retrieval","screening"]){
+  for(const q in (SEED[m] || {})){
+    if(!(q in store[m])) store[m][q] = SEED[m][q];
+    if(((SEED.reviewed || {})[m] || {})[q] && !store.reviewed[m][q]) store.reviewed[m][q] = true;
+  }
+}
 
 let mode = "retrieval";
 let qi = 0, ci = 0;

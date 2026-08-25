@@ -935,5 +935,364 @@
         "pdf_url": "https://arxiv.org/pdf/2503.17922v2"
       }
     ]
+  },
+  "memorization": {
+    "query": "memorization of training data in neural language models",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2404.17143v2",
+        "title": "Quantifying Memorization and Detecting Training Data of Pre-trained Language Models using Japanese Newspaper",
+        "authors": [
+          "Shotaro Ishihara",
+          "Hiromu Takahashi"
+        ],
+        "published": "2024-04-26",
+        "abstract": "Dominant pre-trained language models (PLMs) have demonstrated the potential risk of memorizing and outputting the training data. While this concern has been discussed mainly in English, it is also practically important to focus on domain-specific PLMs. In this study, we pre-trained domain-specific GPT-2 models using a limited corpus of Japanese newspaper articles and evaluated their behavior. Experiments replicated the empirical finding that memorization of PLMs is related to the duplication in the training data, model size, and prompt length, in Japanese the same as in previous English studies. Furthermore, we attempted membership inference attacks, demonstrating that the training data can be detected even in Japanese, which is the same trend as in English. The study warns that domain-specific PLMs, sometimes trained with valuable private data, can ''copy and paste'' on a large scale.",
+        "entry_url": "http://arxiv.org/abs/2404.17143v2",
+        "pdf_url": "https://arxiv.org/pdf/2404.17143v2"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "2509.00488v1",
+        "title": "Localizing and Mitigating Memorization in Image Autoregressive Models",
+        "authors": [
+          "Aditya Kasliwal",
+          "Franziska Boenisch",
+          "Adam Dziedzic"
+        ],
+        "published": "2025-08-30",
+        "abstract": "Image AutoRegressive (IAR) models have achieved state-of-the-art performance in speed and quality of generated images. However, they also raise concerns about memorization of their training data and its implications for privacy. This work explores where and how such memorization occurs within different image autoregressive architectures by measuring a fine-grained memorization. The analysis reveals that memorization patterns differ across various architectures of IARs. In hierarchical per-resolution architectures, it tends to emerge early and deepen with resolutions, while in IARs with standard autoregressive per token prediction, it concentrates in later processing stages. These localization of memorization patterns are further connected to IARs' ability to memorize and leak training data. By intervening on their most memorizing components, we significantly reduce the capacity for data extraction from IARs with minimal impact on the quality of generated images. These findings offer new insights into the internal behavior of image generative models and point toward practical strategies for mitigating privacy risks.",
+        "entry_url": "http://arxiv.org/abs/2509.00488v1",
+        "pdf_url": "https://arxiv.org/pdf/2509.00488v1"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "1907.02664v2",
+        "title": "Data Encoding for Byzantine-Resilient Distributed Optimization",
+        "authors": [
+          "Deepesh Data",
+          "Linqi Song",
+          "Suhas Diggavi"
+        ],
+        "published": "2019-07-05",
+        "abstract": "We study distributed optimization in the presence of Byzantine adversaries, where both data and computation are distributed among $m$ worker machines, $t$ of which may be corrupt. The compromised nodes may collaboratively and arbitrarily deviate from their pre-specified programs, and a designated (master) node iteratively computes the model/parameter vector for generalized linear models. In this work, we primarily focus on two iterative algorithms: Proximal Gradient Descent (PGD) and Coordinate Descent (CD). Gradient descent (GD) is a special case of these algorithms. PGD is typically used in the data-parallel setting, where data is partitioned across different samples, whereas, CD is used in the model-parallelism setting, where data is partitioned across the parameter space. In this paper, we propose a method based on data encoding and error correction over real numbers to combat adversarial attacks. We can tolerate up to $t\\leq \\lfloor\\frac{m-1}{2}\\rfloor$ corrupt worker nodes, which is information-theoretically optimal. We give deterministic guarantees, and our method does not assume any probability distribution on the data. We develop a {\\em sparse} encoding scheme which enables computationally efficient data encoding and decoding. We demonstrate a trade-off between the corruption threshold and the resource requirements (storage, computational, and communication complexity). As an example, for $t\\leq\\frac{m}{3}$, our scheme incurs only a {\\em constant} overhead on these resources, over that required by the plain distributed PGD/CD algorithms which provide no adversarial protection. To the best of our knowledge, ours is the first paper that makes CD secure against adversarial attacks. Our encoding scheme extends efficiently to the data streaming model and for stochastic gradient descent (SGD). We also give experimental results to show the efficacy of our proposed schemes.",
+        "entry_url": "http://arxiv.org/abs/1907.02664v2",
+        "pdf_url": "https://arxiv.org/pdf/1907.02664v2"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "2005.07866v1",
+        "title": "Byzantine-Resilient SGD in High Dimensions on Heterogeneous Data",
+        "authors": [
+          "Deepesh Data",
+          "Suhas Diggavi"
+        ],
+        "published": "2020-05-16",
+        "abstract": "We study distributed stochastic gradient descent (SGD) in the master-worker architecture under Byzantine attacks. We consider the heterogeneous data model, where different workers may have different local datasets, and we do not make any probabilistic assumptions on data generation. At the core of our algorithm, we use the polynomial-time outlier-filtering procedure for robust mean estimation proposed by Steinhardt et al. (ITCS 2018) to filter-out corrupt gradients. In order to be able to apply their filtering procedure in our {\\em heterogeneous} data setting where workers compute {\\em stochastic} gradients, we derive a new matrix concentration result, which may be of independent interest. We provide convergence analyses for smooth strongly-convex and non-convex objectives. We derive our results under the bounded variance assumption on local stochastic gradients and a {\\em deterministic} condition on datasets, namely, gradient dissimilarity; and for both these quantities, we provide concrete bounds in the statistical heterogeneous data model. We give a trade-off between the mini-batch size for stochastic gradients and the approximation error. Our algorithm can tolerate up to $\\frac{1}{4}$ fraction Byzantine workers. It can find approximate optimal parameters in the strongly-convex setting exponentially fast and reach to an approximate stationary point in the non-convex setting with a linear speed, thus, matching the convergence rates of vanilla SGD in the Byzantine-free setting. We also propose and analyze a Byzantine-resilient SGD algorithm with gradient compression, where workers send $k$ random coordinates of their gradients. Under mild conditions, we show a $\\frac{d}{k}$-factor saving in communication bits as well as decoding complexity over our compression-free algorithm without affecting its convergence rate (order-wise) and the approximation error.",
+        "entry_url": "http://arxiv.org/abs/2005.07866v1",
+        "pdf_url": "https://arxiv.org/pdf/2005.07866v1"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2404.15146v3",
+        "title": "Rethinking LLM Memorization through the Lens of Adversarial Compression",
+        "authors": [
+          "Avi Schwarzschild",
+          "Zhili Feng",
+          "Pratyush Maini",
+          "Zachary C. Lipton",
+          "J. Zico Kolter"
+        ],
+        "published": "2024-04-23",
+        "abstract": "Large language models (LLMs) trained on web-scale datasets raise substantial concerns regarding permissible data usage. One major question is whether these models \"memorize\" all their training data or they integrate many data sources in some way more akin to how a human would learn and synthesize information. The answer hinges, to a large degree, on how we define memorization. In this work, we propose the Adversarial Compression Ratio (ACR) as a metric for assessing memorization in LLMs. A given string from the training data is considered memorized if it can be elicited by a prompt (much) shorter than the string itself -- in other words, if these strings can be \"compressed\" with the model by computing adversarial prompts of fewer tokens. The ACR overcomes the limitations of existing notions of memorization by (i) offering an adversarial view of measuring memorization, especially for monitoring unlearning and compliance; and (ii) allowing for the flexibility to measure memorization for arbitrary strings at a reasonably low compute. Our definition serves as a practical tool for determining when model owners may be violating terms around data usage, providing a potential legal tool and a critical lens through which to address such scenarios.",
+        "entry_url": "http://arxiv.org/abs/2404.15146v3",
+        "pdf_url": "https://arxiv.org/pdf/2404.15146v3"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "1110.5626v1",
+        "title": "Constraints on dark energy from H II starburst galaxy apparent magnitude versus redshift data",
+        "authors": [
+          "Data Mania",
+          "Bharat Ratra"
+        ],
+        "published": "2011-10-25",
+        "abstract": "In this paper we use H II starburst galaxy apparent magnitude versus redshift data from Siegel et al. (2005) to constrain dark energy cosmological model parameters. These constraints are generally consistent with those derived using other data sets, but are not as restrictive as the tightest currently available constraints.",
+        "entry_url": "http://arxiv.org/abs/1110.5626v1",
+        "pdf_url": "https://arxiv.org/pdf/1110.5626v1"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2510.21391v1",
+        "title": "TerraGen: A Unified Multi-Task Layout Generation Framework for Remote Sensing Data Augmentation",
+        "authors": [
+          "Datao Tang",
+          "Hao Wang",
+          "Yudeng Xin",
+          "Hui Qiao",
+          "Dongsheng Jiang",
+          "Yin Li"
+        ],
+        "published": "2025-10-24",
+        "abstract": "Remote sensing vision tasks require extensive labeled data across multiple, interconnected domains. However, current generative data augmentation frameworks are task-isolated, i.e., each vision task requires training an independent generative model, and ignores the modeling of geographical information and spatial constraints. To address these issues, we propose \\textbf{TerraGen}, a unified layout-to-image generation framework that enables flexible, spatially controllable synthesis of remote sensing imagery for various high-level vision tasks, e.g., detection, segmentation, and extraction. Specifically, TerraGen introduces a geographic-spatial layout encoder that unifies bounding box and segmentation mask inputs, combined with a multi-scale injection scheme and mask-weighted loss to explicitly encode spatial constraints, from global structures to fine details. Also, we construct the first large-scale multi-task remote sensing layout generation dataset containing 45k images and establish a standardized evaluation protocol for this task. Experimental results show that our TerraGen can achieve the best generation image quality across diverse tasks. Additionally, TerraGen can be used as a universal data-augmentation generator, enhancing downstream task performance significantly and demonstrating robust cross-task generalisation in both full-data and few-shot scenarios.",
+        "entry_url": "http://arxiv.org/abs/2510.21391v1",
+        "pdf_url": "https://arxiv.org/pdf/2510.21391v1"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2112.12938v2",
+        "title": "Counterfactual Memorization in Neural Language Models",
+        "authors": [
+          "Chiyuan Zhang",
+          "Daphne Ippolito",
+          "Katherine Lee",
+          "Matthew Jagielski",
+          "Florian Tramèr",
+          "Nicholas Carlini"
+        ],
+        "published": "2021-12-24",
+        "abstract": "Modern neural language models that are widely used in various NLP tasks risk memorizing sensitive information from their training data. Understanding this memorization is important in real world applications and also from a learning-theoretical perspective. An open question in previous studies of language model memorization is how to filter out \"common\" memorization. In fact, most memorization criteria strongly correlate with the number of occurrences in the training set, capturing memorized familiar phrases, public knowledge, templated texts, or other repeated data. We formulate a notion of counterfactual memorization which characterizes how a model's predictions change if a particular document is omitted during training. We identify and study counterfactually-memorized training examples in standard text datasets. We estimate the influence of each memorized training example on the validation set and on generated texts, showing how this can provide direct evidence of the source of memorization at test time.",
+        "entry_url": "http://arxiv.org/abs/2112.12938v2",
+        "pdf_url": "https://arxiv.org/pdf/2112.12938v2"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "1706.06749v1",
+        "title": "Cross-language Learning with Adversarial Neural Networks: Application to Community Question Answering",
+        "authors": [
+          "Shafiq Joty",
+          "Preslav Nakov",
+          "Lluís Màrquez",
+          "Israa Jaradat"
+        ],
+        "published": "2017-06-21",
+        "abstract": "We address the problem of cross-language adaptation for question-question similarity reranking in community question answering, with the objective to port a system trained on one input language to another input language given labeled training data for the first language and only unlabeled data for the second language. In particular, we propose to use adversarial training of neural networks to learn high-level features that are discriminative for the main learning task, and at the same time are invariant across the input languages. The evaluation results show sizable improvements for our cross-language adversarial neural network (CLANN) model over a strong non-adversarial system.",
+        "entry_url": "http://arxiv.org/abs/1706.06749v1",
+        "pdf_url": "https://arxiv.org/pdf/1706.06749v1"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "2203.12171v1",
+        "title": "An Empirical Study of Memorization in NLP",
+        "authors": [
+          "Xiaosen Zheng",
+          "Jing Jiang"
+        ],
+        "published": "2022-03-23",
+        "abstract": "A recent study by Feldman (2020) proposed a long-tail theory to explain the memorization behavior of deep learning models. However, memorization has not been empirically verified in the context of NLP, a gap addressed by this work. In this paper, we use three different NLP tasks to check if the long-tail theory holds. Our experiments demonstrate that top-ranked memorized training instances are likely atypical, and removing the top-memorized training instances leads to a more serious drop in test accuracy compared with removing training instances randomly. Furthermore, we develop an attribution method to better understand why a training instance is memorized. We empirically show that our memorization attribution method is faithful, and share our interesting finding that the top-memorized parts of a training instance tend to be features negatively correlated with the class label.",
+        "entry_url": "http://arxiv.org/abs/2203.12171v1",
+        "pdf_url": "https://arxiv.org/pdf/2203.12171v1"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2411.15497v3",
+        "title": "AeroGen: Enhancing Remote Sensing Object Detection with Diffusion-Driven Data Generation",
+        "authors": [
+          "Datao Tang",
+          "Xiangyong Cao",
+          "Xuan Wu",
+          "Jialin Li",
+          "Jing Yao",
+          "Xueru Bai"
+        ],
+        "published": "2024-11-23",
+        "abstract": "Remote sensing image object detection (RSIOD) aims to identify and locate specific objects within satellite or aerial imagery. However, there is a scarcity of labeled data in current RSIOD datasets, which significantly limits the performance of current detection algorithms. Although existing techniques, e.g., data augmentation and semi-supervised learning, can mitigate this scarcity issue to some extent, they are heavily dependent on high-quality labeled data and perform worse in rare object classes. To address this issue, this paper proposes a layout-controllable diffusion generative model (i.e. AeroGen) tailored for RSIOD. To our knowledge, AeroGen is the first model to simultaneously support horizontal and rotated bounding box condition generation, thus enabling the generation of high-quality synthetic images that meet specific layout and object category requirements. Additionally, we propose an end-to-end data augmentation framework that integrates a diversity-conditioned generator and a filtering mechanism to enhance both the diversity and quality of generated data. Experimental results demonstrate that the synthetic data produced by our method are of high quality and diversity. Furthermore, the synthetic RSIOD data can significantly improve the detection performance of existing RSIOD models, i.e., the mAP metrics on DIOR, DIOR-R, and HRSC datasets are improved by 3.7%, 4.3%, and 2.43%, respectively. The code is available at https://github.com/Sonettoo/AeroGen.",
+        "entry_url": "http://arxiv.org/abs/2411.15497v3",
+        "pdf_url": "https://arxiv.org/pdf/2411.15497v3"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2503.21676v2",
+        "title": "How do language models learn facts? Dynamics, curricula and hallucinations",
+        "authors": [
+          "Nicolas Zucchet",
+          "Jörg Bornschein",
+          "Stephanie Chan",
+          "Andrew Lampinen",
+          "Razvan Pascanu",
+          "Soham De"
+        ],
+        "published": "2025-03-27",
+        "abstract": "Large language models accumulate vast knowledge during pre-training, yet the dynamics governing this acquisition remain poorly understood. This work investigates the learning dynamics of language models on a synthetic factual recall task, uncovering three key findings: First, language models learn in three phases, exhibiting a performance plateau before acquiring precise factual knowledge. Mechanistically, this plateau coincides with the formation of attention-based circuits that support recall. Second, the training data distribution significantly impacts learning dynamics, as imbalanced distributions lead to shorter plateaus. Finally, hallucinations emerge simultaneously with knowledge, and integrating new knowledge into the model through fine-tuning is challenging, as it quickly corrupts its existing parametric memories. Our results emphasize the importance of data distribution in knowledge acquisition and suggest novel data scheduling strategies to accelerate neural network training.",
+        "entry_url": "http://arxiv.org/abs/2503.21676v2",
+        "pdf_url": "https://arxiv.org/pdf/2503.21676v2"
+      }
+    ]
+  },
+  "uncertainty_calibration": {
+    "query": "uncertainty quantification and calibration in large language models",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2501.05032v2",
+        "title": "Enhancing Human-Like Responses in Large Language Models",
+        "authors": [
+          "Ethem Yağız Çalık",
+          "Talha Rüzgar Akkuş"
+        ],
+        "published": "2025-01-09",
+        "abstract": "This paper explores the advancements in making large language models (LLMs) more human-like. We focus on techniques that enhance natural language understanding, conversational coherence, and emotional intelligence in AI systems. The study evaluates various approaches, including fine-tuning with diverse datasets, incorporating psychological principles, and designing models that better mimic human reasoning patterns. Our findings demonstrate that these enhancements not only improve user interactions but also open new possibilities for AI applications across different domains. Future work will address the ethical implications and potential biases introduced by these human-like attributes.",
+        "entry_url": "http://arxiv.org/abs/2501.05032v2",
+        "pdf_url": "https://arxiv.org/pdf/2501.05032v2"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "1706.07500v1",
+        "title": "Uncertainty quantification for kinetic models in socio-economic and life sciences",
+        "authors": [
+          "Giacomo Dimarco",
+          "Lorenzo Pareschi",
+          "Mattia Zanella"
+        ],
+        "published": "2017-06-22",
+        "abstract": "Kinetic equations play a major rule in modeling large systems of interacting particles. Recently the legacy of classical kinetic theory found novel applications in socio-economic and life sciences, where processes characterized by large groups of agents exhibit spontaneous emergence of social structures. Well-known examples are the formation of clusters in opinion dynamics, the appearance of inequalities in wealth distributions, flocking and milling behaviors in swarming models, synchronization phenomena in biological systems and lane formation in pedestrian traffic. The construction of kinetic models describing the above processes, however, has to face the difficulty of the lack of fundamental principles since physical forces are replaced by empirical social forces. These empirical forces are typically constructed with the aim to reproduce qualitatively the observed system behaviors, like the emergence of social structures, and are at best known in terms of statistical information of the modeling parameters. For this reason the presence of random inputs characterizing the parameters uncertainty should be considered as an essential feature in the modeling process. In this survey we introduce several examples of such kinetic models, that are mathematically described by nonlinear Vlasov and Fokker--Planck equations, and present different numerical approaches for uncertainty quantification which preserve the main features of the kinetic solution.",
+        "entry_url": "http://arxiv.org/abs/1706.07500v1",
+        "pdf_url": "https://arxiv.org/pdf/1706.07500v1"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "2310.11435v1",
+        "title": "Uncertainty Quantification For Turbulent Flows with Machine Learning",
+        "authors": [
+          "Minghan Chu",
+          "Weicheng Qian"
+        ],
+        "published": "2023-10-17",
+        "abstract": "Turbulent flows are of central importance across applications in science and engineering problems. For design and analysis, scientists and engineers use Computational Fluid Dynamics (CFD) simulations using turbulence models. Turbulent models are limited approximations, introducing epistemic uncertainty in CFD results. For reliable design and analysis, we require quantification of these uncertainties. The Eigenspace Perturbation Method (EPM) is the preeminent physics based approach for turbulence model UQ, but often leads to overly conservative uncertainty bounds. In this study, we use Machine Learning (ML) models to moderate the EPM perturbations and introduce our physics constrained machine learning framework for turbulence model UQ. We test this framework in multiple problems to show that it leads to improved calibration of the uncertainty estimates.",
+        "entry_url": "http://arxiv.org/abs/2310.11435v1",
+        "pdf_url": "https://arxiv.org/pdf/2310.11435v1"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "1012.2631v2",
+        "title": "Monte Carlo uncertainty estimation for wavelength calibration",
+        "authors": [
+          "Thang H. L.",
+          "Nguyen D. D.",
+          "Dung D. N."
+        ],
+        "published": "2010-12-13",
+        "abstract": "CIPM published the Supplement I for GUM in 2008 as not only an alternative approach to estimate the uncertainty for a given calibration measurement but also as a proper uncertainty estimation one, whenever any of the conditions imposed in GUM which must be satisfied does not hold [1, 2]. Before the introduction of the new approach in the Supplement I, namely Monte Carlo (MC) method, the GUM rules have been always applied even if in cases where the mentioned conditions were not fulfilled. After or even before the official introduction of this MC method, a number of published papers in uncertainty estimation by using MC method had been shown up, giving more insight for the ways the uncertainties estimated and also for the specific calibration measurements under investigation themselves [3 - 16]. However, in most of those published papers, the application conditions required before a method selection should be analyzed, in fact, has been ignored. In our uncertainty study for wavelength calibration by using beat frequency technique, the application conditions have not been ignored but analyzed carefully and it was found that a GUM application condition was unsatisfactory. However, all the MC method conditions for this calibration problem have been well fulfilled. A computer program was then coded [17] following the steps in the Supplement I. The resultant outputs showed difference in statistical nature and suggested to replace the MC method to the GUM one as soon as possible for this case.",
+        "entry_url": "http://arxiv.org/abs/1012.2631v2",
+        "pdf_url": "https://arxiv.org/pdf/1012.2631v2"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2402.14679v2",
+        "title": "Is Self-knowledge and Action Consistent or Not: Investigating Large Language Model's Personality",
+        "authors": [
+          "Yiming Ai",
+          "Zhiwei He",
+          "Ziyin Zhang",
+          "Wenhong Zhu",
+          "Hongkun Hao",
+          "Kai Yu"
+        ],
+        "published": "2024-02-22",
+        "abstract": "In this study, we delve into the validity of conventional personality questionnaires in capturing the human-like personality traits of Large Language Models (LLMs). Our objective is to assess the congruence between the personality traits LLMs claim to possess and their demonstrated tendencies in real-world scenarios. By conducting an extensive examination of LLM outputs against observed human response patterns, we aim to understand the disjunction between self-knowledge and action in LLMs.",
+        "entry_url": "http://arxiv.org/abs/2402.14679v2",
+        "pdf_url": "https://arxiv.org/pdf/2402.14679v2"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "1908.11476v1",
+        "title": "The network uncertainty quantification method for propagating uncertainties in component-based systems",
+        "authors": [
+          "Kevin Carlberg",
+          "Sofia Guzzetti",
+          "Mohammad Khalil",
+          "Khachik Sargsyan"
+        ],
+        "published": "2019-08-29",
+        "abstract": "This work introduces the network uncertainty quantification (NetUQ) method for performing uncertainty propagation in systems composed of interconnected components. The method assumes the existence of a collection of components, each of which is characterized by exogenous-input random variables, endogenous-input random variables, output random variables, and a local uncertainty-propagation operator that computes output random variables from input random variables. The method assembles the full-system network by connecting components, which is achieved simply by associating endogenous-input random variables for each component with output random variables from other components; no other inter-component compatibility conditions are required. The network uncertainty-propagation problem is: Compute output random variables for all components given all exogenous-input random variables. To solve this problem, the method applies classical relaxation methods (i.e., Jacobi and Gauss--Seidel iteration with Anderson acceleration), which require only black-box evaluations of component uncertainty-propagation operators. Compared with other available methods, this approach is applicable to any network topology, promotes component independence by enabling components to employ tailored uncertainty-propagation operators, supports general functional representations of random variables, and requires no offline preprocessing stage. Also, because the method propagates functional representations of random variables throughout the network (and not, e.g., probability density functions), the joint distribution of any set of random variables throughout the network can be estimated a posteriori in a straightforward manner. We perform supporting convergence and error analysis and execute numerical experiments that demonstrate the weak- and strong-scaling performance of the method.",
+        "entry_url": "http://arxiv.org/abs/1908.11476v1",
+        "pdf_url": "https://arxiv.org/pdf/1908.11476v1"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2405.11357v3",
+        "title": "Large Language Models Lack Understanding of Character Composition of Words",
+        "authors": [
+          "Andrew Shin",
+          "Kunitake Kaneko"
+        ],
+        "published": "2024-05-18",
+        "abstract": "Large language models (LLMs) have demonstrated remarkable performances on a wide range of natural language tasks. Yet, LLMs' successes have been largely restricted to tasks concerning words, sentences, or documents, and it remains questionable how much they understand the minimal units of text, namely characters. In this paper, we examine contemporary LLMs regarding their ability to understand character composition of words, and show that most of them fail to reliably carry out even the simple tasks that can be handled by humans with perfection. We analyze their behaviors with comparison to token level performances, and discuss the potential directions for future research.",
+        "entry_url": "http://arxiv.org/abs/2405.11357v3",
+        "pdf_url": "https://arxiv.org/pdf/2405.11357v3"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2406.05213v2",
+        "title": "On Subjective Uncertainty Quantification and Calibration in Natural Language Generation",
+        "authors": [
+          "Ziyu Wang",
+          "Chris Holmes"
+        ],
+        "published": "2024-06-07",
+        "abstract": "Applications of large language models often involve the generation of free-form responses, in which case uncertainty quantification becomes challenging. This is due to the need to identify task-specific uncertainties (e.g., about the semantics) which appears difficult to define in general cases. This work addresses these challenges from a perspective of Bayesian decision theory, starting from the assumption that our utility is characterized by a similarity measure that compares a generated response with a hypothetical true response. We discuss how this assumption enables principled quantification of the model's subjective uncertainty and its calibration. We further derive a measure for epistemic uncertainty, based on a missing data perspective and its characterization as an excess risk. The proposed methods can be applied to black-box language models. We illustrate the methods on question answering and machine translation tasks. Our experiments provide a principled evaluation of task-specific calibration, and demonstrate that epistemic uncertainty offers a promising deferral strategy for efficient data acquisition in in-context learning.",
+        "entry_url": "http://arxiv.org/abs/2406.05213v2",
+        "pdf_url": "https://arxiv.org/pdf/2406.05213v2"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "1509.08130v7",
+        "title": "On Uncertainty Quantification in Particle Accelerators Modelling",
+        "authors": [
+          "Andreas Adelmann"
+        ],
+        "published": "2015-09-27",
+        "abstract": "Using a cyclotron based model problem, we demonstrate for the first time the applicability and usefulness of a uncertainty quantification (UQ) approach in order to construct surrogate models for quantities such as emittance, energy spread but also the halo parameter, and construct a global sensitivity analysis together with error propagation and $L_{2}$ error analysis. The model problem is selected in a way that it represents a template for general high intensity particle accelerator modelling tasks. The presented physics problem has to be seen as hypothetical, with the aim to demonstrate the usefulness and applicability of the presented UQ approach and not solving a particulate problem. The proposed UQ approach is based on sparse polynomial chaos expansions and relies on a small number of high fidelity particle accelerator simulations. Within this UQ framework, the identification of most important uncertainty sources is achieved by performing a global sensitivity analysis via computing the so-called Sobols' indices.",
+        "entry_url": "http://arxiv.org/abs/1509.08130v7",
+        "pdf_url": "https://arxiv.org/pdf/1509.08130v7"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "2403.09676v1",
+        "title": "Unmasking the Shadows of AI: Investigating Deceptive Capabilities in Large Language Models",
+        "authors": [
+          "Linge Guo"
+        ],
+        "published": "2024-02-07",
+        "abstract": "This research critically navigates the intricate landscape of AI deception, concentrating on deceptive behaviours of Large Language Models (LLMs). My objective is to elucidate this issue, examine the discourse surrounding it, and subsequently delve into its categorization and ramifications. The essay initiates with an evaluation of the AI Safety Summit 2023 (ASS) and introduction of LLMs, emphasising multidimensional biases that underlie their deceptive behaviours.The literature review covers four types of deception categorised: Strategic deception, Imitation, Sycophancy, and Unfaithful Reasoning, along with the social implications and risks they entail. Lastly, I take an evaluative stance on various aspects related to navigating the persistent challenges of the deceptive AI. This encompasses considerations of international collaborative governance, the reconfigured engagement of individuals with AI, proposal of practical adjustments, and specific elements of digital education.",
+        "entry_url": "http://arxiv.org/abs/2403.09676v1",
+        "pdf_url": "https://arxiv.org/pdf/2403.09676v1"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2309.02144v1",
+        "title": "Making Large Language Models Better Reasoners with Alignment",
+        "authors": [
+          "Peiyi Wang",
+          "Lei Li",
+          "Liang Chen",
+          "Feifan Song",
+          "Binghuai Lin",
+          "Yunbo Cao"
+        ],
+        "published": "2023-09-05",
+        "abstract": "Reasoning is a cognitive process of using evidence to reach a sound conclusion. The reasoning capability is essential for large language models (LLMs) to serve as the brain of the artificial general intelligence agent. Recent studies reveal that fine-tuning LLMs on data with the chain of thought (COT) reasoning process can significantly enhance their reasoning capabilities. However, we find that the fine-tuned LLMs suffer from an \\textit{Assessment Misalignment} problem, i.e., they frequently assign higher scores to subpar COTs, leading to potential limitations in their reasoning abilities. To address this problem, we introduce an \\textit{Alignment Fine-Tuning (AFT)} paradigm, which involves three steps: 1) fine-tuning LLMs with COT training data; 2) generating multiple COT responses for each question, and categorizing them into positive and negative ones based on whether they achieve the correct answer; 3) calibrating the scores of positive and negative responses given by LLMs with a novel constraint alignment loss. Specifically, the constraint alignment loss has two objectives: a) Alignment, which guarantees that positive scores surpass negative scores to encourage answers with high-quality COTs; b) Constraint, which keeps the negative scores confined to a reasonable range to prevent the model degradation. Beyond just the binary positive and negative feedback, the constraint alignment loss can be seamlessly adapted to the ranking situations when ranking feedback is accessible. Furthermore, we also delve deeply into recent ranking-based alignment methods, such as DPO, RRHF, and PRO, and discover that the constraint, which has been overlooked by these approaches, is also crucial for their performance. Extensive experiments on four reasoning benchmarks with both binary and ranking feedback demonstrate the effectiveness of AFT.",
+        "entry_url": "http://arxiv.org/abs/2309.02144v1",
+        "pdf_url": "https://arxiv.org/pdf/2309.02144v1"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2506.21849v1",
+        "title": "The Consistency Hypothesis in Uncertainty Quantification for Large Language Models",
+        "authors": [
+          "Quan Xiao",
+          "Debarun Bhattacharjya",
+          "Balaji Ganesan",
+          "Radu Marinescu",
+          "Katsiaryna Mirylenka",
+          "Nhan H Pham"
+        ],
+        "published": "2025-06-27",
+        "abstract": "Estimating the confidence of large language model (LLM) outputs is essential for real-world applications requiring high user trust. Black-box uncertainty quantification (UQ) methods, relying solely on model API access, have gained popularity due to their practical benefits. In this paper, we examine the implicit assumption behind several UQ methods, which use generation consistency as a proxy for confidence, an idea we formalize as the consistency hypothesis. We introduce three mathematical statements with corresponding statistical tests to capture variations of this hypothesis and metrics to evaluate LLM output conformity across tasks. Our empirical investigation, spanning 8 benchmark datasets and 3 tasks (question answering, text summarization, and text-to-SQL), highlights the prevalence of the hypothesis under different settings. Among the statements, we highlight the `Sim-Any' hypothesis as the most actionable, and demonstrate how it can be leveraged by proposing data-free black-box UQ methods that aggregate similarities between generations for confidence estimation. These approaches can outperform the closest baselines, showcasing the practical value of the empirically observed consistency hypothesis.",
+        "entry_url": "http://arxiv.org/abs/2506.21849v1",
+        "pdf_url": "https://arxiv.org/pdf/2506.21849v1"
+      }
+    ]
   }
 }

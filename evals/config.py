@@ -41,6 +41,24 @@ EVAL_QUERIES = [
         "query_id": "efficient_inference",
         "text": "efficient inference and KV cache optimization for LLMs",
     },
+    # The five queries above each name a distinctive multi-word technical term, which
+    # arXiv matches almost perfectly. `interpretability` and `efficient_inference` came
+    # back 12 central out of 12, leaving precision@target saturated: any selection of
+    # four scores 1.0, so those queries cannot separate a good screener from a random
+    # one. The two below use vocabulary shared with other fields, so their candidate
+    # sets mix on-topic papers with plainly irrelevant ones and the metric has
+    # something to measure. Phrasing a query as prose instead was tried and is worse:
+    # `search_arxiv` applies no category filter, so "how can we tell whether a language
+    # model is being honest with us" returned twelve gravitational-wave papers.
+    # Both are screening-only and contribute no paper to the retrieval corpus.
+    {
+        "query_id": "memorization",
+        "text": "memorization of training data in neural language models",
+    },
+    {
+        "query_id": "uncertainty_calibration",
+        "text": "uncertainty quantification and calibration in large language models",
+    },
 ]
 
 # One paper per query forms the retrieval corpus. These are chosen by hand from the
