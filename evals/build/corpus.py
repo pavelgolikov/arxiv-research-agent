@@ -10,7 +10,7 @@ from arxiv_reviewer.rag import chunk_pages, index_paper
 from arxiv_reviewer.retrieval import fetch_parsed_paper
 from arxiv_reviewer.review_types import PaperMetadata
 
-from .config import (
+from ..config import (
     CANDIDATES_FILE,
     CHUNKS_FILE,
     CORPUS_PAPERS,

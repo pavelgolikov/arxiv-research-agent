@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-from .config import (
+from ..config import (
     CANDIDATES_FILE,
     LABELS_DIR,
     POOLS_FILE,

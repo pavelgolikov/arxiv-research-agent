@@ -5,17 +5,20 @@ browsers refuse cross-origin reads of local JSON.
 """
 
 import json
+from pathlib import Path
 
-from .config import (
+from ..config import (
     CANDIDATES_FILE,
-    EVALS_DIR,
     POOLS_FILE,
     RETRIEVAL_LABELS,
     SCREENING_LABELS,
 )
 
-TEMPLATE = EVALS_DIR / "label_tool_template.html"
-OUTPUT = EVALS_DIR / "label_tool.html"
+# The page and its template sit beside this module rather than under `evals/`, so
+# the whole labeling workflow stays in one directory.
+HERE = Path(__file__).resolve().parent
+TEMPLATE = HERE / "label_tool_template.html"
+OUTPUT = HERE / "label_tool.html"
 
 
 def build_seed() -> dict:

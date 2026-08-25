@@ -15,7 +15,7 @@ import random
 
 from arxiv_reviewer.rag import RETRIEVER_KINDS, get_retriever
 
-from .config import (
+from ..config import (
     CHUNKS_FILE,
     DATA_DIR,
     EVAL_THREAD_ID,

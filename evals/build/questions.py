@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from arxiv_reviewer.analysis import FACET_QUESTIONS
 from arxiv_reviewer.gemini_client import generate_structured
 
-from .config import (
+from ..config import (
     CHUNKS_FILE,
     DATA_DIR,
     EVAL_QUERIES,

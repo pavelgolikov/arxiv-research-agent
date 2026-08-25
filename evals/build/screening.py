@@ -14,7 +14,7 @@ import time
 
 from arxiv_reviewer.retrieval import search_arxiv
 
-from .config import CANDIDATES_FILE, CANDIDATES_PER_QUERY, DATA_DIR, EVAL_QUERIES
+from ..config import CANDIDATES_FILE, CANDIDATES_PER_QUERY, DATA_DIR, EVAL_QUERIES
 
 
 def build(existing: dict | None = None) -> dict:
