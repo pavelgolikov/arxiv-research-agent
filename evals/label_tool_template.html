@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>arXiv Research Agent — Labeling</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1c1c1a;--muted:#6b6b66;--line:#e2e2dd;--card:#fff;
+--a0:#9a9a94;--a1:#b8860b;--a2:#1f7a4d;--accent:#2f5fd0;--warn:#b03030}
+@media (prefers-color-scheme:dark){:root{--bg:#16171a;--fg:#e8e8e4;--muted:#9a9a94;
+--line:#2c2e33;--card:#1d1f23;--a1:#d9a441;--a2:#4bbd85;--accent:#7aa2f7}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--bg);
+border-bottom:1px solid var(--line);padding:10px 20px}
+header>.row{max-width:none;margin:0}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+button{font:inherit;padding:5px 11px;border:1px solid var(--line);background:var(--card);
+color:var(--fg);border-radius:6px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab{border-radius:6px}
+.tab[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--a2);width:0}
+main{max-width:none;margin:0;padding:16px 24px}
+.qbox{background:var(--card);border:1px solid var(--line);border-radius:8px;
+padding:12px 14px;margin-bottom:14px}
+.qmeta{color:var(--muted);font-size:12.5px;margin-bottom:4px}
+.qtext{font-size:17px;font-weight:600}
+.cand{background:var(--card);border:1px solid var(--line);border-left-width:4px;
+border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.cand.sel{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.cand[data-l="0"]{border-left-color:var(--a0)}
+.cand[data-l="1"]{border-left-color:var(--a1)}
+.cand[data-l="2"]{border-left-color:var(--a2)}
+.cmeta{display:flex;gap:10px;align-items:center;color:var(--muted);
+font-size:12px;margin-bottom:6px;flex-wrap:wrap}
+.txt{white-space:normal;overflow-wrap:break-word;font-size:14.5px;line-height:1.6}
+.tag{border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px}
+.tag.sampled{color:var(--warn);border-color:var(--warn)}
+.marks{display:flex;gap:5px;margin-left:auto}
+.marks button{padding:2px 9px;font-size:12.5px}
+.marks button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
+padding:0 5px;font-size:11.5px;font-family:ui-monospace,monospace}
+.hint{color:var(--muted);font-size:12.5px}
+.done{color:var(--a2);font-weight:600}
+.abs{font-size:14px;color:var(--muted);white-space:normal;overflow-wrap:break-word;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <button class="tab" id="tab-ret" aria-selected="true">Retrieval</button>
+    <button class="tab" id="tab-scr" aria-selected="false">Screening</button>
+    <span class="grow"></span>
+    <span id="counter" class="hint"></span>
+    <button id="prev">&larr; Prev</button>
+    <button id="next" class="primary">Next &rarr;</button>
+    <button id="export">Export JSON</button>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="row hint" style="margin-top:6px">
+    <span><kbd>j</kbd>/<kbd>k</kbd> move</span>
+    <span><kbd>0</kbd><kbd>1</kbd><kbd>2</kbd> label</span>
+    <span><kbd>Enter</kbd> mark reviewed + next</span>
+    <span><kbd>b</kbd> back</span>
+    <span id="revstate"></span>
+  </div>
+</header>
+<main>
+  <div class="qbox">
+    <div class="qmeta" id="qmeta"></div>
+    <div class="qtext" id="qtext"></div>
+  </div>
+  <div id="list"></div>
+</main>
+<script>
+const DATA = __DATA__;
+const KEY = "arxiv-eval-labels-v1";
+let store = {retrieval:{}, screening:{}, reviewed:{retrieval:{}, screening:{}}};
+try{ const raw = localStorage.getItem(KEY); if(raw) store = JSON.parse(raw); }catch(e){}
+if(!store.reviewed) store.reviewed = {retrieval:{}, screening:{}};
+
+let mode = "retrieval";
+let qi = 0, ci = 0;
+
+const items = () => mode === "retrieval" ? DATA.retrieval : DATA.screening;
+const cur = () => items()[qi];
+const cands = () => mode === "retrieval" ? cur().candidates : cur().candidates;
+const idOf = (c) => mode === "retrieval" ? c.chunk_id : c.arxiv_id;
+const qidOf = (q) => mode === "retrieval" ? q.question_id : q.query_id;
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
+function labelOf(c){
+  const m = store[mode][qidOf(cur())] || {};
+  return m[idOf(c)] ?? 0;
+}
+function setLabel(c, v){
+  const q = qidOf(cur());
+  store[mode][q] = store[mode][q] || {};
+  store[mode][q][idOf(c)] = v;
+  save(); render();
+}
+function reviewed(){ return !!store.reviewed[mode][qidOf(cur())]; }
+function markReviewed(){
+  store.reviewed[mode][qidOf(cur())] = true;
+  save();
+}
+
+function render(){
+  const q = cur();
+  const list = document.getElementById("list");
+  document.getElementById("tab-ret").setAttribute("aria-selected", mode==="retrieval");
+  document.getElementById("tab-scr").setAttribute("aria-selected", mode==="screening");
+
+  if(mode === "retrieval"){
+    document.getElementById("qmeta").textContent =
+      `${q.arxiv_id}  ·  ${q.kind}${q.facet ? " · " + q.facet : ""}  ·  ${q.question_id}`;
+  } else {
+    document.getElementById("qmeta").textContent = `query: ${q.query_id}`;
+  }
+  document.getElementById("qtext").textContent = q.text || q.query;
+
+  const total = items().length;
+  const done = items().filter(x => store.reviewed[mode][qidOf(x)]).length;
+  document.getElementById("counter").textContent =
+    `${mode} — question ${qi+1} / ${total} · reviewed ${done}`;
+  document.getElementById("bar").style.width = (100*done/total) + "%";
+  document.getElementById("revstate").innerHTML =
+    reviewed() ? '<span class="done">reviewed</span>' : '<span>not reviewed</span>';
+
+  list.innerHTML = "";
+  cands().forEach((c, i) => {
+    const v = labelOf(c);
+    const el = document.createElement("div");
+    el.className = "cand" + (i===ci ? " sel" : "");
+    el.dataset.l = v;
+
+    const meta = document.createElement("div");
+    meta.className = "cmeta";
+    if(mode === "retrieval"){
+      // Which retrievers found a chunk, and whether it was randomly sampled, are
+      // deliberately not shown: judging must be blind to the systems being compared.
+      meta.innerHTML = `<b>p.${c.page_number}</b><span>${c.chunk_id}</span>`;
+    } else {
+      meta.innerHTML =
+        `<b>[${c.search_position}]</b><span>${c.arxiv_id}</span>` +
+        `<span class="tag">${c.published}</span>`;
+    }
+    const marks = document.createElement("div");
+    marks.className = "marks";
+    [0,1,2].forEach(n => {
+      const b = document.createElement("button");
+      b.textContent = n;
+      b.setAttribute("aria-pressed", v === n);
+      b.onclick = (ev) => { ev.stopPropagation(); ci = i; setLabel(c, n); };
+      marks.appendChild(b);
+    });
+    meta.appendChild(marks);
+    el.appendChild(meta);
+
+    if(mode === "screening"){
+      const t = document.createElement("div");
+      t.style.fontWeight = "600";
+      t.style.marginBottom = "4px";
+      t.textContent = c.title;
+      el.appendChild(t);
+      const a = document.createElement("div");
+      a.className = "abs";
+      a.textContent = c.abstract;
+      el.appendChild(a);
+    } else {
+      const t = document.createElement("div");
+      t.className = "txt";
+      t.textContent = c.text;
+      el.appendChild(t);
+    }
+    el.onclick = () => { ci = i; render(); };
+    list.appendChild(el);
+  });
+
+  const sel = list.children[ci];
+  if(sel) sel.scrollIntoView({block:"nearest"});
+}
+
+function go(d){
+  qi = Math.min(items().length-1, Math.max(0, qi + d));
+  ci = 0; render(); window.scrollTo({top:0});
+}
+
+document.getElementById("next").onclick = () => { markReviewed(); go(1); };
+document.getElementById("prev").onclick = () => go(-1);
+document.getElementById("tab-ret").onclick = () => { mode="retrieval"; qi=0; ci=0; render(); };
+document.getElementById("tab-scr").onclick = () => { mode="screening"; qi=0; ci=0; render(); };
+document.getElementById("export").onclick = () => {
+  const out = {
+    generated_at: new Date().toISOString(),
+    retrieval: store.retrieval,
+    screening: store.screening,
+    reviewed: store.reviewed,
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "labels.json";
+  a.click();
+};
+
+document.addEventListener("keydown", (e) => {
+  if(e.target.tagName === "INPUT") return;
+  const n = cands().length;
+  if(e.key === "j" || e.key === "ArrowDown"){ ci = Math.min(n-1, ci+1); render(); e.preventDefault(); }
+  else if(e.key === "k" || e.key === "ArrowUp"){ ci = Math.max(0, ci-1); render(); e.preventDefault(); }
+  else if(e.key === "0" || e.key === "1" || e.key === "2"){ setLabel(cands()[ci], +e.key); ci = Math.min(n-1, ci+1); render(); }
+  else if(e.key === "Enter"){ markReviewed(); go(1); }
+  else if(e.key === "b"){ go(-1); }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+[
+  {
+    "question_id": "2606.20023v2:research_problem",
+    "arxiv_id": "2606.20023v2",
+    "kind": "facet",
+    "facet": "research_problem",
+    "text": "What research problem does this paper address, and why?"
+  },
+  {
+    "question_id": "2606.20023v2:method",
+    "arxiv_id": "2606.20023v2",
+    "kind": "facet",
+    "facet": "method",
+    "text": "What method, model, or algorithm do the authors propose?"
+  },
+  {
+    "question_id": "2606.20023v2:experimental_setup",
+    "arxiv_id": "2606.20023v2",
+    "kind": "facet",
+    "facet": "experimental_setup",
+    "text": "What datasets, baselines, and experimental setup are used?"
+  },
+  {
+    "question_id": "2606.20023v2:main_findings",
+    "arxiv_id": "2606.20023v2",
+    "kind": "facet",
+    "facet": "main_findings",
+    "text": "What are the main quantitative results and findings?"
+  },
+  {
+    "question_id": "2606.20023v2:limitations",
+    "arxiv_id": "2606.20023v2",
+    "kind": "facet",
+    "facet": "limitations",
+    "text": "What limitations, failure cases, or future work do the authors state?"
+  },
+  {
+    "question_id": "2606.20023v2:relevance_to_query",
+    "arxiv_id": "2606.20023v2",
+    "kind": "facet",
+    "facet": "relevance_to_query",
+    "text": "evaluating LLM agent workflows and tool use"
+  },
+  {
+    "question_id": "2606.20023v2:specific0",
+    "arxiv_id": "2606.20023v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What are the two metrics used to evaluate over-privileged tool selection behavior in the TOOLPRIVBENCH benchmark?"
+  },
+  {
+    "question_id": "2606.20023v2:specific1",
+    "arxiv_id": "2606.20023v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "How many application domains and how many recurring risk types are included in the TOOLPRIVBENCH benchmark?"
+  },
+  {
+    "question_id": "2606.20023v2:specific2",
+    "arxiv_id": "2606.20023v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What two models were used as judges during the automated cross-model consensus stage to validate the functional sufficiency of tools?"
+  },
+  {
+    "question_id": "2606.20023v2:specific3",
+    "arxiv_id": "2606.20023v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which two specific models among those evaluated demonstrated the highest Over-Privileged Tool Use Rate (OPUR) in the study?"
+  },
+  {
+    "question_id": "2505.21444v2:research_problem",
+    "arxiv_id": "2505.21444v2",
+    "kind": "facet",
+    "facet": "research_problem",
+    "text": "What research problem does this paper address, and why?"
+  },
+  {
+    "question_id": "2505.21444v2:method",
+    "arxiv_id": "2505.21444v2",
+    "kind": "facet",
+    "facet": "method",
+    "text": "What method, model, or algorithm do the authors propose?"
+  },
+  {
+    "question_id": "2505.21444v2:experimental_setup",
+    "arxiv_id": "2505.21444v2",
+    "kind": "facet",
+    "facet": "experimental_setup",
+    "text": "What datasets, baselines, and experimental setup are used?"
+  },
+  {
+    "question_id": "2505.21444v2:main_findings",
+    "arxiv_id": "2505.21444v2",
+    "kind": "facet",
+    "facet": "main_findings",
+    "text": "What are the main quantitative results and findings?"
+  },
+  {
+    "question_id": "2505.21444v2:limitations",
+    "arxiv_id": "2505.21444v2",
+    "kind": "facet",
+    "facet": "limitations",
+    "text": "What limitations, failure cases, or future work do the authors state?"
+  },
+  {
+    "question_id": "2505.21444v2:relevance_to_query",
+    "arxiv_id": "2505.21444v2",
+    "kind": "facet",
+    "facet": "relevance_to_query",
+    "text": "language model self-improvement and self-training"
+  },
+  {
+    "question_id": "2505.21444v2:specific0",
+    "arxiv_id": "2505.21444v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What specific synthetic reasoning tasks from Reasoning Gym were used to evaluate the self-training approach?"
+  },
+  {
+    "question_id": "2505.21444v2:specific1",
+    "arxiv_id": "2505.21444v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which metric does the paper use for comparing the performance of SRT against RL with ground truth on the MATH-500 dataset?"
+  },
+  {
+    "question_id": "2505.21444v2:specific2",
+    "arxiv_id": "2505.21444v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What phenomenon is described as a critical limitation of prolonged RL with self-reward, leading to sudden and complete performance collapse?"
+  },
+  {
+    "question_id": "2505.21444v2:specific3",
+    "arxiv_id": "2505.21444v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "How does the paper define the reward function for the self-rewarded training (SRT) mechanism?"
+  },
+  {
+    "question_id": "2407.15549v3:research_problem",
+    "arxiv_id": "2407.15549v3",
+    "kind": "facet",
+    "facet": "research_problem",
+    "text": "What research problem does this paper address, and why?"
+  },
+  {
+    "question_id": "2407.15549v3:method",
+    "arxiv_id": "2407.15549v3",
+    "kind": "facet",
+    "facet": "method",
+    "text": "What method, model, or algorithm do the authors propose?"
+  },
+  {
+    "question_id": "2407.15549v3:experimental_setup",
+    "arxiv_id": "2407.15549v3",
+    "kind": "facet",
+    "facet": "experimental_setup",
+    "text": "What datasets, baselines, and experimental setup are used?"
+  },
+  {
+    "question_id": "2407.15549v3:main_findings",
+    "arxiv_id": "2407.15549v3",
+    "kind": "facet",
+    "facet": "main_findings",
+    "text": "What are the main quantitative results and findings?"
+  },
+  {
+    "question_id": "2407.15549v3:limitations",
+    "arxiv_id": "2407.15549v3",
+    "kind": "facet",
+    "facet": "limitations",
+    "text": "What limitations, failure cases, or future work do the authors state?"
+  },
+  {
+    "question_id": "2407.15549v3:relevance_to_query",
+    "arxiv_id": "2407.15549v3",
+    "kind": "facet",
+    "facet": "relevance_to_query",
+    "text": "adversarial perturbations and robustness of LLM reasoning"
+  },
+  {
+    "question_id": "2407.15549v3:specific0",
+    "arxiv_id": "2407.15549v3",
+    "kind": "specific",
+    "facet": null,
+    "text": "What specific layers did the authors empirically select to perform latent adversarial training, according to their heuristic?"
+  },
+  {
+    "question_id": "2407.15549v3:specific1",
+    "arxiv_id": "2407.15549v3",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which baseline method for improving robustness to jailbreaks is described as being computationally expensive compared to the authors' method?"
+  },
+  {
+    "question_id": "2407.15549v3:specific2",
+    "arxiv_id": "2407.15549v3",
+    "kind": "specific",
+    "facet": null,
+    "text": "What was the specific set of values used for the grid search to determine the perturbation bound epsilon?"
+  },
+  {
+    "question_id": "2407.15549v3:specific3",
+    "arxiv_id": "2407.15549v3",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which benign dataset was used during the Llama-2 experiments to interleave training and preserve model performance?"
+  },
+  {
+    "question_id": "2511.09432v2:research_problem",
+    "arxiv_id": "2511.09432v2",
+    "kind": "facet",
+    "facet": "research_problem",
+    "text": "What research problem does this paper address, and why?"
+  },
+  {
+    "question_id": "2511.09432v2:method",
+    "arxiv_id": "2511.09432v2",
+    "kind": "facet",
+    "facet": "method",
+    "text": "What method, model, or algorithm do the authors propose?"
+  },
+  {
+    "question_id": "2511.09432v2:experimental_setup",
+    "arxiv_id": "2511.09432v2",
+    "kind": "facet",
+    "facet": "experimental_setup",
+    "text": "What datasets, baselines, and experimental setup are used?"
+  },
+  {
+    "question_id": "2511.09432v2:main_findings",
+    "arxiv_id": "2511.09432v2",
+    "kind": "facet",
+    "facet": "main_findings",
+    "text": "What are the main quantitative results and findings?"
+  },
+  {
+    "question_id": "2511.09432v2:limitations",
+    "arxiv_id": "2511.09432v2",
+    "kind": "facet",
+    "facet": "limitations",
+    "text": "What limitations, failure cases, or future work do the authors state?"
+  },
+  {
+    "question_id": "2511.09432v2:relevance_to_query",
+    "arxiv_id": "2511.09432v2",
+    "kind": "facet",
+    "facet": "relevance_to_query",
+    "text": "mechanistic interpretability of transformer internals"
+  },
+  {
+    "question_id": "2511.09432v2:specific0",
+    "arxiv_id": "2511.09432v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What are the three specific loss functions used to train Equivariant Sparse Autoencoders for approximately invariant latents?"
+  },
+  {
+    "question_id": "2511.09432v2:specific1",
+    "arxiv_id": "2511.09432v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which five baselines were used to compare against Equivariant Sparse Autoencoders in the experiments?"
+  },
+  {
+    "question_id": "2511.09432v2:specific2",
+    "arxiv_id": "2511.09432v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "How does the paper define the three regimes of feature completeness in the toy model based on the number of features N and dimensions D?"
+  },
+  {
+    "question_id": "2511.09432v2:specific3",
+    "arxiv_id": "2511.09432v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which machine learning models were used to quantify the usefulness of discovered features via probing in the experiments?"
+  },
+  {
+    "question_id": "2510.14973v2:research_problem",
+    "arxiv_id": "2510.14973v2",
+    "kind": "facet",
+    "facet": "research_problem",
+    "text": "What research problem does this paper address, and why?"
+  },
+  {
+    "question_id": "2510.14973v2:method",
+    "arxiv_id": "2510.14973v2",
+    "kind": "facet",
+    "facet": "method",
+    "text": "What method, model, or algorithm do the authors propose?"
+  },
+  {
+    "question_id": "2510.14973v2:experimental_setup",
+    "arxiv_id": "2510.14973v2",
+    "kind": "facet",
+    "facet": "experimental_setup",
+    "text": "What datasets, baselines, and experimental setup are used?"
+  },
+  {
+    "question_id": "2510.14973v2:main_findings",
+    "arxiv_id": "2510.14973v2",
+    "kind": "facet",
+    "facet": "main_findings",
+    "text": "What are the main quantitative results and findings?"
+  },
+  {
+    "question_id": "2510.14973v2:limitations",
+    "arxiv_id": "2510.14973v2",
+    "kind": "facet",
+    "facet": "limitations",
+    "text": "What limitations, failure cases, or future work do the authors state?"
+  },
+  {
+    "question_id": "2510.14973v2:relevance_to_query",
+    "arxiv_id": "2510.14973v2",
+    "kind": "facet",
+    "facet": "relevance_to_query",
+    "text": "efficient inference and KV cache optimization for LLMs"
+  },
+  {
+    "question_id": "2510.14973v2:specific0",
+    "arxiv_id": "2510.14973v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What specific speedups does the Elastic-Cache method achieve on GSM8K with 256 tokens and on longer sequences?"
+  },
+  {
+    "question_id": "2510.14973v2:specific1",
+    "arxiv_id": "2510.14973v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "Which three specific LLaDA model variants were used for experiments in this study?"
+  },
+  {
+    "question_id": "2510.14973v2:specific2",
+    "arxiv_id": "2510.14973v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "How is the drift statistic for the most-attended token calculated to determine when a global refresh of the KV cache is warranted?"
+  },
+  {
+    "question_id": "2510.14973v2:specific3",
+    "arxiv_id": "2510.14973v2",
+    "kind": "specific",
+    "facet": null,
+    "text": "What are the three core empirical observations that drive the design of the Elastic-Cache strategy?"
+  }
+]

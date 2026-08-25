@@ -249,6 +249,60 @@ replaces them. Don't rewrite git history.
 > **[+X pts recall@5 / +Y nDCG@10]** from hybrid retrieval + reranking over dense-only, with
 > **[Z]%** citation referential integrity across generated reports.
 
+---
+
+## DAY 5 — Labeling (materials built; labeling outstanding)
+
+**Goal:** produce two frozen, hand-labeled datasets so Day 6's ablation has ground
+truth. This is the only day whose output cannot be generated.
+
+### What was built
+
+| Artifact | Purpose |
+| --- | --- |
+| `evals/data/screening_candidates.json` | 5 queries x 12 arXiv candidates, metadata frozen |
+| `evals/data/corpus_papers.json` | the 5 corpus papers and their provenance |
+| `evals/data/corpus_chunks.jsonl` | 570 chunks with stable `chunk_id`s |
+| `evals/data/retrieval_questions.json` | 50 questions (30 facet, 20 paper-specific) |
+| `evals/data/retrieval_pools.json` | 1096 pooled candidates to judge |
+| `evals/label_tool.html` | offline keyboard-driven labeling page |
+| `evals/verify_labels.py` | validates an export and writes the label files |
+
+Rebuild order (only if the corpus must change):
+`build_screening` -> `build_corpus` -> `build_questions` -> `build_pools` ->
+`make_label_tool`.
+
+### Method
+
+**Pooling.** Judging all 570 chunks against all 50 questions is 28,500 decisions.
+Instead each retriever contributes its top 10 per question and the union is judged:
+about 22 candidates per question. This is standard TREC-style pooling.
+
+**Pooling bias, measured rather than assumed.** A chunk no retriever returns is
+never judged and silently counts as irrelevant, which overstates recall. Three
+chunks per question that no retriever returned are therefore sampled into the pool.
+If they come back relevant at more than a few percent, the pools were too shallow
+and `POOL_DEPTH` must rise. `verify_labels.py` reports this rate.
+
+**Graded labels.** `0` irrelevant, `1` partial, `2` directly answers. nDCG@10 is a
+graded metric and degenerates if labels are binary.
+
+**Facet questions are the real workload.** Thirty of the fifty questions are the
+exact strings `analysis.py` asks of every paper, so the benchmark measures the
+system's actual behaviour, not a proxy. The other twenty probe precise retrieval.
+
+**Corpus papers were chosen, not sampled.** One on-topic research paper per query,
+so every facet question has a real answer. Paper *selection* quality is what the
+separate screening dataset measures; the retrieval ablation measures finding the
+right chunk within a paper.
+
+### Acceptance gate
+
+- All 50 retrieval questions and 5 screening queries marked reviewed.
+- `verify_labels.py` reports zero problems.
+- Sampled-chunk miss rate at or below ~5%, or `POOL_DEPTH` raised and pools rebuilt.
+- `evals/labels/*.json` committed.
+
 ## Stretch (only after the week lands)
 
 LangSmith tracing + hosted evals · `interrupt` for human-in-the-loop paper approval (a genuinely

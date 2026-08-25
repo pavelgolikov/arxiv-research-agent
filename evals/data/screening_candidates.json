@@ -1,0 +1,939 @@
+{
+  "agent_eval": {
+    "query": "evaluating LLM agent workflows and tool use",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2606.20023v2",
+        "title": "When Lower Privileges Suffice: Investigating Over-Privileged Tool Selection in LLM Agents",
+        "authors": [
+          "Kaiyue Yang",
+          "Yuyan Bu",
+          "Jingwei Yi",
+          "Yuchi Wang",
+          "Biyu Zhou",
+          "Juntao Dai"
+        ],
+        "published": "2026-06-18",
+        "abstract": "As LLM agents increasingly select tools autonomously, their choices among tools with different privileges become safety-relevant. However, prior tool-selection studies focus on safety-agnostic metadata preferences, leaving privilege-sensitive choices underexplored. To address this gap, we study over-privileged tool selection, in which an agent selects or escalates to a higher-privilege tool despite a sufficient lower-privilege alternative. We introduce ToolPrivBench to evaluate whether agents choose higher-privilege tools despite sufficient lower-privilege alternatives, measuring both initial selection and escalation after transient tool failures. Across eight domains and five recurring risk patterns, we find that over-privileged tool selection is common among mainstream LLM agents and is further amplified by transient failures. We further find that general safety alignment does not reliably transfer to least-privilege tool choice, while prompt-level controls provide only limited mitigation under transient failures. We therefore introduce a privilege-aware post-training defense that teaches agents to prefer sufficient lower-privilege tools and escalate only when necessary. Our mitigation experiments show that this defense substantially reduces unnecessary high-privilege tool use while preserving general capabilities.",
+        "entry_url": "http://arxiv.org/abs/2606.20023v2",
+        "pdf_url": "https://arxiv.org/pdf/2606.20023v2"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "2502.09809v1",
+        "title": "AgentGuard: Repurposing Agentic Orchestrator for Safety Evaluation of Tool Orchestration",
+        "authors": [
+          "Jizhou Chen",
+          "Samuel Lee Cong"
+        ],
+        "published": "2025-02-13",
+        "abstract": "The integration of tool use into large language models (LLMs) enables agentic systems with real-world impact. In the meantime, unlike standalone LLMs, compromised agents can execute malicious workflows with more consequential impact, signified by their tool-use capability. We propose AgentGuard, a framework to autonomously discover and validate unsafe tool-use workflows, followed by generating safety constraints to confine the behaviors of agents, achieving the baseline of safety guarantee at deployment. AgentGuard leverages the LLM orchestrator's innate capabilities - knowledge of tool functionalities, scalable and realistic workflow generation, and tool execution privileges - to act as its own safety evaluator. The framework operates through four phases: identifying unsafe workflows, validating them in real-world execution, generating safety constraints, and validating constraint efficacy. The output, an evaluation report with unsafe workflows, test cases, and validated constraints, enables multiple security applications. We empirically demonstrate AgentGuard's feasibility with experiments. With this exploratory work, we hope to inspire the establishment of standardized testing and hardening procedures for LLM agents to enhance their trustworthiness in real-world applications.",
+        "entry_url": "http://arxiv.org/abs/2502.09809v1",
+        "pdf_url": "https://arxiv.org/pdf/2502.09809v1"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "2401.07324v3",
+        "title": "Small LLMs Are Weak Tool Learners: A Multi-LLM Agent",
+        "authors": [
+          "Weizhou Shen",
+          "Chenliang Li",
+          "Hongzhan Chen",
+          "Ming Yan",
+          "Xiaojun Quan",
+          "Hehong Chen"
+        ],
+        "published": "2024-01-14",
+        "abstract": "Large Language Model (LLM) agents significantly extend the capabilities of standalone LLMs, empowering them to interact with external tools (e.g., APIs, functions) and complete various tasks in a self-directed fashion. The challenge of tool use demands that LLMs not only understand user queries and generate answers accurately but also excel in task planning, tool invocation, and result summarization. While traditional works focus on training a single LLM with all these capabilities, performance limitations become apparent, particularly with smaller models. To overcome these challenges, we propose a novel approach that decomposes the aforementioned capabilities into a planner, caller, and summarizer. Each component is implemented by a single LLM that focuses on a specific capability and collaborates with others to accomplish the task. This modular framework facilitates individual updates and the potential use of smaller LLMs for building each capability. To effectively train this framework, we introduce a two-stage training paradigm. First, we fine-tune a backbone LLM on the entire dataset without discriminating sub-tasks, providing the model with a comprehensive understanding of the task. Second, the fine-tuned LLM is used to instantiate the planner, caller, and summarizer respectively, which are continually fine-tuned on respective sub-tasks. Evaluation across various tool-use benchmarks illustrates that our proposed multi-LLM framework surpasses the traditional single-LLM approach, highlighting its efficacy and advantages in tool learning.",
+        "entry_url": "http://arxiv.org/abs/2401.07324v3",
+        "pdf_url": "https://arxiv.org/pdf/2401.07324v3"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "2111.01762v1",
+        "title": "AIRCC-Clim: a user-friendly tool for generating regional probabilistic climate change scenarios and risk measures",
+        "authors": [
+          "Francisco Estrada",
+          "Oscar Calderón-Bustamante",
+          "Wouter Botzen",
+          "Julián A. Velasco",
+          "Richard S. J. Tol"
+        ],
+        "published": "2021-10-30",
+        "abstract": "Complex physical models are the most advanced tools available for producing realistic simulations of the climate system. However, such levels of realism imply high computational cost and restrictions on their use for policymaking and risk assessment. Two central characteristics of climate change are uncertainty and that it is a dynamic problem in which international actions can significantly alter climate projections and information needs, including partial and full compliance of global climate goals. Here we present AIRCC-Clim, a simple climate model emulator that produces regional probabilistic climate change projections of monthly and annual temperature and precipitation, as well as risk measures, based both on standard and user-defined emissions scenarios for six greenhouse gases. AIRCC-Clim emulates 37 atmosphere-ocean coupled general circulation models with low computational and technical requirements for the user. This standalone, user-friendly software is designed for a variety of applications including impact assessments, climate policy evaluation and integrated assessment modelling.",
+        "entry_url": "http://arxiv.org/abs/2111.01762v1",
+        "pdf_url": "https://arxiv.org/pdf/2111.01762v1"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2508.02866v3",
+        "title": "PROV-AGENT: Unified Provenance for Tracking AI Agent Interactions in Agentic Workflows",
+        "authors": [
+          "Renan Souza",
+          "Amal Gueroudji",
+          "Stephen DeWitt",
+          "Daniel Rosendo",
+          "Tirthankar Ghosal",
+          "Robert Ross"
+        ],
+        "published": "2025-08-04",
+        "abstract": "Large Language Models (LLMs) and other foundation models are increasingly used as the core of AI agents. In agentic workflows, these agents plan tasks, interact with humans and peers, and influence scientific outcomes across federated and heterogeneous environments. However, agents can hallucinate or reason incorrectly, propagating errors when one agent's output becomes another's input. Thus, assuring that agents' actions are transparent, traceable, reproducible, and reliable is critical to assess hallucination risks and mitigate their workflow impacts. While provenance techniques have long supported these principles, existing methods fail to capture and relate agent-centric metadata such as prompts, responses, and decisions with the broader workflow context and downstream outcomes. In this paper, we introduce PROV-AGENT, a provenance model that extends W3C PROV and leverages the Model Context Protocol (MCP) and data observability to integrate agent interactions into end-to-end workflow provenance. Our contributions include: (1) a provenance model tailored for agentic workflows, (2) a near real-time, open-source system for capturing agentic provenance, and (3) a cross-facility evaluation spanning edge, cloud, and HPC environments, demonstrating support for critical provenance queries and agent reliability analysis.",
+        "entry_url": "http://arxiv.org/abs/2508.02866v3",
+        "pdf_url": "https://arxiv.org/pdf/2508.02866v3"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "2512.21309v2",
+        "title": "A Plan Reuse Mechanism for LLM-Driven Agent",
+        "authors": [
+          "Guopeng Li",
+          "Ruiqi Wu",
+          "Haisheng Tan"
+        ],
+        "published": "2025-12-24",
+        "abstract": "Integrating large language models (LLMs) into personal assistants, like Xiao Ai and Blue Heart V, effectively enhances their ability to interact with humans, solve complex tasks, and manage IoT devices. Such assistants are also termed LLM-driven agents. Upon receiving user requests, the LLM-driven agent generates plans using an LLM, executes these plans through various tools, and then returns the response to the user. During this process, the latency for generating a plan with an LLM can reach tens of seconds, significantly degrading user experience. Real-world dataset analysis shows that about 30% of the requests received by LLM-driven agents are identical or similar, which allows the reuse of previously generated plans to reduce latency. However, it is difficult to accurately define the similarity between the request texts received by the LLM-driven agent through directly evaluating the original request texts. Moreover, the diverse expressions of natural language and the unstructured format of plan texts make implementing plan reuse challenging. To address these issues, we present and implement a plan reuse mechanism for LLM-driven agents called AgentReuse. AgentReuse leverages the similarities and differences among requests' semantics and uses intent classification to evaluate the similarities between requests and enable the reuse of plans. Experimental results based on a real-world dataset demonstrate that AgentReuse achieves a 93% effective plan reuse rate, an F1 score of 0.9718, and an accuracy of 0.9459 in evaluating request similarities, reducing latency by 93.12% compared with baselines without using the reuse mechanism.",
+        "entry_url": "http://arxiv.org/abs/2512.21309v2",
+        "pdf_url": "https://arxiv.org/pdf/2512.21309v2"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2510.01295v1",
+        "title": "The Social Laboratory: A Psychometric Framework for Multi-Agent LLM Evaluation",
+        "authors": [
+          "Zarreen Reza"
+        ],
+        "published": "2025-10-01",
+        "abstract": "As Large Language Models (LLMs) transition from static tools to autonomous agents, traditional evaluation benchmarks that measure performance on downstream tasks are becoming insufficient. These methods fail to capture the emergent social and cognitive dynamics that arise when agents communicate, persuade, and collaborate in interactive environments. To address this gap, we introduce a novel evaluation framework that uses multi-agent debate as a controlled \"social laboratory\" to discover and quantify these behaviors. In our framework, LLM-based agents, instantiated with distinct personas and incentives, deliberate on a wide range of challenging topics under the supervision of an LLM moderator. Our analysis, enabled by a new suite of psychometric and semantic metrics, reveals several key findings. Across hundreds of debates, we uncover a powerful and robust emergent tendency for agents to seek consensus, consistently reaching high semantic agreement (μ > 0.88) even without explicit instruction and across sensitive topics. We show that assigned personas induce stable, measurable psychometric profiles, particularly in cognitive effort, and that the moderators persona can significantly alter debate outcomes by structuring the environment, a key finding for external AI alignment. This work provides a blueprint for a new class of dynamic, psychometrically grounded evaluation protocols designed for the agentic setting, offering a crucial methodology for understanding and shaping the social behaviors of the next generation of AI agents. We have released the code and results at https://github.com/znreza/multi-agent-LLM-eval-for-debate.",
+        "entry_url": "http://arxiv.org/abs/2510.01295v1",
+        "pdf_url": "https://arxiv.org/pdf/2510.01295v1"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2409.01907v1",
+        "title": "Focus Agent: LLM-Powered Virtual Focus Group",
+        "authors": [
+          "Taiyu Zhang",
+          "Xuesong Zhang",
+          "Robbe Cools",
+          "Adalberto L. Simeone"
+        ],
+        "published": "2024-09-03",
+        "abstract": "In the domain of Human-Computer Interaction, focus groups represent a widely utilised yet resource-intensive methodology, often demanding the expertise of skilled moderators and meticulous preparatory efforts. This study introduces the ``Focus Agent,'' a Large Language Model (LLM) powered framework that simulates both the focus group (for data collection) and acts as a moderator in a focus group setting with human participants. To assess the data quality derived from the Focus Agent, we ran five focus group sessions with a total of 23 human participants as well as deploying the Focus Agent to simulate these discussions with AI participants. Quantitative analysis indicates that Focus Agent can generate opinions similar to those of human participants. Furthermore, the research exposes some improvements associated with LLMs acting as moderators in focus group discussions that include human participants.",
+        "entry_url": "http://arxiv.org/abs/2409.01907v1",
+        "pdf_url": "https://arxiv.org/pdf/2409.01907v1"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "2511.07641v1",
+        "title": "LLMs vs. Traditional Sentiment Tools in Psychology: An Evaluation on Belgian-Dutch Narratives",
+        "authors": [
+          "Ratna Kandala",
+          "Katie Hoemann"
+        ],
+        "published": "2025-11-10",
+        "abstract": "Understanding emotional nuances in everyday language is crucial for computational linguistics and emotion research. While traditional lexicon-based tools like LIWC and Pattern have served as foundational instruments, Large Language Models (LLMs) promise enhanced context understanding. We evaluated three Dutch-specific LLMs (ChocoLlama-8B-Instruct, Reynaerde-7B-chat, and GEITje-7B-ultra) against LIWC and Pattern for valence prediction in Flemish, a low-resource language variant. Our dataset comprised approximately 25000 spontaneous textual responses from 102 Dutch-speaking participants, each providing narratives about their current experiences with self-assessed valence ratings (-50 to +50). Surprisingly, despite architectural advancements, the Dutch-tuned LLMs underperformed compared to traditional methods, with Pattern showing superior performance. These findings challenge assumptions about LLM superiority in sentiment analysis tasks and highlight the complexity of capturing emotional valence in spontaneous, real-world narratives. Our results underscore the need for developing culturally and linguistically tailored evaluation frameworks for low-resource language variants, while questioning whether current LLM fine-tuning approaches adequately address the nuanced emotional expressions found in everyday language use.",
+        "entry_url": "http://arxiv.org/abs/2511.07641v1",
+        "pdf_url": "https://arxiv.org/pdf/2511.07641v1"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "2607.09839v1",
+        "title": "Exploring Agentic Workflows for Generating High Quality Math Visual Aids",
+        "authors": [
+          "Rizwaan Malik",
+          "Ashna Khetan",
+          "Isabel Sieh",
+          "Samin Khan"
+        ],
+        "published": "2026-07-10",
+        "abstract": "Mathematical diagrams play a crucial role in K 12 education, both as problem components and as scaffolding for student comprehension. However, current AI tools, including Large Language Models (LLMs), struggle to reliably generate accurate and pedagogically sound visual diagrams, even when provided with detailed descriptions. A significant gap therefore remains in the reliable generation of diagrams for middle school mathematics. To address this, we introduce an agentic workflow that enables LLM agents to evaluate the quality of generated visuals and use this feedback to iteratively improve their outputs. This self improvement loop aims to enhance the accuracy and educational appropriateness of AI generated diagrams. Our research investigates two questions. First, can LLMs accurately generate quality assurance questions for a visual aid given specific criteria for visual quality? Second, given valid quality assurance questions, can Vision Language Models effectively evaluate generated K 12 visual aids and use the resulting feedback to improve them iteratively? We conduct an exploratory evaluation of our agentic workflow and identify key areas for improvement, including stronger spatial reasoning and more comprehensive coverage of diagram features in the generated quality assurance questions. Our results provide preliminary evidence that this approach can improve the reliability and educational value of AI generated mathematical diagrams.",
+        "entry_url": "http://arxiv.org/abs/2607.09839v1",
+        "pdf_url": "https://arxiv.org/pdf/2607.09839v1"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2509.13978v2",
+        "title": "LLM Agents for Interactive Workflow Provenance: Reference Architecture and Evaluation Methodology",
+        "authors": [
+          "Renan Souza",
+          "Timothy Poteet",
+          "Brian Etz",
+          "Daniel Rosendo",
+          "Amal Gueroudji",
+          "Woong Shin"
+        ],
+        "published": "2025-09-17",
+        "abstract": "Modern scientific discovery increasingly relies on workflows that process data across the Edge, Cloud, and High Performance Computing (HPC) continuum. Comprehensive and in-depth analyses of these data are critical for hypothesis validation, anomaly detection, reproducibility, and impactful findings. Although workflow provenance techniques support such analyses, at large scale, the provenance data become complex and difficult to analyze. Existing systems depend on custom scripts, structured queries, or static dashboards, limiting data interaction. In this work, we introduce an evaluation methodology, reference architecture, and open-source implementation that leverages interactive Large Language Model (LLM) agents for runtime data analysis. Our approach uses a lightweight, metadata-driven design that translates natural language into structured provenance queries. Evaluations across LLaMA, GPT, Gemini, and Claude, covering diverse query classes and a real-world chemistry workflow, show that modular design, prompt tuning, and Retrieval-Augmented Generation (RAG) enable accurate and insightful LLM agent responses beyond recorded provenance.",
+        "entry_url": "http://arxiv.org/abs/2509.13978v2",
+        "pdf_url": "https://arxiv.org/pdf/2509.13978v2"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2606.05868v1",
+        "title": "YouZhi: Towards High-Concurrency Financial LLMs via Adaptive GQA-to-MLA Transition",
+        "authors": [
+          " PSBC LLM Team",
+          " Huawei LLM Team",
+          "Ruihan Long",
+          "Junjie Wu",
+          "Tianan Zhang",
+          "Duo Zhang"
+        ],
+        "published": "2026-06-04",
+        "abstract": "Large language models (LLMs) drive significant financial innovations, yet their high-concurrency deployment is severely bottlenecked by KV cache memory overhead, which inflates infrastructure costs and throttles scalability. To address this, we propose YouZhi-LLM, a highly efficient financial LLM empowered by a comprehensive structural transition and training pipeline natively built on the Huawei Ascend ecosystem. At its algorithmic core, YouZhi-LLM features a layer-adaptive GQA-to-MLA transition framework that dynamically assigns per-layer FreqFold sizes, maximizing KV-cache compression while minimizing perplexity degradation. To recover representation capacity and inject domain expertise, the Ascend-based training pipeline seamlessly integrates generalized knowledge distillation with financial-specific supervised fine-tuning. Evaluations demonstrate the superiority of this systematic approach, with the adaptive transition reducing perplexity degradation by up to 35% over uniform baselines. Crucially, when evaluated on Ascend NPUs via vLLM-Ascend, the massive KV-cache reduction translates directly into deployment efficiency. Compared to their respective base models, YouZhi-7B yields a 12.3% improvement in average financial benchmark score alongside a 2.69$\\times$ increase in maximum concurrency; similarly, YouZhi-14B achieves a 7.0% accuracy gain and a 2.43$\\times$ concurrency boost, establishing a new paradigm for cost-effective, high-throughput financial inference.",
+        "entry_url": "http://arxiv.org/abs/2606.05868v1",
+        "pdf_url": "https://arxiv.org/pdf/2606.05868v1"
+      }
+    ]
+  },
+  "self_improvement": {
+    "query": "language model self-improvement and self-training",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2505.21444v2",
+        "title": "Can Large Reasoning Models Self-Train?",
+        "authors": [
+          "Sheikh Shafayat",
+          "Fahim Tajwar",
+          "Ruslan Salakhutdinov",
+          "Jeff Schneider",
+          "Andrea Zanette"
+        ],
+        "published": "2025-05-27",
+        "abstract": "Recent successes of reinforcement learning (RL) in training large reasoning models motivate the question of whether self-training - the process where a model learns from its own judgments - can be sustained within RL. In this work, we study this question using majority voting as a simple self-feedback mechanism. On a comprehensive set of experiments on both synthetic and real reasoning tasks, we find that this basic approach improves not only the model's reasoning performance, but also its capability of generating better quality feedback for the next RL iteration, driving further model improvement. Yet our analysis also reveals a critical limitation of such a self-training paradigm - prolonged RL with self-reward leads to reward hacking where models learn to maximize training (pseudo-)reward, resulting in sudden and complete performance collapse. Together, these results highlight feedback design as the central challenge and call for future research on mechanisms to enable prolonged self-improvement.",
+        "entry_url": "http://arxiv.org/abs/2505.21444v2",
+        "pdf_url": "https://arxiv.org/pdf/2505.21444v2"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "2303.10856v1",
+        "title": "Revisiting Realistic Test-Time Training: Sequential Inference and Adaptation by Anchored Clustering Regularized Self-Training",
+        "authors": [
+          "Yongyi Su",
+          "Xun Xu",
+          "Tianrui Li",
+          "Kui Jia"
+        ],
+        "published": "2023-03-20",
+        "abstract": "Deploying models on target domain data subject to distribution shift requires adaptation. Test-time training (TTT) emerges as a solution to this adaptation under a realistic scenario where access to full source domain data is not available, and instant inference on the target domain is required. Despite many efforts into TTT, there is a confusion over the experimental settings, thus leading to unfair comparisons. In this work, we first revisit TTT assumptions and categorize TTT protocols by two key factors. Among the multiple protocols, we adopt a realistic sequential test-time training (sTTT) protocol, under which we develop a test-time anchored clustering (TTAC) approach to enable stronger test-time feature learning. TTAC discovers clusters in both source and target domains and matches the target clusters to the source ones to improve adaptation. When source domain information is strictly absent (i.e. source-free) we further develop an efficient method to infer source domain distributions for anchored clustering. Finally, self-training~(ST) has demonstrated great success in learning from unlabeled data and we empirically figure out that applying ST alone to TTT is prone to confirmation bias. Therefore, a more effective TTT approach is introduced by regularizing self-training with anchored clustering, and the improved model is referred to as TTAC++. We demonstrate that, under all TTT protocols, TTAC++ consistently outperforms the state-of-the-art methods on five TTT datasets, including corrupted target domain, selected hard samples, synthetic-to-real adaptation and adversarially attacked target domain. We hope this work will provide a fair benchmarking of TTT methods, and future research should be compared within respective protocols.",
+        "entry_url": "http://arxiv.org/abs/2303.10856v1",
+        "pdf_url": "https://arxiv.org/pdf/2303.10856v1"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "2411.00750v2",
+        "title": "Mitigating Tail Narrowing in LLM Self-Improvement via Socratic-Guided Sampling",
+        "authors": [
+          "Yiwen Ding",
+          "Zhiheng Xi",
+          "Wei He",
+          "Zhuoyuan Li",
+          "Yitao Zhai",
+          "Xiaowei Shi"
+        ],
+        "published": "2024-11-01",
+        "abstract": "Self-improvement methods enable large language models (LLMs) to generate solutions themselves and iteratively train on filtered, high-quality rationales. This process proves effective and reduces the reliance on human supervision in LLMs' reasoning, but the performance soon plateaus. We delve into the process and find that models tend to over-sample on easy queries and under-sample on queries they have yet to master. As iterations proceed, this imbalance in sampling is exacerbated, leading to a long-tail distribution where solutions to difficult queries almost diminish. This phenomenon limits the performance gain of self-improving models. A straightforward solution is brute-force sampling to balance the distribution, which significantly raises computational costs. In this paper, we introduce Guided Self-Improvement (GSI), a strategy aimed at improving the efficiency of sampling challenging heavy-tailed data. It leverages Socratic-style guidance signals to help LLM reasoning with complex queries, reducing the exploration effort and minimizing computational overhead. Experiments on four models across diverse mathematical tasks show that GSI strikes a balance between performance and efficiency, while also being effective on held-out tasks.",
+        "entry_url": "http://arxiv.org/abs/2411.00750v2",
+        "pdf_url": "https://arxiv.org/pdf/2411.00750v2"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "2603.25681v2",
+        "title": "Self-Improvement of Large Language Models: A Technical Overview and Future Outlook",
+        "authors": [
+          "Haoyan Yang",
+          "Mario Xerri",
+          "Solha Park",
+          "Huajian Zhang",
+          "Yiyang Feng",
+          "Sai Akhil Kogilathota"
+        ],
+        "published": "2026-03-26",
+        "abstract": "As large language models (LLMs) continue to advance, improving them solely through human supervision is becoming increasingly costly and limited in scalability. As models approach human-level capabilities in certain domains, human feedback may no longer provide sufficiently informative signals for further improvement. At the same time, the growing ability of models to make autonomous decisions and execute complex actions naturally enables abstractions in which components of the model development process can be progressively automated. Together, these challenges and opportunities have driven increasing interest in self-improvement, where models autonomously generate data, evaluate outputs, and iteratively refine their own capabilities. In this paper, we present a system-level perspective on self-improving language models and introduce a unified framework that organizes existing techniques. We conceptualize the self-improvement system as a closed-loop lifecycle, consisting of four tightly coupled processes: data acquisition, data selection, model optimization, and inference refinement, along with an autonomous evaluation layer. Within this framework, the model itself plays a central role in driving each stage: collecting or generating data, selecting informative signals, updating its parameters, and refining outputs, while the autonomous evaluation layer continuously monitors progress and guides the improvement cycle across stages. Following this lifecycle perspective, we systematically review and analyze representative methods for each component from a technical standpoint. We further discuss current limitations and outline our vision for future research toward fully self-improving LLMs.",
+        "entry_url": "http://arxiv.org/abs/2603.25681v2",
+        "pdf_url": "https://arxiv.org/pdf/2603.25681v2"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2412.01951v2",
+        "title": "Self-Improvement in Language Models: The Sharpening Mechanism",
+        "authors": [
+          "Audrey Huang",
+          "Adam Block",
+          "Dylan J. Foster",
+          "Dhruv Rohatgi",
+          "Cyril Zhang",
+          "Max Simchowitz"
+        ],
+        "published": "2024-12-02",
+        "abstract": "Recent work in language modeling has raised the possibility of self-improvement, where a language models evaluates and refines its own generations to achieve higher performance without external feedback. It is impossible for this self-improvement to create information that is not already in the model, so why should we expect that this will lead to improved capabilities? We offer a new perspective on the capabilities of self-improvement through a lens we refer to as sharpening. Motivated by the observation that language models are often better at verifying response quality than they are at generating correct responses, we formalize self-improvement as using the model itself as a verifier during post-training in order to ``sharpen'' the model to one placing large mass on high-quality sequences, thereby amortizing the expensive inference-time computation of generating good sequences. We begin by introducing a new statistical framework for sharpening in which the learner aims to sharpen a pre-trained base policy via sample access, and establish fundamental limits. Then we analyze two natural families of self-improvement algorithms based on SFT and RLHF. We find that (i) the SFT-based approach is minimax optimal whenever the initial model has sufficient coverage, but (ii) the RLHF-based approach can improve over SFT-based self-improvement by leveraging online exploration, bypassing the need for coverage. Finally, we empirically validate the sharpening mechanism via inference-time and amortization experiments. We view these findings as a starting point toward a foundational understanding that can guide the design and evaluation of self-improvement algorithms.",
+        "entry_url": "http://arxiv.org/abs/2412.01951v2",
+        "pdf_url": "https://arxiv.org/pdf/2412.01951v2"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "2604.13356v3",
+        "title": "Peer-Predictive Self-Training for Language Model Reasoning",
+        "authors": [
+          "Shi Feng",
+          "Hanlin Zhang",
+          "Fan Nie",
+          "Sham Kakade",
+          "Yiling Chen"
+        ],
+        "published": "2026-04-14",
+        "abstract": "Mechanisms for continued self-improvement of language models without external supervision remain an open challenge. We propose Peer-Predictive Self-Training (PST), a label-free fine-tuning framework in which multiple language models improve collaboratively by using a cross-model aggregate response as an internal training signal. Given a prompt, models generate responses sequentially; the final aggregated answer, which is often more reliable than individual responses in practice, serves as an internal reference for learning. We measure how informative each intermediate response is about the aggregate using pointwise mutual information (PMI), and use this signal to scale self-training updates: responses already aligned with the aggregate receive smaller updates, while less informative or misaligned responses receive larger ones. On mathematical reasoning benchmarks, including SimulEq, MATH-500-Numeric, and MultiArith, PST improves exact-match accuracy by 2.2--4.3 percentage points across Gemma-2-2B, LLaMA-3.2-1B, and Qwen2.5-1.5B, and reduces the average generator--verifier gap (GV-Gap) by 26--40%, while requiring no external supervision, no teacher--student hierarchy, and only cross-model interactions. These results suggest that peer-predictive feedback from cross-model generations can provide an effective mechanism for self-supervised language-model improvement.",
+        "entry_url": "http://arxiv.org/abs/2604.13356v3",
+        "pdf_url": "https://arxiv.org/pdf/2604.13356v3"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2603.03524v2",
+        "title": "Test-Time Meta-Adaptation with Self-Synthesis",
+        "authors": [
+          "Zeyneb N. Kaya",
+          "Nick Rui"
+        ],
+        "published": "2026-03-03",
+        "abstract": "As strong general reasoners, large language models (LLMs) encounter diverse domains and tasks, where the ability to adapt and self-improve at test time is valuable. We introduce MASS, a meta-learning framework that enables LLMs to self-adapt by generating problem-specific synthetic training data and performing targeted self-updates optimized for downstream performance at inference time. We train this behavior end-to-end via bilevel optimization: an inner loop adapts on self-generated examples while an outer loop meta-learns data-attribution signals and rewards post-update task performance. The synthetic data is optimized with scalable meta-gradients, backpropagating the downstream loss through the inner updates to reward useful generations. Experiments on mathematical reasoning show that MASS learns to synthesize per-instance curricula that yield effective, data-efficient test-time adaptation.",
+        "entry_url": "http://arxiv.org/abs/2603.03524v2",
+        "pdf_url": "https://arxiv.org/pdf/2603.03524v2"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2407.08400v3",
+        "title": "Self-training Language Models for Arithmetic Reasoning",
+        "authors": [
+          "Marek Kadlčík",
+          "Michal Štefánik"
+        ],
+        "published": "2024-07-11",
+        "abstract": "Recent language models achieve impressive results in tasks involving complex multistep reasoning, but scaling these capabilities further traditionally requires expensive collection of more annotated data. In this work, we explore the potential of improving models' reasoning capabilities without new data, merely using automated feedback to the validity of their predictions in arithmetic reasoning (self-training). In systematic experimentation across six different arithmetic reasoning datasets, we find that models can substantially improve in both single-round (offline) and online self-training, reaching a correct result in +13.9% and +25.9% more cases, respectively, underlining the importance of actuality of self-training feedback. We further find that in the single-round, offline self-training, traditional supervised training can deliver gains comparable to preference optimization, but in online self-training, preference optimization methods largely outperform supervised training thanks to their superior stability and robustness on unseen types of problems.",
+        "entry_url": "http://arxiv.org/abs/2407.08400v3",
+        "pdf_url": "https://arxiv.org/pdf/2407.08400v3"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "2010.02194v1",
+        "title": "Self-training Improves Pre-training for Natural Language Understanding",
+        "authors": [
+          "Jingfei Du",
+          "Edouard Grave",
+          "Beliz Gunel",
+          "Vishrav Chaudhary",
+          "Onur Celebi",
+          "Michael Auli"
+        ],
+        "published": "2020-10-05",
+        "abstract": "Unsupervised pre-training has led to much recent progress in natural language understanding. In this paper, we study self-training as another way to leverage unlabeled data through semi-supervised learning. To obtain additional data for a specific task, we introduce SentAugment, a data augmentation method which computes task-specific query embeddings from labeled data to retrieve sentences from a bank of billions of unlabeled sentences crawled from the web. Unlike previous semi-supervised methods, our approach does not require in-domain unlabeled data and is therefore more generally applicable. Experiments show that self-training is complementary to strong RoBERTa baselines on a variety of tasks. Our augmentation approach leads to scalable and effective self-training with improvements of up to 2.6% on standard text classification benchmarks. Finally, we also show strong gains on knowledge-distillation and few-shot learning.",
+        "entry_url": "http://arxiv.org/abs/2010.02194v1",
+        "pdf_url": "https://arxiv.org/pdf/2010.02194v1"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "2503.21676v2",
+        "title": "How do language models learn facts? Dynamics, curricula and hallucinations",
+        "authors": [
+          "Nicolas Zucchet",
+          "Jörg Bornschein",
+          "Stephanie Chan",
+          "Andrew Lampinen",
+          "Razvan Pascanu",
+          "Soham De"
+        ],
+        "published": "2025-03-27",
+        "abstract": "Large language models accumulate vast knowledge during pre-training, yet the dynamics governing this acquisition remain poorly understood. This work investigates the learning dynamics of language models on a synthetic factual recall task, uncovering three key findings: First, language models learn in three phases, exhibiting a performance plateau before acquiring precise factual knowledge. Mechanistically, this plateau coincides with the formation of attention-based circuits that support recall. Second, the training data distribution significantly impacts learning dynamics, as imbalanced distributions lead to shorter plateaus. Finally, hallucinations emerge simultaneously with knowledge, and integrating new knowledge into the model through fine-tuning is challenging, as it quickly corrupts its existing parametric memories. Our results emphasize the importance of data distribution in knowledge acquisition and suggest novel data scheduling strategies to accelerate neural network training.",
+        "entry_url": "http://arxiv.org/abs/2503.21676v2",
+        "pdf_url": "https://arxiv.org/pdf/2503.21676v2"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2412.02674v2",
+        "title": "Mind the Gap: Examining the Self-Improvement Capabilities of Large Language Models",
+        "authors": [
+          "Yuda Song",
+          "Hanlin Zhang",
+          "Carson Eisenach",
+          "Sham Kakade",
+          "Dean Foster",
+          "Udaya Ghai"
+        ],
+        "published": "2024-12-03",
+        "abstract": "Self-improvement is a mechanism in Large Language Model (LLM) pre-training, post-training and test-time inference. We explore a framework where the model verifies its own outputs, filters or reweights data based on this verification, and distills the filtered data. Despite several empirical successes, a fundamental understanding is still lacking. In this work, we initiate a comprehensive, modular and controlled study on LLM self-improvement. We provide a mathematical formulation for self-improvement, which is largely governed by a quantity which we formalize as the generation-verification gap. Through experiments with various model families and tasks, we discover a scaling phenomenon of self-improvement -- a variant of the generation-verification gap scales monotonically with the model pre-training flops. We also examine when self-improvement is possible, an iterative self-improvement procedure, and ways to improve its performance. Our findings not only advance understanding of LLM self-improvement with practical implications, but also open numerous avenues for future research into its capabilities and boundaries.",
+        "entry_url": "http://arxiv.org/abs/2412.02674v2",
+        "pdf_url": "https://arxiv.org/pdf/2412.02674v2"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2203.06041v1",
+        "title": "Embedding Earth: Self-supervised contrastive pre-training for dense land cover classification",
+        "authors": [
+          "Michail Tarasiou",
+          "Stefanos Zafeiriou"
+        ],
+        "published": "2022-03-11",
+        "abstract": "In training machine learning models for land cover semantic segmentation there is a stark contrast between the availability of satellite imagery to be used as inputs and ground truth data to enable supervised learning. While thousands of new satellite images become freely available on a daily basis, getting ground truth data is still very challenging, time consuming and costly. In this paper we present Embedding Earth a self-supervised contrastive pre-training method for leveraging the large availability of satellite imagery to improve performance on downstream dense land cover classification tasks. Performing an extensive experimental evaluation spanning four countries and two continents we use models pre-trained with our proposed method as initialization points for supervised land cover semantic segmentation and observe significant improvements up to 25% absolute mIoU. In every case tested we outperform random initialization, especially so when ground truth data are scarse. Through a series of ablation studies we explore the qualities of the proposed approach and find that learnt features can generalize between disparate regions opening up the possibility of using the proposed pre-training scheme as a replacement to random initialization for Earth observation tasks. Code will be uploaded soon at https://github.com/michaeltrs/DeepSatModels.",
+        "entry_url": "http://arxiv.org/abs/2203.06041v1",
+        "pdf_url": "https://arxiv.org/pdf/2203.06041v1"
+      }
+    ]
+  },
+  "adversarial_reasoning": {
+    "query": "adversarial perturbations and robustness of LLM reasoning",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2504.16021v1",
+        "title": "Navigating the State of Cognitive Flow: Context-Aware AI Interventions for Effective Reasoning Support",
+        "authors": [
+          "Dinithi Dissanayake",
+          "Suranga Nanayakkara"
+        ],
+        "published": "2025-04-22",
+        "abstract": "Flow theory describes an optimal cognitive state where individuals experience deep focus and intrinsic motivation when a task's difficulty aligns with their skill level. In AI-augmented reasoning, interventions that disrupt the state of cognitive flow can hinder rather than enhance decision-making. This paper proposes a context-aware cognitive augmentation framework that adapts interventions based on three key contextual factors: type, timing, and scale. By leveraging multimodal behavioral cues (e.g., gaze behavior, typing hesitation, interaction speed), AI can dynamically adjust cognitive support to maintain or restore flow. We introduce the concept of cognitive flow, an extension of flow theory in AI-augmented reasoning, where interventions are personalized, adaptive, and minimally intrusive. By shifting from static interventions to context-aware augmentation, our approach ensures that AI systems support deep engagement in complex decision-making and reasoning without disrupting cognitive immersion.",
+        "entry_url": "http://arxiv.org/abs/2504.16021v1",
+        "pdf_url": "https://arxiv.org/pdf/2504.16021v1"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "2407.15549v3",
+        "title": "Latent Adversarial Training Improves Robustness to Persistent Harmful Behaviors in LLMs",
+        "authors": [
+          "Abhay Sheshadri",
+          "Aidan Ewart",
+          "Phillip Guo",
+          "Aengus Lynch",
+          "Cindy Wu",
+          "Vivek Hebbar"
+        ],
+        "published": "2024-07-22",
+        "abstract": "Large language models (LLMs) can often be made to behave in undesirable ways that they are explicitly fine-tuned not to. For example, the LLM red-teaming literature has produced a wide variety of 'jailbreaking' techniques to elicit harmful text from models that were fine-tuned to be harmless. Recent work on red-teaming, model editing, and interpretability suggests that this challenge stems from how (adversarial) fine-tuning largely serves to suppress rather than remove undesirable capabilities from LLMs. Prior work has introduced latent adversarial training (LAT) as a way to improve robustness to broad classes of failures. These prior works have considered untargeted latent space attacks where the adversary perturbs latent activations to maximize loss on examples of desirable behavior. Untargeted LAT can provide a generic type of robustness but does not leverage information about specific failure modes. Here, we experiment with targeted LAT where the adversary seeks to minimize loss on a specific competing task. We find that it can augment a wide variety of state-of-the-art methods. First, we use targeted LAT to improve robustness to jailbreaks, outperforming a strong R2D2 baseline with orders of magnitude less compute. Second, we use it to more effectively remove backdoors with no knowledge of the trigger. Finally, we use it to more effectively unlearn knowledge for specific undesirable tasks in a way that is also more robust to re-learning. Overall, our results suggest that targeted LAT can be an effective tool for defending against harmful behaviors from LLMs.",
+        "entry_url": "http://arxiv.org/abs/2407.15549v3",
+        "pdf_url": "https://arxiv.org/pdf/2407.15549v3"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "1809.00958v1",
+        "title": "Targeted Nonlinear Adversarial Perturbations in Images and Videos",
+        "authors": [
+          "Roberto Rey-de-Castro",
+          "Herschel Rabitz"
+        ],
+        "published": "2018-08-27",
+        "abstract": "We introduce a method for learning adversarial perturbations targeted to individual images or videos. The learned perturbations are found to be sparse while at the same time containing a high level of feature detail. Thus, the extracted perturbations allow a form of object or action recognition and provide insights into what features the studied deep neural network models consider important when reaching their classification decisions. From an adversarial point of view, the sparse perturbations successfully confused the models into misclassifying, although the perturbed samples still belonged to the same original class by visual examination. This is discussed in terms of a prospective data augmentation scheme. The sparse yet high-quality perturbations may also be leveraged for image or video compression.",
+        "entry_url": "http://arxiv.org/abs/1809.00958v1",
+        "pdf_url": "https://arxiv.org/pdf/1809.00958v1"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "2103.15670v3",
+        "title": "On the Adversarial Robustness of Vision Transformers",
+        "authors": [
+          "Rulin Shao",
+          "Zhouxing Shi",
+          "Jinfeng Yi",
+          "Pin-Yu Chen",
+          "Cho-Jui Hsieh"
+        ],
+        "published": "2021-03-29",
+        "abstract": "Following the success in advancing natural language processing and understanding, transformers are expected to bring revolutionary changes to computer vision. This work provides a comprehensive study on the robustness of vision transformers (ViTs) against adversarial perturbations. Tested on various white-box and transfer attack settings, we find that ViTs possess better adversarial robustness when compared with MLP-Mixer and convolutional neural networks (CNNs) including ConvNeXt, and this observation also holds for certified robustness. Through frequency analysis and feature visualization, we summarize the following main observations contributing to the improved robustness of ViTs: 1) Features learned by ViTs contain less high-frequency patterns that have spurious correlation, which helps explain why ViTs are less sensitive to high-frequency perturbations than CNNs and MLP-Mixer, and there is a high correlation between how much the model learns high-frequency features and its robustness against different frequency-based perturbations. 2) Introducing convolutional or tokens-to-token blocks for learning high-frequency features in ViTs can improve classification accuracy but at the cost of adversarial robustness. 3) Modern CNN designs that borrow techniques from ViTs including activation function, layer norm, larger kernel size to imitate the global attention, and patchify the images as inputs, etc., could help bridge the performance gap between ViTs and CNNs not only in terms of performance, but also certified and empirical adversarial robustness. Moreover, we show adversarial training is also applicable to ViT for training robust models, and sharpness-aware minimization can also help improve robustness, while pre-training with clean images on larger datasets does not significantly improve adversarial robustness.",
+        "entry_url": "http://arxiv.org/abs/2103.15670v3",
+        "pdf_url": "https://arxiv.org/pdf/2103.15670v3"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2606.30247v1",
+        "title": "Grounding LLM Reasoning under Incomplete Graph Evidence",
+        "authors": [
+          "Jiaqi Li",
+          "Fanghui Song"
+        ],
+        "published": "2026-06-29",
+        "abstract": "Knowledge graphs can guide large language models (LLMs) reasoning, but the graph seen by a system is usually a retrieved, linked, temporally scoped, and incomplete evidence state rather than a complete account of truth. We develop a theoretical perspective on grounding observable LLM trajectories under such incomplete graph evidence.The evidence state induces entity anchors, typed relation residuals, path energies, and support regions, while the language model supplies a prior over candidate trajectories. We show that, under open-world incompleteness, no hard rule based only on the observed state can both reject every false unsupported trajectory and retain every true-but-unobserved one.We then characterize soft grounding as a KL-regularized deformation of the LLM prior: finite slack preserves support for unsupported but non-contradicted trajectories, whereas hard conditioning appears as an infinite-penalty limit.The framework also yields stability bounds under evidence perturbations and clarifies the constraint regimes appropriate for GraphRAG, KGQA, graph agents, constrained decoding, and faithful generation. The claims are evidence-relative: KG compatibility is treated as declared support, not factual truth.",
+        "entry_url": "http://arxiv.org/abs/2606.30247v1",
+        "pdf_url": "https://arxiv.org/pdf/2606.30247v1"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "2008.07651v1",
+        "title": "A Deep Dive into Adversarial Robustness in Zero-Shot Learning",
+        "authors": [
+          "Mehmet Kerim Yucel",
+          "Ramazan Gokberk Cinbis",
+          "Pinar Duygulu"
+        ],
+        "published": "2020-08-17",
+        "abstract": "Machine learning (ML) systems have introduced significant advances in various fields, due to the introduction of highly complex models. Despite their success, it has been shown multiple times that machine learning models are prone to imperceptible perturbations that can severely degrade their accuracy. So far, existing studies have primarily focused on models where supervision across all classes were available. In constrast, Zero-shot Learning (ZSL) and Generalized Zero-shot Learning (GZSL) tasks inherently lack supervision across all classes. In this paper, we present a study aimed on evaluating the adversarial robustness of ZSL and GZSL models. We leverage the well-established label embedding model and subject it to a set of established adversarial attacks and defenses across multiple datasets. In addition to creating possibly the first benchmark on adversarial robustness of ZSL models, we also present analyses on important points that require attention for better interpretation of ZSL robustness results. We hope these points, along with the benchmark, will help researchers establish a better understanding what challenges lie ahead and help guide their work.",
+        "entry_url": "http://arxiv.org/abs/2008.07651v1",
+        "pdf_url": "https://arxiv.org/pdf/2008.07651v1"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2504.07887v2",
+        "title": "Benchmarking Adversarial Robustness to Bias Elicitation in Large Language Models: Scalable Automated Assessment with LLM-as-a-Judge",
+        "authors": [
+          "Riccardo Cantini",
+          "Alessio Orsino",
+          "Massimo Ruggiero",
+          "Domenico Talia"
+        ],
+        "published": "2025-04-10",
+        "abstract": "The growing integration of Large Language Models (LLMs) into critical societal domains has raised concerns about embedded biases that can perpetuate stereotypes and undermine fairness. Such biases may stem from historical inequalities in training data, linguistic imbalances, or adversarial manipulation. Despite mitigation efforts, recent studies show that LLMs remain vulnerable to adversarial attacks that elicit biased outputs. This work proposes a scalable benchmarking framework to assess LLM robustness to adversarial bias elicitation. Our methodology involves: (i) systematically probing models across multiple tasks targeting diverse sociocultural biases, (ii) quantifying robustness through safety scores using an LLM-as-a-Judge approach, and (iii) employing jailbreak techniques to reveal safety vulnerabilities. To facilitate systematic benchmarking, we release a curated dataset of bias-related prompts, named CLEAR-Bias. Our analysis, identifying DeepSeek V3 as the most reliable judge LLM, reveals that bias resilience is uneven, with age, disability, and intersectional biases among the most prominent. Some small models outperform larger ones in safety, suggesting that training and architecture may matter more than scale. However, no model is fully robust to adversarial elicitation, with jailbreak attacks using low-resource languages or refusal suppression proving effective across model families. We also find that successive LLM generations exhibit slight safety gains, while models fine-tuned for the medical domain tend to be less safe than their general-purpose counterparts.",
+        "entry_url": "http://arxiv.org/abs/2504.07887v2",
+        "pdf_url": "https://arxiv.org/pdf/2504.07887v2"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2007.08428v4",
+        "title": "On Adversarial Robustness: A Neural Architecture Search perspective",
+        "authors": [
+          "Chaitanya Devaguptapu",
+          "Devansh Agarwal",
+          "Gaurav Mittal",
+          "Pulkit Gopalani",
+          "Vineeth N Balasubramanian"
+        ],
+        "published": "2020-07-16",
+        "abstract": "Adversarial robustness of deep learning models has gained much traction in the last few years. Various attacks and defenses are proposed to improve the adversarial robustness of modern-day deep learning architectures. While all these approaches help improve the robustness, one promising direction for improving adversarial robustness is unexplored, i.e., the complex topology of the neural network architecture. In this work, we address the following question: Can the complex topology of a neural network give adversarial robustness without any form of adversarial training?. We answer this empirically by experimenting with different hand-crafted and NAS-based architectures. Our findings show that, for small-scale attacks, NAS-based architectures are more robust for small-scale datasets and simple tasks than hand-crafted architectures. However, as the size of the dataset or the complexity of task increases, hand-crafted architectures are more robust than NAS-based architectures. Our work is the first large-scale study to understand adversarial robustness purely from an architectural perspective. Our study shows that random sampling in the search space of DARTS (a popular NAS method) with simple ensembling can improve the robustness to PGD attack by nearly~12\\%. We show that NAS, which is popular for achieving SoTA accuracy, can provide adversarial accuracy as a free add-on without any form of adversarial training. Our results show that leveraging the search space of NAS methods with methods like ensembles can be an excellent way to achieve adversarial robustness without any form of adversarial training. We also introduce a metric that can be used to calculate the trade-off between clean accuracy and adversarial robustness. Code and pre-trained models will be made available at \\url{https://github.com/tdchaitanya/nas-robustness}",
+        "entry_url": "http://arxiv.org/abs/2007.08428v4",
+        "pdf_url": "https://arxiv.org/pdf/2007.08428v4"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "2007.04137v3",
+        "title": "SLAP: Improving Physical Adversarial Examples with Short-Lived Adversarial Perturbations",
+        "authors": [
+          "Giulio Lovisotto",
+          "Henry Turner",
+          "Ivo Sluganovic",
+          "Martin Strohmeier",
+          "Ivan Martinovic"
+        ],
+        "published": "2020-07-08",
+        "abstract": "Research into adversarial examples (AE) has developed rapidly, yet static adversarial patches are still the main technique for conducting attacks in the real world, despite being obvious, semi-permanent and unmodifiable once deployed. In this paper, we propose Short-Lived Adversarial Perturbations (SLAP), a novel technique that allows adversaries to realize physically robust real-world AE by using a light projector. Attackers can project a specifically crafted adversarial perturbation onto a real-world object, transforming it into an AE. This allows the adversary greater control over the attack compared to adversarial patches: (i) projections can be dynamically turned on and off or modified at will, (ii) projections do not suffer from the locality constraint imposed by patches, making them harder to detect. We study the feasibility of SLAP in the self-driving scenario, targeting both object detector and traffic sign recognition tasks, focusing on the detection of stop signs. We conduct experiments in a variety of ambient light conditions, including outdoors, showing how in non-bright settings the proposed method generates AE that are extremely robust, causing misclassifications on state-of-the-art networks with up to 99% success rate for a variety of angles and distances. We also demostrate that SLAP-generated AE do not present detectable behaviours seen in adversarial patches and therefore bypass SentiNet, a physical AE detection method. We evaluate other defences including an adaptive defender using adversarial learning which is able to thwart the attack effectiveness up to 80% even in favourable attacker conditions.",
+        "entry_url": "http://arxiv.org/abs/2007.04137v3",
+        "pdf_url": "https://arxiv.org/pdf/2007.04137v3"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "1807.09380v3",
+        "title": "Contrastive Video Representation Learning via Adversarial Perturbations",
+        "authors": [
+          "Jue Wang",
+          "Anoop Cherian"
+        ],
+        "published": "2018-07-24",
+        "abstract": "Adversarial perturbations are noise-like patterns that can subtly change the data, while failing an otherwise accurate classifier. In this paper, we propose to use such perturbations within a novel contrastive learning setup to build negative samples, which are then used to produce improved video representations. To this end, given a well-trained deep model for per-frame video recognition, we first generate adversarial noise adapted to this model. Positive and negative bags are produced using the original data features from the full video sequence and their perturbed counterparts, respectively. Unlike the classic contrastive learning methods, we develop a binary classification problem that learns a set of discriminative hyperplanes -- as a subspace -- that will separate the two bags from each other. This subspace is then used as a descriptor for the video, dubbed \\emph{discriminative subspace pooling}. As the perturbed features belong to data classes that are likely to be confused with the original features, the discriminative subspace will characterize parts of the feature space that are more representative of the original data, and thus may provide robust video representations. To learn such descriptors, we formulate a subspace learning objective on the Stiefel manifold and resort to Riemannian optimization methods for solving it efficiently. We provide experiments on several video datasets and demonstrate state-of-the-art results.",
+        "entry_url": "http://arxiv.org/abs/1807.09380v3",
+        "pdf_url": "https://arxiv.org/pdf/1807.09380v3"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2509.26306v5",
+        "title": "Interactive Learning for LLM Reasoning",
+        "authors": [
+          "Hehai Lin",
+          "Shilei Cao",
+          "Sudong Wang",
+          "Haotian Wu",
+          "Minzhi Li",
+          "Linyi Yang"
+        ],
+        "published": "2025-09-30",
+        "abstract": "Existing multi-agent learning approaches have developed interactive training environments to explicitly promote collaboration among multiple Large Language Models (LLMs), thereby constructing stronger multi-agent systems (MAS). However, during inference, they require re-executing the MAS to obtain final solutions, which diverges from human cognition that individuals can enhance their reasoning capabilities through interactions with others and resolve questions independently in the future. To investigate whether multi-agent interaction can enhance LLMs' independent problem-solving ability, we introduce ILR, a novel co-learning framework for MAS that integrates two key components: Dynamic Interaction and Perception Calibration. Specifically, Dynamic Interaction first adaptively selects either cooperative or competitive strategies depending on question difficulty and model ability. LLMs then exchange information through Idea3, an innovative interaction paradigm designed to mimic human discussion, before deriving their respective final answers. In Perception Calibration, ILR employs Group Relative Policy Optimization (GRPO) to train LLMs while integrating one LLM's reward distribution characteristics into another's reward function, thereby enhancing the cohesion of multi-agent interactions. We evaluate the effectiveness of ILR across three LLMs from two model families of varying scales on five mathematical, one coding, one general question answering, and one scientific reasoning benchmarks. Experimental results show that ILR consistently outperforms single-agent learning, yielding an improvement of up to 5% over the strongest baseline. We further discover that Idea3 can enhance the robustness of stronger LLMs during multi-agent inference, and dynamic interaction types can boost multi-agent learning compared to pure cooperative or competitive strategies.",
+        "entry_url": "http://arxiv.org/abs/2509.26306v5",
+        "pdf_url": "https://arxiv.org/pdf/2509.26306v5"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2202.07201v3",
+        "title": "Holistic Adversarial Robustness of Deep Learning Models",
+        "authors": [
+          "Pin-Yu Chen",
+          "Sijia Liu"
+        ],
+        "published": "2022-02-15",
+        "abstract": "Adversarial robustness studies the worst-case performance of a machine learning model to ensure safety and reliability. With the proliferation of deep-learning-based technology, the potential risks associated with model development and deployment can be amplified and become dreadful vulnerabilities. This paper provides a comprehensive overview of research topics and foundational principles of research methods for adversarial robustness of deep learning models, including attacks, defenses, verification, and novel applications.",
+        "entry_url": "http://arxiv.org/abs/2202.07201v3",
+        "pdf_url": "https://arxiv.org/pdf/2202.07201v3"
+      }
+    ]
+  },
+  "interpretability": {
+    "query": "mechanistic interpretability of transformer internals",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2511.14465v2",
+        "title": "nnterp: A Standardized Interface for Mechanistic Interpretability of Transformers",
+        "authors": [
+          "Clément Dumas"
+        ],
+        "published": "2025-11-18",
+        "abstract": "Mechanistic interpretability research requires reliable tools for analyzing transformer internals across diverse architectures. Current approaches face a fundamental tradeoff: custom implementations like TransformerLens ensure consistent interfaces but require coding a manual adaptation for each architecture, introducing numerical mismatch with the original models, while direct HuggingFace access through NNsight preserves exact behavior but lacks standardization across models. To bridge this gap, we develop nnterp, a lightweight wrapper around NNsight that provides a unified interface for transformer analysis while preserving original HuggingFace implementations. Through automatic module renaming and comprehensive validation testing, nnterp enables researchers to write intervention code once and deploy it across 50+ model variants spanning 16 architecture families. The library includes built-in implementations of common interpretability methods (logit lens, patchscope, activation steering) and provides direct access to attention probabilities for models that support it. By packaging validation tests with the library, researchers can verify compatibility with custom models locally. nnterp bridges the gap between correctness and usability in mechanistic interpretability tooling.",
+        "entry_url": "http://arxiv.org/abs/2511.14465v2",
+        "pdf_url": "https://arxiv.org/pdf/2511.14465v2"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "2504.19475v3",
+        "title": "Prisma: An Open Source Toolkit for Mechanistic Interpretability in Vision and Video",
+        "authors": [
+          "Sonia Joseph",
+          "Praneet Suresh",
+          "Lorenz Hufe",
+          "Edward Stevinson",
+          "Robert Graham",
+          "Yash Vadi"
+        ],
+        "published": "2025-04-28",
+        "abstract": "Robust tooling and publicly available pre-trained models have helped drive recent advances in mechanistic interpretability for language models. However, similar progress in vision mechanistic interpretability has been hindered by the lack of accessible frameworks and pre-trained weights. We present Prisma (Access the codebase here: https://github.com/Prisma-Multimodal/ViT-Prisma), an open-source framework designed to accelerate vision mechanistic interpretability research, providing a unified toolkit for accessing 75+ vision and video transformers; support for sparse autoencoder (SAE), transcoder, and crosscoder training; a suite of 80+ pre-trained SAE weights; activation caching, circuit analysis tools, and visualization tools; and educational resources. Our analysis reveals surprising findings, including that effective vision SAEs can exhibit substantially lower sparsity patterns than language SAEs, and that in some instances, SAE reconstructions can decrease model loss. Prisma enables new research directions for understanding vision model internals while lowering barriers to entry in this emerging field.",
+        "entry_url": "http://arxiv.org/abs/2504.19475v3",
+        "pdf_url": "https://arxiv.org/pdf/2504.19475v3"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "2402.03855v2",
+        "title": "Challenges in Mechanistically Interpreting Model Representations",
+        "authors": [
+          "Satvik Golechha",
+          "James Dao"
+        ],
+        "published": "2024-02-06",
+        "abstract": "Mechanistic interpretability (MI) aims to understand AI models by reverse-engineering the exact algorithms neural networks learn. Most works in MI so far have studied behaviors and capabilities that are trivial and token-aligned. However, most capabilities important for safety and trust are not that trivial, which advocates for the study of hidden representations inside these networks as the unit of analysis. We formalize representations for features and behaviors, highlight their importance and evaluation, and perform an exploratory study of dishonesty representations in `Mistral-7B-Instruct-v0.1'. We justify that studying representations is an important and under-studied field, and highlight several challenges that arise while attempting to do so through currently established methods in MI, showing their insufficiency and advocating work on new frameworks for the same.",
+        "entry_url": "http://arxiv.org/abs/2402.03855v2",
+        "pdf_url": "https://arxiv.org/pdf/2402.03855v2"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "2511.09432v2",
+        "title": "Equivariant Sparse Autoencoders: Mechanistic Interpretability of Neural Networks on Symmetric Data",
+        "authors": [
+          "Ege Erdogan",
+          "Ana Lucic"
+        ],
+        "published": "2025-11-12",
+        "abstract": "Machine learning (ML) models achieve remarkable performance but remain hard to interpret due to their scale and complexity. In particular, their activations entangle many concepts into fewer dimensions, a phenomenon known as superposition. Mechanistic interpretability methods such as sparse autoencoders (SAEs) can disentangle these dense activations into sparse sums of interpretable features, but SAEs suffer from unidentifiability: different explanations can fit the data equally well without necessarily being more interpretable or faithful to the underlying model. We show that this problem is exacerbated by data symmetries such as rotations that are prevalent in scientific domains. We extend the Linear Representation Hypothesis, the theory behind SAEs, to account for symmetries and show on synthetic as well as real-world scientific datasets and models that the resulting Equivariant SAEs can (1) avoid the pitfalls of existing SAEs on symmetric data and (2) discover features more useful for downstream tasks despite worse reconstructions. Our results show that incorporating the correct priors in SAEs can significantly improve their usefulness while highlighting that reconstruction quality can be inversely correlated with feature usefulness under symmetries, cautioning against its use as a key measure of interpretability. Code: https://github.com/ege-erdogan/equivariant-sae",
+        "entry_url": "http://arxiv.org/abs/2511.09432v2",
+        "pdf_url": "https://arxiv.org/pdf/2511.09432v2"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2603.18353v1",
+        "title": "Interpretability without actionability: mechanistic methods cannot correct language model errors despite near-perfect internal representations",
+        "authors": [
+          "Sanjay Basu",
+          "Sadiq Y. Patel",
+          "Parth Sheth",
+          "Bhairavi Muralidharan",
+          "Namrata Elamaran",
+          "Aakriti Kinra"
+        ],
+        "published": "2026-03-18",
+        "abstract": "Language models encode task-relevant knowledge in internal representations that far exceeds their output performance, but whether mechanistic interpretability methods can bridge this knowledge-action gap has not been systematically tested. We compared four mechanistic interpretability methods -- concept bottleneck steering (Steerling-8B), sparse autoencoder feature steering, logit lens with activation patching, and linear probing with truthfulness separator vector steering (Qwen 2.5 7B Instruct) -- for correcting false-negative triage errors using 400 physician-adjudicated clinical vignettes (144 hazards, 256 benign). Linear probes discriminated hazardous from benign cases with 98.2% AUROC, yet the model's output sensitivity was only 45.1%, a 53-percentage-point knowledge-action gap. Concept bottleneck steering corrected 20% of missed hazards but disrupted 53% of correct detections, indistinguishable from random perturbation (p=0.84). SAE feature steering produced zero effect despite 3,695 significant features. TSV steering at high strength corrected 24% of missed hazards while disrupting 6% of correct detections, but left 76% of errors uncorrected. Current mechanistic interpretability methods cannot reliably translate internal knowledge into corrected outputs, with implications for AI safety frameworks that assume interpretability enables effective error correction.",
+        "entry_url": "http://arxiv.org/abs/2603.18353v1",
+        "pdf_url": "https://arxiv.org/pdf/2603.18353v1"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "2606.16939v1",
+        "title": "Scalable Circuit Learning for Interpreting Large Language Models",
+        "authors": [
+          "Naiyu Yin",
+          "Dennis Wei",
+          "Tian Gao",
+          "Amit Dhurandhar",
+          "Karthikeyan Natesan Ramamurthy",
+          "Yue Yu"
+        ],
+        "published": "2026-06-15",
+        "abstract": "A prominent research direction in mechanistic interpretability is learning sparse circuits over LLM components to reveal how they jointly produce model behavior. However, raw neurons are polysemantic, making learned circuits hard to interpret. Sparse autoencoder (SAE) features alleviate this, but their high dimensionality makes existing intervention-based circuit learning methods computationally prohibitive. We propose CircuitLasso, a scalable circuit-learning approach based on sparse linear regression. CircuitLasso recovers circuits whose structural accuracy matches that of state-of-the-art intervention-based methods on the benchmark data, at a fraction of the computational cost. For interpretability, CircuitLasso efficiently uncovers relationships among SAE features, showing how human-interpretable semantic features propagate through the model and influence its predictions. Finally, we validate the utility of our learned circuits by leveraging their insights to achieve comparable performance at substantially lower cost on a domain-generalization task.",
+        "entry_url": "http://arxiv.org/abs/2606.16939v1",
+        "pdf_url": "https://arxiv.org/pdf/2606.16939v1"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2409.13714v1",
+        "title": "TracrBench: Generating Interpretability Testbeds with Large Language Models",
+        "authors": [
+          "Hannes Thurnherr",
+          "Jérémy Scheurer"
+        ],
+        "published": "2024-09-07",
+        "abstract": "Achieving a mechanistic understanding of transformer-based language models is an open challenge, especially due to their large number of parameters. Moreover, the lack of ground truth mappings between model weights and their functional roles hinders the effective evaluation of interpretability methods, impeding overall progress. Tracr, a method for generating compiled transformers with inherent ground truth mappings in RASP, has been proposed to address this issue. However, manually creating a large number of models needed for verifying interpretability methods is labour-intensive and time-consuming. In this work, we present a novel approach for generating interpretability test beds using large language models (LLMs) and introduce TracrBench, a novel dataset consisting of 121 manually written and LLM-generated, human-validated RASP programs and their corresponding transformer weights. During this process, we evaluate the ability of frontier LLMs to autonomously generate RASP programs and find that this task poses significant challenges. GPT-4-turbo, with a 20-shot prompt and best-of-5 sampling, correctly implements only 57 out of 101 test programs, necessitating the manual implementation of the remaining programs. With its 121 samples, TracrBench aims to serve as a valuable testbed for evaluating and comparing interpretability methods.",
+        "entry_url": "http://arxiv.org/abs/2409.13714v1",
+        "pdf_url": "https://arxiv.org/pdf/2409.13714v1"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2405.17703v1",
+        "title": "Mechanistic Interpretability of Binary and Ternary Transformers",
+        "authors": [
+          "Jason Li"
+        ],
+        "published": "2024-05-27",
+        "abstract": "Recent research (arXiv:2310.11453, arXiv:2402.17764) has proposed binary and ternary transformer networks as a way to significantly reduce memory and improve inference speed in Large Language Models (LLMs) while maintaining accuracy. In this work, we apply techniques from mechanistic interpretability to investigate whether such networks learn distinctly different or similar algorithms when compared to full-precision transformer networks. In particular, we reverse engineer the algorithms learned for the toy problem of modular addition where we find that binary and ternary networks learn similar algorithms as full precision networks. This provides evidence against the possibility of using binary and ternary networks as a more interpretable alternative in the LLM setting.",
+        "entry_url": "http://arxiv.org/abs/2405.17703v1",
+        "pdf_url": "https://arxiv.org/pdf/2405.17703v1"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "2511.21514v1",
+        "title": "Mechanistic Interpretability for Transformer-based Time Series Classification",
+        "authors": [
+          "Matīss Kalnāre",
+          "Sofoklis Kitharidis",
+          "Thomas Bäck",
+          "Niki van Stein"
+        ],
+        "published": "2025-11-26",
+        "abstract": "Transformer-based models have become state-of-the-art tools in various machine learning tasks, including time series classification, yet their complexity makes understanding their internal decision-making challenging. Existing explainability methods often focus on input-output attributions, leaving the internal mechanisms largely opaque. This paper addresses this gap by adapting various Mechanistic Interpretability techniques; activation patching, attention saliency, and sparse autoencoders, from NLP to transformer architectures designed explicitly for time series classification. We systematically probe the internal causal roles of individual attention heads and timesteps, revealing causal structures within these models. Through experimentation on a benchmark time series dataset, we construct causal graphs illustrating how information propagates internally, highlighting key attention heads and temporal positions driving correct classifications. Additionally, we demonstrate the potential of sparse autoencoders for uncovering interpretable latent features. Our findings provide both methodological contributions to transformer interpretability and novel insights into the functional mechanics underlying transformer performance in time series classification tasks.",
+        "entry_url": "http://arxiv.org/abs/2511.21514v1",
+        "pdf_url": "https://arxiv.org/pdf/2511.21514v1"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "2511.08854v2",
+        "title": "Decomposition of Small Transformer Models",
+        "authors": [
+          "Casper L. Christensen",
+          "Logan Riggs"
+        ],
+        "published": "2025-11-12",
+        "abstract": "Recent work in mechanistic interpretability has shown that decomposing models in parameter space may yield clean handles for analysis and intervention. Previous methods have demonstrated successful applications on a wide range of toy models, but the gap to \"real models\" has not yet been bridged. In this work, we extend Stochastic Parameter Decomposition (SPD) to Transformer models, proposing an updated causal importance function suited for sequential data and a new loss function. We demonstrate that SPD can successfully decompose a toy induction-head model and recover the expected 2-step circuit. We also show that applying SPD to GPT-2-small can successfully locate subcomponents corresponding to interpretable concepts like \"golf\" and \"basketball\". These results take the first step in the direction of extending SPD to modern models, and show that we can use the method to surface interpretable parameter-space mechanisms.",
+        "entry_url": "http://arxiv.org/abs/2511.08854v2",
+        "pdf_url": "https://arxiv.org/pdf/2511.08854v2"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2410.24050v3",
+        "title": "A Mechanistic Study of Transformers Training Dynamics",
+        "authors": [
+          "Ambroise Odonnat",
+          "Wassim Bouaziz",
+          "Vivien Cabannes"
+        ],
+        "published": "2024-10-31",
+        "abstract": "Large-scale pretraining of transformers has been central to the success of foundation models. However, the scale of those models limits our understanding of the mechanisms at play during optimization. In this work, we study the training dynamics of transformers in a controlled and interpretable setting. On the sparse modular addition task, we demonstrate that specialized attention circuits, called clustering heads, can be implemented during gradient descent to solve the problem. Our experiments show that such pathways naturally emerge during training. By monitoring the evolution of tokens via a visual sandbox, we uncover a two-stage learning and the occurrences of loss spikes due to the high curvature of normalization layers. Our findings provide several insights into patterns observed in more practical settings, such as the pretraining of large language models.",
+        "entry_url": "http://arxiv.org/abs/2410.24050v3",
+        "pdf_url": "https://arxiv.org/pdf/2410.24050v3"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2407.13594v2",
+        "title": "Validating Mechanistic Interpretations: An Axiomatic Approach",
+        "authors": [
+          "Nils Palumbo",
+          "Ravi Mangal",
+          "Zifan Wang",
+          "Saranya Vijayakumar",
+          "Corina S. Pasareanu",
+          "Somesh Jha"
+        ],
+        "published": "2024-07-18",
+        "abstract": "Mechanistic interpretability aims to reverse engineer the computation performed by a neural network in terms of its internal components. Although there is a growing body of research on mechanistic interpretation of neural networks, the notion of a mechanistic interpretation itself is often ad-hoc. Inspired by the notion of abstract interpretation from the program analysis literature that aims to develop approximate semantics for programs, we give a set of axioms that formally characterize a mechanistic interpretation as a description that approximately captures the semantics of the neural network under analysis in a compositional manner. We demonstrate the applicability of these axioms for validating mechanistic interpretations on an existing, well-known interpretability study as well as on a new case study involving a Transformer-based model trained to solve the well-known 2-SAT problem.",
+        "entry_url": "http://arxiv.org/abs/2407.13594v2",
+        "pdf_url": "https://arxiv.org/pdf/2407.13594v2"
+      }
+    ]
+  },
+  "efficient_inference": {
+    "query": "efficient inference and KV cache optimization for LLMs",
+    "candidates": [
+      {
+        "search_position": 0,
+        "arxiv_id": "2604.24971v1",
+        "title": "PolyKV: A Shared Asymmetrically-Compressed KV Cache Pool for Multi-Agent LLM Inference",
+        "authors": [
+          "Ishan Patel",
+          "Ishan Joshi"
+        ],
+        "published": "2026-04-27",
+        "abstract": "We present PolyKV, a system in which multiple concurrent inference agents share a single, asymmetrically compressed KV cache pool. Rather than allocating a separate KV cache per agent -- the standard paradigm -- PolyKV writes a compressed cache once and injects it into N independent agent contexts via HuggingFace DynamicCache objects. Compression is asymmetric: Keys are quantized at int8 (q8_0) to preserve softmax stability, while Values are compressed using TurboQuant MSE -- a Fast Walsh-Hadamard Transform (FWHT) rotation followed by 3-bit Lloyd-Max quantization with centroids tuned to N(0,1). We evaluate across two model scales (SmolLM2-1.7B-Instruct and Llama-3-8B-Instruct), three context lengths (600-7,194 tokens), and up to 15 concurrent agents. PolyKV achieves a stable 2.91x compression ratio across all configurations. On Llama-3-8B with 15 agents sharing a 4K-token context, PolyKV reduces KV cache memory from 19.8 GB to 0.45 GB -- a 97.7% reduction -- while maintaining only +0.57% perplexity degradation and a mean BERTScore F1 of 0.928. PPL delta does not grow with agent count and improves as context length increases, inverting to -0.26% at 1,851 coherent tokens. To our knowledge, no prior work combines a single shared, lossy-compressed KV pool with multi-reader concurrent agent access.",
+        "entry_url": "http://arxiv.org/abs/2604.24971v1",
+        "pdf_url": "https://arxiv.org/pdf/2604.24971v1"
+      },
+      {
+        "search_position": 1,
+        "arxiv_id": "2603.20397v1",
+        "title": "KV Cache Optimization Strategies for Scalable and Efficient LLM Inference",
+        "authors": [
+          "Yichun Xu",
+          "Navjot K. Khaira",
+          "Tejinder Singh"
+        ],
+        "published": "2026-03-20",
+        "abstract": "The key-value (KV) cache is a foundational optimization in Transformer-based large language models (LLMs), eliminating redundant recomputation of past token representations during autoregressive generation. However, its memory footprint scales linearly with context length, imposing critical bottlenecks on GPU memory capacity, memory bandwidth, and inference throughput as production LLMs push context windows from thousands to millions of tokens. Efficient KV cache management has thus become a first-order challenge for scalable LLM deployment. This paper provides a systematic review of recent KV cache optimization techniques, organizing them into five principal directions: cache eviction, cache compression, hybrid memory solutions, novel attention mechanisms, and combination strategies. For each category we analyze the underlying mechanisms, deployment trade-offs, and empirical performance across memory reduction, throughput, and model accuracy metrics. We further map techniques to seven practical deployment scenarios, including long-context single requests, high-throughput datacenter serving, edge devices, multi-turn conversations, and accuracy-critical reasoning, providing actionable guidance for practitioners selecting among competing approaches. Our analysis reveals that no single technique dominates across all settings; instead, the optimal strategy depends on context length, hardware constraints, and workload characteristics, pointing toward adaptive, multi-stage optimization pipelines as a promising direction for future research.",
+        "entry_url": "http://arxiv.org/abs/2603.20397v1",
+        "pdf_url": "https://arxiv.org/pdf/2603.20397v1"
+      },
+      {
+        "search_position": 2,
+        "arxiv_id": "2510.14973v2",
+        "title": "Attention Is All You Need for KV Cache in Diffusion LLMs",
+        "authors": [
+          "Quan Nguyen-Tri",
+          "Mukul Ranjan",
+          "Zhiqiang Shen"
+        ],
+        "published": "2025-10-16",
+        "abstract": "This work studies how to adaptively recompute key-value (KV) caches for diffusion large language models (DLMs) to maximize prediction accuracy while minimizing decoding latency. Prior methods' decoders recompute QKV for all tokens at every denoising step and layer, despite KV states changing little across most steps, especially in shallow layers, leading to substantial redundancy. We make three observations: (1) distant ${\\bf MASK}$ tokens primarily act as a length-bias and can be cached block-wise beyond the active prediction window; (2) KV dynamics increase with depth, suggesting that selective refresh starting from deeper layers is sufficient; and (3) the most-attended token exhibits the smallest KV drift, providing a conservative lower bound on cache change for other tokens. Building on these, we propose ${\\bf Elastic-Cache}$, a training-free, architecture-agnostic strategy that jointly decides ${when}$ to refresh (via an attention-aware drift test on the most-attended token) and ${where}$ to refresh (via a depth-aware schedule that recomputes from a chosen layer onward while reusing shallow-layer caches and off-window MASK caches). Unlike fixed-period schemes, Elastic-Cache performs adaptive, layer-aware cache updates for diffusion LLMs, reducing redundant computation and accelerating decoding with negligible loss in generation quality. Experiments on LLaDA-Instruct, LLaDA-1.5, and LLaDA-V across mathematical reasoning and code generation tasks demonstrate consistent speedups: $8.7\\times$ on GSM8K (256 tokens), and $45.1\\times$ on longer sequences, while consistently maintaining higher accuracy than the baseline. Our method achieves significantly higher throughput ($6.8\\times$ on GSM8K) than existing confidence-based approaches while preserving generation quality, enabling practical deployment of diffusion LLMs.",
+        "entry_url": "http://arxiv.org/abs/2510.14973v2",
+        "pdf_url": "https://arxiv.org/pdf/2510.14973v2"
+      },
+      {
+        "search_position": 3,
+        "arxiv_id": "2605.08840v1",
+        "title": "ReST-KV: Robust KV Cache Eviction with Layer-wise Output Reconstruction and Spatial-Temporal Smoothing",
+        "authors": [
+          "Yongqi An",
+          "Chang Lu",
+          "Kuan Zhu",
+          "Tao Yu",
+          "Chaoyang Zhao",
+          "Hong Wu"
+        ],
+        "published": "2026-05-09",
+        "abstract": "Large language models (LLMs) face growing challenges in efficient generative inference due to the increasing memory demands of Key-Value (KV) caches, especially for long sequences. Existing eviction methods typically retain KV pairs with high attention weights but overlook the impact of attention redistribution caused by token removal, as well as the spatial-temporal dynamics in KV selection. In this paper, we propose ReST-KV, a robust KV eviction method that combines layer-wise output Reconstruction and Spatial-Temporal smoothing to provide a more comprehensive perspective for the KV cache eviction task. Specifically, ReST-KV formulates KV cache eviction as an optimization problem that minimizes output discrepancies through efficient layer-wise reconstruction. By directly modeling how each token's removal affects the model output, our method naturally captures attention redistribution effects, going beyond simplistic reliance on raw attention weights. To further enhance robustness, we design exponential moving average smoothing to handle temporal variations and an adaptive window-based mechanism to capture spatial patterns. Our method, ReST-KV, significantly advances performance on long-context benchmarks. It surpasses state-of-the-art baselines by 2.58% on LongBench and 15.2% on RULER. Additionally, ReST-KV consistently outperforms existing methods on Needle-in-a-Haystack and InfiniteBench, all while achieving a remarkable 10.61$\\times$ reduction in decoding latency at 128k context length. The code is publicly available at https://github.com/an-yongqi/rest-kv to facilitate reproducibility and further research.",
+        "entry_url": "http://arxiv.org/abs/2605.08840v1",
+        "pdf_url": "https://arxiv.org/pdf/2605.08840v1"
+      },
+      {
+        "search_position": 4,
+        "arxiv_id": "2605.02262v1",
+        "title": "WindowQuant: Mixed-Precision KV Cache Quantization based on Window-Level Similarity for VLMs Inference Optimization",
+        "authors": [
+          "Wei Tao",
+          "Xiaoyang Qu",
+          "Peiqiang Wang",
+          "Guokuan Li",
+          "Jiguang Wan",
+          "Kai Lu"
+        ],
+        "published": "2026-05-04",
+        "abstract": "Recently, video language models (VLMs) have been applied in various fields. However, the visual token sequence of the VLM is too long, which may cause intolerant inference latency and GPU memory usage. Existing methods propose mixed-precision quantization to the key-value (KV) cache in VLMs based on token granularity, which is time-consuming in the search process and hardware inefficient during computation. This paper introduces a novel approach called WindowQuant, which employs window-adaptive mixed-precision quantization to optimize the KV cache. WindowQuant consists of two modules: window-level quantization search and window-level KV cache computation. Window-level quantization search quickly determines the optimal bit-width configuration of the KV cache windows based on the similarity scores between the corresponding visual token windows and the text prompt, maintaining the model accuracy. Furthermore, window-level KV cache computation reorders the KV cache windows before quantization, avoiding the hardware inefficiency caused by mixed-precision quantization in inference computation. Extensive experiments demonstrate that WindowQuant outperforms state-of-the-art VLM models and KV cache quantization methods on various datasets.",
+        "entry_url": "http://arxiv.org/abs/2605.02262v1",
+        "pdf_url": "https://arxiv.org/pdf/2605.02262v1"
+      },
+      {
+        "search_position": 5,
+        "arxiv_id": "2503.08879v1",
+        "title": "LLMs Know What to Drop: Self-Attention Guided KV Cache Eviction for Efficient Long-Context Inference",
+        "authors": [
+          "Guangtao Wang",
+          "Shubhangi Upasani",
+          "Chen Wu",
+          "Darshan Gandhi",
+          "Jonathan Li",
+          "Changran Hu"
+        ],
+        "published": "2025-03-11",
+        "abstract": "Efficient long-context inference is critical as large language models (LLMs) adopt context windows of ranging from 128K to 1M tokens. However, the growing key-value (KV) cache and the high computational complexity of attention create significant bottlenecks in memory usage and latency. In this paper, we find that attention in diverse long-context tasks exhibits sparsity, and LLMs implicitly \"know\" which tokens can be dropped or evicted at the head level after the pre-filling stage. Based on this insight, we propose Self-Attention Guided Eviction~(SAGE-KV), a simple and effective KV eviction cache method for long-context inference. After prefilling, our method performs a one-time top-k selection at both the token and head levels to compress the KV cache, enabling efficient inference with the reduced cache. Evaluations on LongBench and three long-context LLMs (Llama3.1-8B-Instruct-128k, Llama3-8B-Prolong-512k-Instruct, and Qwen2.5-7B-Instruct-128k) show that SAGE-KV maintains accuracy comparable to full attention while significantly improving efficiency. Specifically, SAGE-KV achieves 4x higher memory efficiency with improved accuracy over the static KV cache selection method StreamLLM, and 2x higher memory efficiency with better accuracy than the dynamic KV cache selection method Quest.",
+        "entry_url": "http://arxiv.org/abs/2503.08879v1",
+        "pdf_url": "https://arxiv.org/pdf/2503.08879v1"
+      },
+      {
+        "search_position": 6,
+        "arxiv_id": "2605.09649v1",
+        "title": "Make Each Token Count: Towards Improving Long-Context Performance with KV Cache Eviction",
+        "authors": [
+          "Ngoc Bui",
+          "Hieu Trung Nguyen",
+          "Arman Cohan",
+          "Rex Ying"
+        ],
+        "published": "2026-05-10",
+        "abstract": "The key-value (KV) cache is a major bottleneck in long-context inference, where memory and computation grow with sequence length. Existing KV eviction methods reduce this cost but typically degrade performance relative to full-cache inference. Our key insight is that full-cache attention is not always optimal: in long contexts, irrelevant tokens can dilute attention away from useful evidence, so selective, learnable eviction can improve generation rather than merely approximate the full cache. We introduce a global retention-based KV eviction method that learns each token's future utility under a unified memory budget. Lightweight retention gates assign utility scores to cached KV entries, and a shared final scoring projection calibrates these scores across all layers and heads. This enables a single global eviction policy in which tokens from different layers, heads, and modalities compete directly for cache capacity. We further provide theoretical analysis showing that preferentially retaining useful tokens reduces attention dilution, and we justify geometric retention as a query-agnostic proxy for future utility. Across diverse long-context language and vision-language reasoning, and multi-turn dialogue benchmarks, our method substantially reduces KV memory while matching or surpassing full-cache inference. These results suggest that learned, globally calibrated KV eviction is not only a compression technique, but also a mechanism for improving long-context reasoning.",
+        "entry_url": "http://arxiv.org/abs/2605.09649v1",
+        "pdf_url": "https://arxiv.org/pdf/2605.09649v1"
+      },
+      {
+        "search_position": 7,
+        "arxiv_id": "2510.09665v2",
+        "title": "LMCache: An Efficient KV Cache Layer for Enterprise-Scale LLM Inference",
+        "authors": [
+          "Yuhan Liu",
+          "Yihua Cheng",
+          "Jiayi Yao",
+          "Yuwei An",
+          "Xiaokun Chen",
+          "Shaoting Feng"
+        ],
+        "published": "2025-10-08",
+        "abstract": "KV cache has traditionally been stored in GPU memory to accelerate the decoding phase of large language model (LLM) inference. However, it is increasingly necessary to move KV caches outside GPU devices, to enable cache reuse across different queries and inference engines. Our real-world usage statistics confirm this trend: over time, the total KV cache stored by users has grown rapidly, far exceeding the capacity of GPU memory. Despite this need, there lacks an efficient solution for offloading and transferring KV caches. We present LMCACHE, the first and so far the most efficient open-source KV caching solution, which extracts and stores KV caches generated by modern LLM engines (vLLM and SGLang) out of the GPU memory and shares them across engines and queries. LMCACHE supports both cache offloading (prefix reuse across queries) and prefill-decode (PD) disaggregation (cross-engine/GPU cache transfer). LMCACHE's high performance and wide adoption stem from the following contributions: (1) highly optimized KV cache data movement powered by batched data movement operations, compute and I/O pipelining; (2) a modular KV cache connector component, decoupling LMCACHE from the rapid evolution of inference engines; (3) a first-class control API for flexible cache orchestration across GPU, CPU, storage, and network layers. Our evaluation shows that combining LMCACHE with vLLM achieves up to 15x improvement in throughput across workloads such as multi-round question answering and document analysis. Large-scale adoption of LMCACHE in enterprise settings provides us valuable insights, for example, fetching KV cache from remote storage has unsurprisingly benefits to prefill delay, and that context truncation, which is a widely applied technique in industry, can greatly reduce prefix cache hit ratio by half. The source code of LMCACHE is at: https://github.com/LMCache/LMCache.",
+        "entry_url": "http://arxiv.org/abs/2510.09665v2",
+        "pdf_url": "https://arxiv.org/pdf/2510.09665v2"
+      },
+      {
+        "search_position": 8,
+        "arxiv_id": "2501.06807v2",
+        "title": "MPCache: MPC-Friendly KV Cache Eviction for Efficient Private LLM Inference",
+        "authors": [
+          "Wenxuan Zeng",
+          "Ye Dong",
+          "Jinjin Zhou",
+          "Jin Tan",
+          "Lei Wang",
+          "Tao Wei"
+        ],
+        "published": "2025-01-12",
+        "abstract": "Private large language model (LLM) inference based on secure multi-party computation (MPC) achieves formal data privacy protection but suffers from significant latency overhead, especially for long input sequences. While key-value (KV) cache eviction and sparse attention algorithms have been proposed for efficient LLM inference in plaintext, they are not designed for MPC and cannot benefit private LLM inference directly. In this paper, we propose an accurate and MPC-friendly KV cache eviction framework, dubbed MPCache, building on the observation that historical tokens in a long sequence may have different effects on the downstream decoding. Hence, MPCache combines a look-once static eviction algorithm to discard unimportant KV cache and a query-aware dynamic selection algorithm to activate only a small subset of KV cache for attention computation. MPCache further incorporates a series of optimizations for efficient dynamic KV cache selection, including MPC-friendly similarity approximation, hierarchical KV cache clustering, and cross-layer index-sharing strategy. Extensive experiments demonstrate that MPCache consistently outperforms prior-art KV cache eviction baselines across different generation tasks and achieves 1.8 ~ 2.01x and 3.39 ~ 8.37x decoding latency and communication reduction on different sequence lengths, respectively.",
+        "entry_url": "http://arxiv.org/abs/2501.06807v2",
+        "pdf_url": "https://arxiv.org/pdf/2501.06807v2"
+      },
+      {
+        "search_position": 9,
+        "arxiv_id": "2511.11106v1",
+        "title": "AccKV: Towards Efficient Audio-Video LLMs Inference via Adaptive-Focusing and Cross-Calibration KV Cache Optimization",
+        "authors": [
+          "Zhonghua Jiang",
+          "Kui Chen",
+          "Kunxi Li",
+          "Keting Yin",
+          "Yiyun Zhou",
+          "Zhaode Wang"
+        ],
+        "published": "2025-11-14",
+        "abstract": "Recent advancements in Audio-Video Large Language Models (AV-LLMs) have enhanced their capabilities in tasks like audio-visual question answering and multimodal dialog systems. Video and audio introduce an extended temporal dimension, resulting in a larger key-value (KV) cache compared to static image embedding. A naive optimization strategy is to selectively focus on and retain KV caches of audio or video based on task. However, in the experiment, we observed that the attention of AV-LLMs to various modalities in the high layers is not strictly dependent on the task. In higher layers, the attention of AV-LLMs shifts more towards the video modality. In addition, we also found that directly integrating temporal KV of audio and spatial-temporal KV of video may lead to information confusion and significant performance degradation of AV-LLMs. If audio and video are processed indiscriminately, it may also lead to excessive compression or reservation of a certain modality, thereby disrupting the alignment between modalities. To address these challenges, we propose AccKV, an Adaptive-Focusing and Cross-Calibration KV cache optimization framework designed specifically for efficient AV-LLMs inference. Our method is based on layer adaptive focusing technology, selectively focusing on key modalities according to the characteristics of different layers, and enhances the recognition of heavy hitter tokens through attention redistribution. In addition, we propose a Cross-Calibration technique that first integrates inefficient KV caches within the audio and video modalities, and then aligns low-priority modalities with high-priority modalities to selectively evict KV cache of low-priority modalities. The experimental results show that AccKV can significantly improve the computational efficiency of AV-LLMs while maintaining accuracy.",
+        "entry_url": "http://arxiv.org/abs/2511.11106v1",
+        "pdf_url": "https://arxiv.org/pdf/2511.11106v1"
+      },
+      {
+        "search_position": 10,
+        "arxiv_id": "2508.06297v1",
+        "title": "KV Cache Compression for Inference Efficiency in LLMs: A Review",
+        "authors": [
+          "Yanyu Liu",
+          "Jingying Fu",
+          "Sixiang Liu",
+          "Yitian Zou",
+          "You Fu",
+          "Jiehan Zhou"
+        ],
+        "published": "2025-08-08",
+        "abstract": "Withtherapid advancement of large language models (LLMs), the context length for inference has been continuously increasing, leading to an exponential growth in the demand for Key-Value (KV) caching. This has resulted in a significant memory bottleneck, limiting the inference efficiency and scalability of the models. Therefore, optimizing the KV cache during inference is crucial for enhancing performance and efficiency. This review systematically examines current KV cache optimization techniques, including compression strategies such as selective token strategies, quantization, and attention compression. We evaluate the effectiveness, trade-offs, and application scenarios of these methods, providing a comprehensive analysis of their impact on memory usage and inference speed. We focus on identifying the limitations and challenges of existing methods, such as compatibility issues with different models and tasks. Additionally, this review highlights future research directions, including hybrid optimization techniques, adaptive dynamic strategies, and software-hardware co-design. These approaches aim to improve inference efficiency and promote the practical application of large language models.",
+        "entry_url": "http://arxiv.org/abs/2508.06297v1",
+        "pdf_url": "https://arxiv.org/pdf/2508.06297v1"
+      },
+      {
+        "search_position": 11,
+        "arxiv_id": "2503.17922v2",
+        "title": "WindowKV: Task-Adaptive Group-Wise KV Cache Window Selection for Efficient LLM Inference",
+        "authors": [
+          "Youhui Zuo",
+          "Sibo Wei",
+          "Chen Zhang",
+          "Zhuorui Liu",
+          "Wenpeng Lu",
+          "Dawei Song"
+        ],
+        "published": "2025-03-23",
+        "abstract": "With the advancements in long-context inference capabilities of large language models (LLMs), the KV cache has become one of the foundational components. However, its substantial GPU memory consumption makes KV cache compression a key technique for enabling efficient LLM inference in industrial scenarios. While recent studies have focused on optimizing the memory occupied by the KV cache, they overlook two critical factors: preserving semantic coherence and considering task-specific characteristic during compression. To address these limitations, we propose a novel task-adaptive KV cache window selection method, WindowKV. WindowKV dynamically selects local semantic windows consisting of consecutive tokens, according to task-specific characteristics, ensuring the retained KV cache captures continuous, essential context. Additionally, we introduce an intra-group layer KV cache indices sharing strategy to reduce computational overhead, achieving a balance between performance and efficiency. We rigorously evaluate WindowKV on the LongBench benchmark, and the results demonstrate that it maintains a performance comparable to full KV cache retention while using only 12% of the original KV cache, significantly reducing memory requirements. Furthermore, our method also achieves state-of-the-art results in the Needle-in-a-Haystack evaluation, highlighting its effectiveness and robustness.",
+        "entry_url": "http://arxiv.org/abs/2503.17922v2",
+        "pdf_url": "https://arxiv.org/pdf/2503.17922v2"
+      }
+    ]
+  }
+}

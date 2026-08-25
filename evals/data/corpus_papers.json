@@ -1,0 +1,79 @@
+[
+  {
+    "query_id": "agent_eval",
+    "arxiv_id": "2606.20023v2",
+    "title": "When Lower Privileges Suffice: Investigating Over-Privileged Tool Selection in LLM Agents",
+    "authors": [
+      "Kaiyue Yang",
+      "Yuyan Bu",
+      "Jingwei Yi",
+      "Yuchi Wang",
+      "Biyu Zhou",
+      "Juntao Dai"
+    ],
+    "published": "2026-06-18",
+    "entry_url": "http://arxiv.org/abs/2606.20023v2",
+    "page_count": 20,
+    "chunk_count": 89
+  },
+  {
+    "query_id": "self_improvement",
+    "arxiv_id": "2505.21444v2",
+    "title": "Can Large Reasoning Models Self-Train?",
+    "authors": [
+      "Sheikh Shafayat",
+      "Fahim Tajwar",
+      "Ruslan Salakhutdinov",
+      "Jeff Schneider",
+      "Andrea Zanette"
+    ],
+    "published": "2025-05-27",
+    "entry_url": "http://arxiv.org/abs/2505.21444v2",
+    "page_count": 38,
+    "chunk_count": 157
+  },
+  {
+    "query_id": "adversarial_reasoning",
+    "arxiv_id": "2407.15549v3",
+    "title": "Latent Adversarial Training Improves Robustness to Persistent Harmful Behaviors in LLMs",
+    "authors": [
+      "Abhay Sheshadri",
+      "Aidan Ewart",
+      "Phillip Guo",
+      "Aengus Lynch",
+      "Cindy Wu",
+      "Vivek Hebbar"
+    ],
+    "published": "2024-07-22",
+    "entry_url": "http://arxiv.org/abs/2407.15549v3",
+    "page_count": 28,
+    "chunk_count": 124
+  },
+  {
+    "query_id": "interpretability",
+    "arxiv_id": "2511.09432v2",
+    "title": "Equivariant Sparse Autoencoders: Mechanistic Interpretability of Neural Networks on Symmetric Data",
+    "authors": [
+      "Ege Erdogan",
+      "Ana Lucic"
+    ],
+    "published": "2025-11-12",
+    "entry_url": "http://arxiv.org/abs/2511.09432v2",
+    "page_count": 15,
+    "chunk_count": 80
+  },
+  {
+    "query_id": "efficient_inference",
+    "arxiv_id": "2510.14973v2",
+    "title": "Attention Is All You Need for KV Cache in Diffusion LLMs",
+    "authors": [
+      "Quan Nguyen-Tri",
+      "Mukul Ranjan",
+      "Zhiqiang Shen"
+    ],
+    "published": "2025-10-16",
+    "entry_url": "http://arxiv.org/abs/2510.14973v2",
+    "page_count": 32,
+    "chunk_count": 120
+  }
+]
