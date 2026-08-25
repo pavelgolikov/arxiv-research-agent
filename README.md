@@ -7,8 +7,9 @@ through LangChain.
 
 ## Project status
 
-The pipeline runs end to end. The evaluation half of the project — the part that
-measures whether the retrieval stack actually helps — is not built yet.
+The pipeline runs end to end. The hand-labeled datasets the evaluation rests on are
+frozen and committed; the ablation and groundedness runs that consume them are in
+progress. No performance numbers appear here until those runs are committed.
 
 **Working today**
 
@@ -25,13 +26,14 @@ measures whether the retrieval stack actually helps — is not built yet.
 | Abstract-first screening (PDFs fetched only for selected papers) | done |
 | Retries, typed per-branch failures, partial reports | done |
 | SQLite checkpointing with real `run` / `resume` / `status` | done |
+| Labeled retrieval dataset — 50 questions, 312 judged chunks | done |
+| Labeled screening dataset — 7 queries x 12 candidates | done |
+| Reproducible index rebuild with pool-coverage verification | done |
 
 **Not built yet**
 
 | Area | Notes |
 | --- | --- |
-| Labeled retrieval dataset | ~40-50 hand-labeled question to relevant-chunk pairs, frozen and committed |
-| Labeled screening dataset | ~5 queries of candidate metadata labeled irrelevant / related / central |
 | Retrieval ablation | recall@5, MRR, nDCG@10 across the four `--retriever` settings |
 | Groundedness metrics | citation referential integrity and claim-support rate over generated reports |
 | `evals/results/*.json` | machine-readable output; the only place performance numbers may come from |
@@ -57,6 +59,9 @@ See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
   - `review_types.py` — Pydantic models and the typed graph state.
   - `failures.py` — retry classification and retrying.
   - `gemini_client.py` — model access through LangChain.
+- `evals/` — frozen datasets, hand labels, and metric runners. `build_index.py`
+  rebuilds the vector index from the committed chunks and verifies that the labels
+  still cover everything the retrievers return.
 - `results/` — artifacts from the **pre-rewrite prototype**, kept only for reference.
   Its checkpoint JSON files use a state schema this code no longer has, and nothing
   reads them. Slated for removal.
@@ -190,6 +195,87 @@ citation is discarded with it. The report records how many were dropped, so a
 paper whose analysis was partly rejected is visible rather than silently thinner.
 Surviving claims render as page-anchored links into the source PDF.
 
+## Evaluation
+
+Two hand-labeled datasets live under `evals/`, frozen and committed so results are
+reproducible and do not drift as arXiv re-ranks its search results.
+
+| Dataset | Size |
+| --- | --- |
+| Retrieval | 5 papers, 570 chunks, 50 questions, 312 judged-relevant chunks (246 fully answering, 66 partial) |
+| Screening | 7 queries x 12 candidates, each labeled irrelevant / related / central |
+
+Thirty of the fifty retrieval questions are the exact strings `analysis.py` asks of
+every paper, so the benchmark measures the real workload rather than a proxy. The
+other twenty are paper-specific factual questions — named datasets, baselines,
+numbers — that probe precise retrieval.
+
+### Pooling, and measuring what it misses
+
+Judging every chunk against every question would be 5,700 decisions. Instead the
+dataset uses **pooling**, the standard TREC approach: each of the four retrievers
+contributes its top 10 for a question, and only the union is judged — 14 to 23
+chunks per question instead of the whole paper.
+
+Pooling has a known flaw. A chunk that no retriever returns is never judged, so it
+counts as irrelevant by default and recall comes out higher than it should be.
+Rather than assume the pools were deep enough, three chunks per question that **no**
+retriever returned were sampled into the pool and judged blind alongside the rest.
+If those come back relevant, the pools were too shallow.
+
+They came back relevant more often than the 5% budgeted for, and how they split is
+the useful part:
+
+| Question type | Sampled unpooled chunks judged relevant |
+| --- | --- |
+| Facet — "what are the main findings?" | 14 / 90 = **15.6%** |
+| Paper-specific — "which datasets were used?" | 0 / 60 = **0%** |
+| Overall | 14 / 150 = 9.3% |
+
+This is not a pool-depth problem, and deepening the pools would not fix it. Those
+chunks were sampled from chunks *no retriever ranked at all*, whereas raising the
+depth to 20 reaches ranks 11-20 — a different population. The actual cause is that
+broad facet questions have diffuse relevance: "what are the main quantitative
+results?" is genuinely answered by dozens of chunks spread through a 157-chunk
+paper, while a precise question has two or three answers and the retrievers find
+them. So the pools were kept as they are and the metrics were chosen to suit them.
+
+### What the bias can and cannot touch
+
+Pool depth is 10 and every retriever contributed its top 10, so at any cutoff
+k <= 10 **every chunk appearing in a ranked list has a label**. No unjudged chunk can
+enter a result list and be silently scored as irrelevant. The numerator of every
+metric is therefore exact, and only denominators are exposed:
+
+| Metric | Exposure |
+| --- | --- |
+| MRR | None. Every ranked chunk is judged. |
+| nDCG@10 | Ideal DCG only, on the 24 of 30 facet questions whose ideal top 10 is not already filled with top-grade chunks — and identically for all four retrievers, since they share one ground truth. The absolute level is slightly optimistic; the comparison between retrievers is not. |
+| recall@5 | Directly. The size of the relevant set is exactly what the missed chunks corrupt. |
+
+recall@5 was the weakest metric here even before this: with a mean of 7.7 relevant
+chunks per facet question, five slots cannot hold them all, so it is capped at 71%
+on facet questions however good the retriever is — 92% on paper-specific ones,
+where the relevant sets are smaller.
+
+The ablation therefore leads with **MRR and nDCG@10**, and reports **recall@5 split
+by question type** rather than pooled into a single figure: clean on the
+paper-specific half, flagged on the facet half. `bpref` and `infAP`, estimators
+built for incomplete judgments, are the fully rigorous alternative and are not
+implemented here.
+
+### Keeping the guarantee true
+
+"Every ranked chunk is judged" holds only while the index matches the one the pools
+were built from. `evals/index/` is not committed, so `python -m evals.build_index`
+rebuilds it from the committed chunk file — identical text, no PDF downloads — and
+`--verify` replays all four retrievers over all fifty questions to confirm every
+retrieved chunk was judged, writing `evals/results/index_coverage.json`.
+
+Re-embedding the entire corpus from scratch and re-checking still returns 2,000
+retrieved chunks with 0 unjudged, so the guarantee survives a clean clone. If drift
+ever breaks it, the check fails loudly instead of quietly lowering recall.
+
 ## Verification
 
 There is **no committed test suite yet**. Behavior has been checked with throwaway
@@ -200,10 +286,12 @@ hallucinated chunk IDs and paraphrased excerpts, per-paper retrieval scoping,
 concurrent Chroma indexing, and interrupt-then-resume without repeating finished
 work. Turning these into `tests/` is outstanding work.
 
-No performance or quality numbers appear in this README on purpose. Once
-`evals/results/*.json` exists, the ablation table and groundedness figures will be
-generated from it, and any number quoted anywhere will come from that committed
-output rather than from a development run.
+No retriever performance or groundedness numbers appear in this README yet. The
+figures under Evaluation describe the datasets and their measured pooling bias, and
+come from the committed labels and `evals/results/index_coverage.json`. When the
+ablation and groundedness runs land, their tables will be generated from
+`evals/results/*.json` the same way: any number quoted anywhere comes from committed
+output, never from a development run.
 
 ## Limitations
 

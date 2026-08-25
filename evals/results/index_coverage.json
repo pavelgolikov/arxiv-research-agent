@@ -1,0 +1,13 @@
+{
+  "pool_depth": 10,
+  "retrievers": [
+    "dense",
+    "bm25",
+    "hybrid",
+    "hybrid-rerank"
+  ],
+  "questions": 50,
+  "retrieved_chunks_checked": 2000,
+  "unjudged_retrieved": [],
+  "complete": true
+}
