@@ -1,0 +1,576 @@
+{
+  "2111.01762v1": {
+    "primary": "physics.ao-ph",
+    "categories": [
+      "physics.ao-ph",
+      "econ.GN",
+      "stat.AP"
+    ]
+  },
+  "2412.02674v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.LG"
+    ]
+  },
+  "2504.16021v1": {
+    "primary": "cs.HC",
+    "categories": [
+      "cs.HC",
+      "cs.AI"
+    ]
+  },
+  "2503.21676v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.LG"
+    ]
+  },
+  "2603.03524v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ]
+  },
+  "2010.02194v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2303.10856v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.CV"
+    ]
+  },
+  "2407.08400v3": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ]
+  },
+  "2508.02866v3": {
+    "primary": "cs.DC",
+    "categories": [
+      "cs.DC",
+      "cs.DB"
+    ]
+  },
+  "2509.13978v2": {
+    "primary": "cs.DC",
+    "categories": [
+      "cs.DC",
+      "cs.AI",
+      "cs.DB"
+    ]
+  },
+  "2510.01295v1": {
+    "primary": "cs.AI",
+    "categories": [
+      "cs.AI",
+      "cs.MA"
+    ]
+  },
+  "2606.05868v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2502.09809v1": {
+    "primary": "cs.CR",
+    "categories": [
+      "cs.CR",
+      "cs.AI"
+    ]
+  },
+  "2409.01907v1": {
+    "primary": "cs.HC",
+    "categories": [
+      "cs.HC"
+    ]
+  },
+  "2505.21444v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2512.21309v2": {
+    "primary": "cs.MA",
+    "categories": [
+      "cs.MA"
+    ]
+  },
+  "2606.20023v2": {
+    "primary": "cs.SE",
+    "categories": [
+      "cs.SE",
+      "cs.AI",
+      "cs.CL"
+    ]
+  },
+  "2603.25681v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2203.06041v1": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV",
+      "cs.LG"
+    ]
+  },
+  "2511.07641v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2401.07324v3": {
+    "primary": "cs.AI",
+    "categories": [
+      "cs.AI",
+      "cs.CL"
+    ]
+  },
+  "2604.13356v3": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.GT"
+    ]
+  },
+  "2411.00750v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "2412.01951v2": {
+    "primary": "cs.AI",
+    "categories": [
+      "cs.AI",
+      "cs.CL",
+      "cs.LG",
+      "stat.ML"
+    ]
+  },
+  "2607.09839v1": {
+    "primary": "cs.AI",
+    "categories": [
+      "cs.AI",
+      "cs.CV",
+      "cs.HC"
+    ]
+  },
+  "2007.04137v3": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV",
+      "cs.LG"
+    ]
+  },
+  "2504.07887v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ]
+  },
+  "2007.08428v4": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.CR",
+      "cs.CV",
+      "stat.ML"
+    ]
+  },
+  "2606.16939v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ]
+  },
+  "2202.07201v3": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI",
+      "cs.CR"
+    ]
+  },
+  "1807.09380v3": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV"
+    ]
+  },
+  "2405.17703v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.CL"
+    ]
+  },
+  "2603.20397v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ]
+  },
+  "2511.21514v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ]
+  },
+  "2509.26306v5": {
+    "primary": "cs.AI",
+    "categories": [
+      "cs.AI"
+    ]
+  },
+  "2410.24050v3": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "stat.ML"
+    ]
+  },
+  "2511.09432v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2402.03855v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ]
+  },
+  "2409.13714v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "2511.08854v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2407.13594v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2407.15549v3": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI",
+      "cs.CL"
+    ]
+  },
+  "2504.19475v3": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "2606.30247v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2008.07651v1": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV"
+    ]
+  },
+  "2103.15670v3": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "1809.00958v1": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV"
+    ]
+  },
+  "2511.14465v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ]
+  },
+  "2603.18353v1": {
+    "primary": "cs.AI",
+    "categories": [
+      "cs.AI"
+    ]
+  },
+  "2604.24971v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.CL",
+      "cs.DC"
+    ]
+  },
+  "2511.11106v1": {
+    "primary": "cs.MM",
+    "categories": [
+      "cs.MM",
+      "cs.CV",
+      "cs.SD"
+    ]
+  },
+  "2510.09665v2": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2112.12938v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "1706.06749v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2509.00488v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2510.21391v1": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV"
+    ]
+  },
+  "2605.08840v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2605.09649v1": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG"
+    ]
+  },
+  "2203.12171v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "1907.02664v2": {
+    "primary": "cs.DC",
+    "categories": [
+      "cs.DC",
+      "cs.CR",
+      "cs.LG"
+    ]
+  },
+  "1110.5626v1": {
+    "primary": "astro-ph.CO",
+    "categories": [
+      "astro-ph.CO"
+    ]
+  },
+  "2310.11435v1": {
+    "primary": "physics.flu-dyn",
+    "categories": [
+      "physics.flu-dyn"
+    ]
+  },
+  "2404.17143v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2510.14973v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "2503.08879v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "2411.15497v3": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV"
+    ]
+  },
+  "2605.02262v1": {
+    "primary": "cs.CV",
+    "categories": [
+      "cs.CV",
+      "cs.CL"
+    ]
+  },
+  "2005.07866v1": {
+    "primary": "stat.ML",
+    "categories": [
+      "stat.ML",
+      "cs.CR",
+      "cs.DC",
+      "cs.LG"
+    ]
+  },
+  "2404.15146v3": {
+    "primary": "cs.LG",
+    "categories": [
+      "cs.LG",
+      "cs.CL"
+    ]
+  },
+  "2501.05032v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ]
+  },
+  "2508.06297v1": {
+    "primary": "cs.DC",
+    "categories": [
+      "cs.DC"
+    ]
+  },
+  "1706.07500v1": {
+    "primary": "math.NA",
+    "categories": [
+      "math.NA",
+      "nlin.AO"
+    ]
+  },
+  "2501.06807v2": {
+    "primary": "cs.CR",
+    "categories": [
+      "cs.CR"
+    ]
+  },
+  "2503.17922v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2405.11357v3": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL"
+    ]
+  },
+  "2406.05213v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG",
+      "stat.ML"
+    ]
+  },
+  "1012.2631v2": {
+    "primary": "physics.data-an",
+    "categories": [
+      "physics.data-an"
+    ]
+  },
+  "2403.09676v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ]
+  },
+  "2402.14679v2": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.CY"
+    ]
+  },
+  "2506.21849v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "2309.02144v1": {
+    "primary": "cs.CL",
+    "categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG"
+    ]
+  },
+  "1908.11476v1": {
+    "primary": "math.NA",
+    "categories": [
+      "math.NA"
+    ]
+  },
+  "1509.08130v7": {
+    "primary": "physics.acc-ph",
+    "categories": [
+      "physics.acc-ph"
+    ]
+  }
+}

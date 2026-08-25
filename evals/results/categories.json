@@ -1,0 +1,127 @@
+{
+  "question": "would a category filter exclude irrelevant candidates and keep central ones",
+  "candidates": 84,
+  "caveat": "Candidates were retrieved without a filter. This measures exclusion of what was returned, not what a filtered search would return instead.",
+  "filters": {
+    "cs.CL (any category)": {
+      "kept": 36,
+      "dropped": 48,
+      "central_kept": 24,
+      "central_dropped": 20,
+      "related_dropped": 8,
+      "irrelevant_dropped": 20,
+      "irrelevant_kept": 8,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.6666666666666666
+    },
+    "cs.CL (primary only)": {
+      "kept": 28,
+      "dropped": 56,
+      "central_kept": 17,
+      "central_dropped": 27,
+      "related_dropped": 9,
+      "irrelevant_dropped": 20,
+      "irrelevant_kept": 8,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.6071428571428571
+    },
+    "cs.CL + cs.LG (any category)": {
+      "kept": 59,
+      "dropped": 25,
+      "central_kept": 38,
+      "central_dropped": 6,
+      "related_dropped": 6,
+      "irrelevant_dropped": 13,
+      "irrelevant_kept": 15,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.6440677966101694
+    },
+    "cs.CL + cs.LG (primary only)": {
+      "kept": 49,
+      "dropped": 35,
+      "central_kept": 34,
+      "central_dropped": 10,
+      "related_dropped": 7,
+      "irrelevant_dropped": 18,
+      "irrelevant_kept": 10,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.6938775510204082
+    },
+    "cs.CL + cs.LG + cs.AI (any category)": {
+      "kept": 66,
+      "dropped": 18,
+      "central_kept": 41,
+      "central_dropped": 3,
+      "related_dropped": 3,
+      "irrelevant_dropped": 12,
+      "irrelevant_kept": 16,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.6212121212121212
+    },
+    "cs.CL + cs.LG + cs.AI (primary only)": {
+      "kept": 55,
+      "dropped": 29,
+      "central_kept": 37,
+      "central_dropped": 7,
+      "related_dropped": 4,
+      "irrelevant_dropped": 18,
+      "irrelevant_kept": 10,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.6727272727272727
+    },
+    "cs.* (any CS) (any category)": {
+      "kept": 77,
+      "dropped": 7,
+      "central_kept": 44,
+      "central_dropped": 0,
+      "related_dropped": 0,
+      "irrelevant_dropped": 7,
+      "irrelevant_kept": 21,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.5714285714285714
+    },
+    "cs.* (any CS) (primary only)": {
+      "kept": 76,
+      "dropped": 8,
+      "central_kept": 44,
+      "central_dropped": 0,
+      "related_dropped": 0,
+      "irrelevant_dropped": 8,
+      "irrelevant_kept": 20,
+      "density_before": 0.5238095238095238,
+      "density_after": 0.5789473684210527
+    }
+  },
+  "category_counts_by_label": {
+    "irrelevant": {
+      "cs.CV": 10,
+      "cs.CL": 8,
+      "cs.LG": 8,
+      "cs.AI": 4,
+      "cs.CR": 3,
+      "stat.ML": 2,
+      "cs.DC": 2,
+      "math.NA": 2
+    },
+    "related": {
+      "cs.AI": 6,
+      "cs.CL": 4,
+      "cs.LG": 4,
+      "cs.DC": 2,
+      "cs.DB": 2,
+      "cs.HC": 2,
+      "cs.MA": 1,
+      "cs.CV": 1
+    },
+    "central": {
+      "cs.LG": 27,
+      "cs.CL": 24,
+      "cs.AI": 23,
+      "stat.ML": 3,
+      "cs.CV": 3,
+      "cs.CR": 2,
+      "cs.DC": 2,
+      "cs.SE": 1
+    }
+  }
+}
