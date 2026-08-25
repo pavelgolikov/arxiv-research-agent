@@ -67,6 +67,8 @@ See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
   - `metrics.py` — MRR, nDCG, recall, and the paired bootstrap, as pure functions.
   - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py` — the metric
     runners; each writes one file under `results/`.
+  - `measure_categories.py`, `measure_depth.py` — one-question studies behind the
+    search-quality findings in Evaluation.
   - `render_tables.py` — regenerates this README's tables from those files.
   - `build_index.py` — rebuilds the vector index from the committed chunks and
     verifies that the labels still cover everything the retrievers return.
@@ -323,7 +325,25 @@ A live run surfaced the real bottleneck, and it is not the threshold. Asked for 
 in language model self-improvement, arXiv returned one on-topic paper and nine about
 federated LoRA, topic modeling, robot platforms, and Byzantine-resilient SGD. The
 screener scored them 1 and 2 and was right to. Selection quality is capped by what
-`search_arxiv` returns, which applies no category filter.
+`search_arxiv` returns, and two follow-up measurements say why.
+
+**An arXiv category filter would not help** (`evals/results/categories.json`). Fetching
+the categories of all 84 frozen candidates shows the papers labeled irrelevant living in
+the same categories as the central ones — irrelevant in cs.CV 10, cs.CL 8, cs.LG 8;
+central in cs.LG 27, cs.CL 24, cs.AI 23. Restricting to any CS category drops only 7 of
+28 irrelevant papers and moves central density from 52% to 57%. Every tighter filter
+costs central papers: `cs.CL` alone would discard 20 of the 44. Off-topic *for a query*
+is not the same as off-topic *by category*, and a junk candidate costs one abstract-only
+model call while a lost central paper is unrecoverable. Not implemented, deliberately.
+
+**Search depth does help** (`evals/results/search_depth.json`). `search_node` divides
+the result budget across the planned queries, so three queries at `--max-results 10`
+give each query four slots. Replaying one run's exact queries at ten slots each took
+relevant papers from 3 to 8 — and the density barely moved, 25% to 27%. arXiv's
+relevance ranking is flat over the first ten results: ranks 4-9 yielded 5 of 18
+relevant against 3 of 12 for ranks 0-3. Searching deeper costs one cheap screening
+call per extra candidate and does not dilute quality, which makes it the fix for
+thin reviews.
 
 ### Groundedness
 
@@ -445,8 +465,12 @@ output, never from a development run.
 ## Limitations
 
 - arXiv is the only source; nothing outside it is searched.
-- Screening is capped by arXiv search, not by the screener: `search_arxiv` applies
-  no category filter, so an on-topic query can return mostly unrelated papers.
+- Screening is capped by arXiv search, not by the screener. A category filter was
+  measured and rejected: the off-topic papers are cross-listed into the same
+  categories as the relevant ones. Searching deeper is the fix that works.
+- `--max-results` is divided across the planned queries, so the default of 10 leaves
+  each query about four slots. Reviews come out thin for that reason, not because
+  screening is too strict.
 - The retrieval ablation has 50 questions. That is enough to separate BM25 from
   the rest and not enough to resolve differences of two or three points.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
