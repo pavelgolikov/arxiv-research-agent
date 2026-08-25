@@ -159,6 +159,7 @@ class ReviewerState(TypedDict, total=False):
     user_query: str
     max_results: int
     target_papers: int
+    relevance_threshold: int
     output: str
     thread_id: str
     data_dir: str

@@ -1,0 +1,189 @@
+{
+  "config": {
+    "source": "langgraph checkpoint state, not the rendered Markdown",
+    "note": "Rates measure what survived validation out of what the model proposed. Citations in a finished report are valid by construction, so measuring the report itself would trivially return 100%.",
+    "revalidation": "deterministic re-check of every committed citation"
+  },
+  "totals": {
+    "runs": 2,
+    "papers": 7,
+    "claims_kept": 123,
+    "claims_dropped": 11,
+    "claim_support_rate": 0.917910447761194,
+    "evidence_kept": 128,
+    "evidence_dropped": 11,
+    "citation_integrity": 0.920863309352518,
+    "citations_per_claim": 1.0406504065040652,
+    "revalidated": 128,
+    "revalidation_failures": 0,
+    "revalidation_rate": 1.0,
+    "claims_by_facet": {
+      "experimental_setup": 23,
+      "limitations": 24,
+      "main_findings": 20,
+      "method": 17,
+      "relevance_to_query": 21,
+      "research_problem": 18
+    }
+  },
+  "runs": [
+    {
+      "thread_id": "groundedness-fixed-1",
+      "user_query": "What are the latest methods for language model self-improvement?",
+      "status": "complete",
+      "retriever_kind": "hybrid-rerank",
+      "output": "evals/results/reports/run1.md",
+      "papers": [
+        {
+          "arxiv_id": "2411.00750v2",
+          "title": "Mitigating Tail Narrowing in LLM Self-Improvement via Socratic-Guided Sampling",
+          "claims_kept": 21,
+          "claims_dropped": 0,
+          "evidence_kept": 21,
+          "evidence_dropped": 0,
+          "claim_support_rate": 1.0,
+          "citation_integrity": 1.0,
+          "revalidated": 21,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 4,
+            "limitations": 4,
+            "main_findings": 4,
+            "method": 3,
+            "relevance_to_query": 2,
+            "research_problem": 4
+          }
+        },
+        {
+          "arxiv_id": "2603.25681v2",
+          "title": "Self-Improvement of Large Language Models: A Technical Overview and Future Outlook",
+          "claims_kept": 16,
+          "claims_dropped": 2,
+          "evidence_kept": 16,
+          "evidence_dropped": 2,
+          "claim_support_rate": 0.8888888888888888,
+          "citation_integrity": 0.8888888888888888,
+          "revalidated": 16,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 3,
+            "limitations": 3,
+            "main_findings": 3,
+            "method": 1,
+            "relevance_to_query": 3,
+            "research_problem": 3
+          }
+        },
+        {
+          "arxiv_id": "2606.04455v1",
+          "title": "The Meta-Agent Challenge: Are Current Agents Capable of Autonomous Agent Development?",
+          "claims_kept": 18,
+          "claims_dropped": 1,
+          "evidence_kept": 18,
+          "evidence_dropped": 1,
+          "claim_support_rate": 0.9473684210526315,
+          "citation_integrity": 0.9473684210526315,
+          "revalidated": 18,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 4,
+            "limitations": 4,
+            "main_findings": 3,
+            "method": 2,
+            "relevance_to_query": 2,
+            "research_problem": 3
+          }
+        }
+      ]
+    },
+    {
+      "thread_id": "groundedness-fixed-2",
+      "user_query": "How is mechanistic interpretability used to understand transformer internals?",
+      "status": "complete",
+      "retriever_kind": "hybrid-rerank",
+      "output": "evals/results/reports/run2.md",
+      "papers": [
+        {
+          "arxiv_id": "2402.03855v2",
+          "title": "Challenges in Mechanistically Interpreting Model Representations",
+          "claims_kept": 14,
+          "claims_dropped": 4,
+          "evidence_kept": 15,
+          "evidence_dropped": 4,
+          "claim_support_rate": 0.7777777777777778,
+          "citation_integrity": 0.7894736842105263,
+          "revalidated": 15,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 2,
+            "limitations": 1,
+            "main_findings": 2,
+            "method": 3,
+            "relevance_to_query": 3,
+            "research_problem": 3
+          }
+        },
+        {
+          "arxiv_id": "2511.14465v2",
+          "title": "nnterp: A Standardized Interface for Mechanistic Interpretability of Transformers",
+          "claims_kept": 19,
+          "claims_dropped": 0,
+          "evidence_kept": 21,
+          "evidence_dropped": 0,
+          "claim_support_rate": 1.0,
+          "citation_integrity": 1.0,
+          "revalidated": 21,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 4,
+            "limitations": 4,
+            "main_findings": 2,
+            "method": 3,
+            "relevance_to_query": 4,
+            "research_problem": 2
+          }
+        },
+        {
+          "arxiv_id": "2511.09432v2",
+          "title": "Equivariant Sparse Autoencoders: Mechanistic Interpretability of Neural Networks on Symmetric Data",
+          "claims_kept": 19,
+          "claims_dropped": 2,
+          "evidence_kept": 20,
+          "evidence_dropped": 2,
+          "claim_support_rate": 0.9047619047619048,
+          "citation_integrity": 0.9090909090909091,
+          "revalidated": 20,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 4,
+            "limitations": 4,
+            "main_findings": 4,
+            "method": 3,
+            "relevance_to_query": 3,
+            "research_problem": 1
+          }
+        },
+        {
+          "arxiv_id": "2503.21676v2",
+          "title": "How do language models learn facts? Dynamics, curricula and hallucinations",
+          "claims_kept": 16,
+          "claims_dropped": 2,
+          "evidence_kept": 17,
+          "evidence_dropped": 2,
+          "claim_support_rate": 0.8888888888888888,
+          "citation_integrity": 0.8947368421052632,
+          "revalidated": 17,
+          "revalidation_failures": [],
+          "claims_by_facet": {
+            "experimental_setup": 2,
+            "limitations": 4,
+            "main_findings": 2,
+            "method": 2,
+            "relevance_to_query": 4,
+            "research_problem": 2
+          }
+        }
+      ]
+    }
+  ]
+}

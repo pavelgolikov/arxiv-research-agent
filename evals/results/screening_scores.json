@@ -1,0 +1,523 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "scores": {
+    "agent_eval": {
+      "2606.20023v2": {
+        "search_position": 0,
+        "score": 5,
+        "reason": "The paper directly addresses the evaluation of LLM agent workflows specifically regarding tool selection and usage, providing a dedicated benchmark (ToolPrivBench) for this purpose.",
+        "status": "ok"
+      },
+      "2502.09809v1": {
+        "search_position": 1,
+        "score": 5,
+        "reason": "The paper directly addresses the evaluation of LLM agent workflows and their tool-use capabilities, specifically focusing on identifying and validating unsafe orchestration patterns, which is highly aligned with the user's research query.",
+        "status": "ok"
+      },
+      "2401.07324v3": {
+        "search_position": 2,
+        "score": 5,
+        "reason": "The paper directly addresses LLM agent workflows, specifically focusing on decomposing the tool use process (planning, calling, summarizing) into a multi-LLM framework, which is central to evaluating and improving agentic tool-use capabilities.",
+        "status": "ok"
+      },
+      "2111.01762v1": {
+        "search_position": 3,
+        "score": 1,
+        "reason": "The paper focuses on climate modeling and software for climate risk assessment, which is entirely unrelated to evaluating Large Language Model (LLM) agent workflows and tool use.",
+        "status": "ok"
+      },
+      "2508.02866v3": {
+        "search_position": 4,
+        "score": 5,
+        "reason": "The paper directly addresses the evaluation of agentic workflows, specifically focusing on transparency, reliability, and provenance tracking, which are critical components for evaluating LLM agent systems and their tool-use/workflow interactions.",
+        "status": "ok"
+      },
+      "2512.21309v2": {
+        "search_position": 5,
+        "score": 5,
+        "reason": "The paper directly addresses evaluating and optimizing LLM agent workflows, specifically focusing on plan generation, tool execution, and an evaluation mechanism to improve performance (latency), which is directly aligned with the user's research interests.",
+        "status": "ok"
+      },
+      "2510.01295v1": {
+        "search_position": 6,
+        "score": 4,
+        "reason": "The paper focuses on evaluating LLM agents in interactive environments using a multi-agent framework, which directly addresses the core challenge of evaluating complex agent workflows and behavioral dynamics.",
+        "status": "ok"
+      },
+      "2409.01907v1": {
+        "search_position": 7,
+        "score": 4,
+        "reason": "The paper investigates the performance and evaluation of an LLM agent acting in a structured, multi-turn role-playing (moderator) workflow, which is directly relevant to assessing LLM agent workflows and their efficacy in interactive settings.",
+        "status": "ok"
+      },
+      "2511.07641v1": {
+        "search_position": 8,
+        "score": 2,
+        "reason": "The paper focuses on evaluating LLM performance in sentiment analysis tasks for a specific language variant, rather than evaluating LLM agent workflows or their capabilities in tool use.",
+        "status": "ok"
+      },
+      "2607.09839v1": {
+        "search_position": 9,
+        "score": 4,
+        "reason": "The paper explicitly proposes and evaluates an agentic workflow involving iterative improvement and feedback loops for LLMs, which is directly aligned with the user's research on evaluating LLM agent workflows and tool use.",
+        "status": "ok"
+      },
+      "2509.13978v2": {
+        "search_position": 10,
+        "score": 5,
+        "reason": "The paper explicitly focuses on an evaluation methodology for LLM agents interacting with complex workflows and includes a practical assessment of tool use (translating natural language to structured queries) using multiple LLM models.",
+        "status": "ok"
+      },
+      "2606.05868v1": {
+        "search_position": 11,
+        "score": 1,
+        "reason": "The paper focuses on model architecture optimization (GQA-to-MLA transition) and high-concurrency inference efficiency for financial LLMs. It does not discuss LLM agent workflows or tool use evaluation.",
+        "status": "ok"
+      }
+    },
+    "self_improvement": {
+      "2505.21444v2": {
+        "search_position": 0,
+        "score": 5,
+        "reason": "The paper directly addresses the core research query of language model self-training and self-improvement mechanisms, specifically analyzing the dynamics and limitations of self-feedback within reinforcement learning.",
+        "status": "ok"
+      },
+      "2303.10856v1": {
+        "search_position": 1,
+        "score": 2,
+        "reason": "The paper focuses on test-time training (TTT) and domain adaptation for computer vision tasks using clustering and self-training. While it mentions self-training, it does not pertain to the language model specific domain or general language model self-improvement paradigms.",
+        "status": "ok"
+      },
+      "2411.00750v2": {
+        "search_position": 2,
+        "score": 5,
+        "reason": "The paper directly addresses LLM self-improvement and self-training, focusing specifically on the challenges of sampling and performance plateaus in these iterative processes.",
+        "status": "ok"
+      },
+      "2603.25681v2": {
+        "search_position": 3,
+        "score": 5,
+        "reason": "The paper directly addresses self-improvement of LLMs, providing a comprehensive technical overview and framework that perfectly matches the user's research query.",
+        "status": "ok"
+      },
+      "2412.01951v2": {
+        "search_position": 4,
+        "score": 5,
+        "reason": "The paper directly addresses language model self-improvement, formalizing it as a 'sharpening mechanism' and analyzing specific techniques like SFT and RLHF for self-training, which is exactly the core of the user's research query.",
+        "status": "ok"
+      },
+      "2604.13356v3": {
+        "search_position": 5,
+        "score": 5,
+        "reason": "The paper directly addresses language model self-improvement and self-training through a label-free fine-tuning framework (Peer-Predictive Self-Training), which is exactly the focus of the user's research query.",
+        "status": "ok"
+      },
+      "2603.03524v2": {
+        "search_position": 6,
+        "score": 5,
+        "reason": "The paper directly addresses language model self-improvement and self-training by introducing a framework (MASS) where the LLM generates synthetic data to adapt and self-update at test time.",
+        "status": "ok"
+      },
+      "2407.08400v3": {
+        "search_position": 7,
+        "score": 5,
+        "reason": "The paper directly addresses self-training and language model self-improvement within the context of reasoning tasks, which aligns perfectly with the user's research query.",
+        "status": "ok"
+      },
+      "2010.02194v1": {
+        "search_position": 8,
+        "score": 4,
+        "reason": "The paper directly addresses self-training techniques for language models to improve performance on downstream tasks using unlabeled data, which is highly relevant to the query regarding language model self-training.",
+        "status": "ok"
+      },
+      "2503.21676v2": {
+        "search_position": 9,
+        "score": 2,
+        "reason": "The paper focuses on the learning dynamics, factual recall, and knowledge acquisition of LMs during pre-training and fine-tuning, but it does not address self-improvement or self-training methodologies.",
+        "status": "ok"
+      },
+      "2412.02674v2": {
+        "search_position": 10,
+        "score": 5,
+        "reason": "The paper directly addresses LLM self-improvement, provides a framework for iterative self-improvement, and performs a controlled study on the capabilities and limitations of these mechanisms, making it highly relevant to the user's research query.",
+        "status": "ok"
+      },
+      "2203.06041v1": {
+        "search_position": 11,
+        "score": 1,
+        "reason": "The paper focuses on self-supervised contrastive learning for satellite imagery in the domain of Earth observation, which is unrelated to language model self-improvement or self-training.",
+        "status": "ok"
+      }
+    },
+    "adversarial_reasoning": {
+      "2504.16021v1": {
+        "search_position": 0,
+        "score": 1,
+        "reason": "The paper focuses on human-AI interaction and maintaining cognitive flow during reasoning tasks, rather than addressing adversarial perturbations or the robustness of LLM reasoning against attacks.",
+        "status": "ok"
+      },
+      "2407.15549v3": {
+        "search_position": 1,
+        "score": 4,
+        "reason": "The paper investigates latent adversarial training to improve robustness against adversarial inputs (jailbreaks) in LLMs, which is directly aligned with the user's focus on adversarial perturbations and LLM robustness.",
+        "status": "ok"
+      },
+      "1809.00958v1": {
+        "search_position": 2,
+        "score": 1,
+        "reason": "The paper focuses on adversarial perturbations in computer vision (images and videos) rather than reasoning capabilities or Large Language Models (LLMs).",
+        "status": "ok"
+      },
+      "2103.15670v3": {
+        "search_position": 3,
+        "score": 1,
+        "reason": "The paper focuses exclusively on adversarial robustness in Vision Transformers (computer vision) rather than LLM reasoning or language models.",
+        "status": "ok"
+      },
+      "2606.30247v1": {
+        "search_position": 4,
+        "score": 4,
+        "reason": "The paper explicitly addresses stability bounds under evidence perturbations in the context of LLM reasoning, which is directly relevant to the study of robustness against adversarial or noisy perturbations.",
+        "status": "ok"
+      },
+      "2008.07651v1": {
+        "search_position": 5,
+        "score": 1,
+        "reason": "The paper focuses on adversarial robustness in zero-shot learning (ZSL) within computer vision contexts, not on the reasoning capabilities or robustness of Large Language Models (LLMs).",
+        "status": "ok"
+      },
+      "2504.07887v2": {
+        "search_position": 6,
+        "score": 3,
+        "reason": "The paper focuses on adversarial robustness against bias elicitation rather than the robustness of reasoning capabilities. While it deals with adversarial perturbations and LLM safety, it is only tangentially related to the specific research on reasoning robustness.",
+        "status": "ok"
+      },
+      "2007.08428v4": {
+        "search_position": 7,
+        "score": 2,
+        "reason": "The paper focuses on adversarial robustness from a Neural Architecture Search (NAS) perspective for general deep learning models, rather than addressing adversarial perturbations specifically for Large Language Model (LLM) reasoning.",
+        "status": "ok"
+      },
+      "2007.04137v3": {
+        "search_position": 8,
+        "score": 1,
+        "reason": "The paper focuses on physical adversarial attacks on computer vision models (specifically object detection for autonomous driving) using light projectors, which is unrelated to the adversarial robustness of reasoning capabilities in Large Language Models.",
+        "status": "ok"
+      },
+      "1807.09380v3": {
+        "search_position": 9,
+        "score": 1,
+        "reason": "The paper focuses on video representation learning and computer vision using adversarial perturbations, which is unrelated to LLM reasoning or the robustness of large language models.",
+        "status": "ok"
+      },
+      "2509.26306v5": {
+        "search_position": 10,
+        "score": 2,
+        "reason": "The paper focuses on multi-agent learning frameworks (ILR) to improve LLM reasoning capabilities. While it mentions the robustness of LLMs, it refers to robustness in the context of multi-agent inference consistency rather than adversarial perturbations or security-related robustness, which is the focus of the user's query.",
+        "status": "ok"
+      },
+      "2202.07201v3": {
+        "search_position": 11,
+        "score": 3,
+        "reason": "The paper provides a broad survey on adversarial robustness in deep learning, which is related to the field, but it is a general overview published in early 2022 and does not specifically focus on LLM reasoning or the unique adversarial challenges associated with language models.",
+        "status": "ok"
+      }
+    },
+    "interpretability": {
+      "2511.14465v2": {
+        "search_position": 0,
+        "score": 5,
+        "reason": "The paper directly addresses the research query by introducing a tool specifically designed for the mechanistic interpretability of transformer internals, focusing on standardizing the interface for analyzing various transformer architectures.",
+        "status": "ok"
+      },
+      "2504.19475v3": {
+        "search_position": 1,
+        "score": 4,
+        "reason": "The paper directly addresses mechanistic interpretability of transformers, specifically focusing on vision and video transformer architectures and providing tools and findings relevant to internal model analysis.",
+        "status": "ok"
+      },
+      "2402.03855v2": {
+        "search_position": 2,
+        "score": 5,
+        "reason": "The paper explicitly focuses on mechanistic interpretability of transformer model representations, addressing the internal mechanisms of large language models like Mistral-7B, which aligns perfectly with the user's research query.",
+        "status": "ok"
+      },
+      "2511.09432v2": {
+        "search_position": 3,
+        "score": 5,
+        "reason": "The paper directly addresses mechanistic interpretability of neural networks by improving sparse autoencoders (SAEs), a key technique in transformer interpretability, to handle symmetric data. It specifically critiques and advances the state-of-the-art methodology used for interpreting internal activations.",
+        "status": "ok"
+      },
+      "2603.18353v1": {
+        "search_position": 4,
+        "score": 5,
+        "reason": "This paper directly addresses mechanistic interpretability by evaluating the efficacy of several prominent methods (SAEs, logit lens, steering) in translating internal knowledge into behavioral changes. It is highly relevant to the field of mechanistic interpretability as it critically analyzes the link between internal representations and model outputs.",
+        "status": "ok"
+      },
+      "2606.16939v1": {
+        "search_position": 5,
+        "score": 5,
+        "reason": "The paper is directly focused on mechanistic interpretability, specifically addressing the challenge of learning sparse circuits in large language models using sparse autoencoders, which is a core topic in current transformer interpretability research.",
+        "status": "ok"
+      },
+      "2409.13714v1": {
+        "search_position": 6,
+        "score": 5,
+        "reason": "The paper focuses directly on evaluating and benchmarking mechanistic interpretability methods for transformer models, specifically by providing ground truth mappings via compiled RASP programs, which is a core task in the field of mechanistic interpretability.",
+        "status": "ok"
+      },
+      "2405.17703v1": {
+        "search_position": 7,
+        "score": 5,
+        "reason": "The paper directly applies mechanistic interpretability techniques to investigate the internal algorithmic mechanisms of binary and ternary transformer architectures.",
+        "status": "ok"
+      },
+      "2511.21514v1": {
+        "search_position": 8,
+        "score": 5,
+        "reason": "The paper directly addresses the mechanistic interpretability of transformer internals by applying and adapting techniques like activation patching and sparse autoencoders to investigate causal roles and information propagation.",
+        "status": "ok"
+      },
+      "2511.08854v2": {
+        "search_position": 9,
+        "score": 5,
+        "reason": "The paper directly addresses mechanistic interpretability of transformer internals by applying Stochastic Parameter Decomposition to decompose GPT-2-small and identify specific subcomponents, which aligns perfectly with the research query.",
+        "status": "ok"
+      },
+      "2410.24050v3": {
+        "search_position": 10,
+        "score": 5,
+        "reason": "The paper directly addresses mechanistic interpretability of transformer internals by studying training dynamics, identifying specific attention circuits (clustering heads), and monitoring internal model evolution during the learning process.",
+        "status": "ok"
+      },
+      "2407.13594v2": {
+        "search_position": 11,
+        "score": 5,
+        "reason": "The paper explicitly focuses on formalizing and validating mechanistic interpretations of neural networks, specifically testing their axiomatic approach on a Transformer-based model. This is directly aligned with the research query on mechanistic interpretability of transformer internals.",
+        "status": "ok"
+      }
+    },
+    "efficient_inference": {
+      "2604.24971v1": {
+        "search_position": 0,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization and efficient inference for LLMs through a novel shared, asymmetrically-compressed cache pool, which is highly relevant to the user's research query.",
+        "status": "ok"
+      },
+      "2603.20397v1": {
+        "search_position": 1,
+        "score": 5,
+        "reason": "The paper directly addresses both efficient inference and KV cache optimization, providing a comprehensive review of techniques, trade-offs, and deployment scenarios that match the user's research query perfectly.",
+        "status": "ok"
+      },
+      "2510.14973v2": {
+        "search_position": 2,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization and efficient inference for LLMs (specifically diffusion-based LLMs). It proposes a novel technique called Elastic-Cache to reduce redundant computation and accelerate decoding, which is exactly aligned with the research query.",
+        "status": "ok"
+      },
+      "2605.08840v1": {
+        "search_position": 3,
+        "score": 5,
+        "reason": "The paper directly addresses efficient inference and KV cache optimization for LLMs, proposing a novel eviction method to handle long-context memory demands and reduce decoding latency.",
+        "status": "ok"
+      },
+      "2605.02262v1": {
+        "search_position": 4,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization for inference efficiency through a novel mixed-precision quantization technique, which is central to the user's research query.",
+        "status": "ok"
+      },
+      "2503.08879v1": {
+        "search_position": 5,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization for efficient long-context LLM inference by proposing a novel eviction method (SAGE-KV), which is central to the user's research query.",
+        "status": "ok"
+      },
+      "2605.09649v1": {
+        "search_position": 6,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization and efficiency in LLM inference, specifically proposing a novel eviction method to handle long-context bottlenecks, which is central to the user's research query.",
+        "status": "ok"
+      },
+      "2510.09665v2": {
+        "search_position": 7,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization, offloading, and efficient inference strategies for LLMs, which is the core of the user's research query.",
+        "status": "ok"
+      },
+      "2501.06807v2": {
+        "search_position": 8,
+        "score": 5,
+        "reason": "The paper directly addresses KV cache optimization and efficient inference for LLMs, specifically proposing a novel eviction framework (MPCache) to reduce latency, which is core to the user's research query.",
+        "status": "ok"
+      },
+      "2511.11106v1": {
+        "search_position": 9,
+        "score": 5,
+        "reason": "The paper specifically proposes a novel framework (AccKV) for KV cache optimization to improve the efficiency of LLM inference, which is directly aligned with the user's research query.",
+        "status": "ok"
+      },
+      "2508.06297v1": {
+        "search_position": 10,
+        "score": 5,
+        "reason": "The paper is a comprehensive review dedicated specifically to KV cache compression and inference efficiency for LLMs, which is exactly the user's research query.",
+        "status": "ok"
+      },
+      "2503.17922v2": {
+        "search_position": 11,
+        "score": 5,
+        "reason": "The paper directly addresses efficient inference for LLMs through a novel KV cache compression technique (WindowKV), which is exactly what the user is researching.",
+        "status": "ok"
+      }
+    },
+    "memorization": {
+      "2404.17143v2": {
+        "search_position": 0,
+        "score": 5,
+        "reason": "The paper directly addresses the memorization of training data in neural language models (GPT-2) and provides experiments quantifying this behavior and evaluating membership inference attacks.",
+        "status": "ok"
+      },
+      "2509.00488v1": {
+        "search_position": 1,
+        "score": 3,
+        "reason": "The paper focuses on memorization in image autoregressive models rather than neural language models. While the core research problem (memorization of training data) is relevant, the domain (image generation) differs from the user's focus on NLP.",
+        "status": "ok"
+      },
+      "1907.02664v2": {
+        "search_position": 2,
+        "score": 1,
+        "reason": "The paper focuses on Byzantine-resilient distributed optimization and data encoding to protect against adversarial node corruption, which is unrelated to the memorization of training data in neural language models.",
+        "status": "ok"
+      },
+      "2005.07866v1": {
+        "search_position": 3,
+        "score": 1,
+        "reason": "The paper focuses on distributed SGD under Byzantine attacks in a heterogeneous data setting. It does not address the memorization of training data in neural language models.",
+        "status": "ok"
+      },
+      "2404.15146v3": {
+        "search_position": 4,
+        "score": 5,
+        "reason": "The paper directly addresses the core research query by proposing a new metric for evaluating memorization of training data in LLMs, which is a central topic in the research area.",
+        "status": "ok"
+      },
+      "1110.5626v1": {
+        "search_position": 5,
+        "score": 1,
+        "reason": "The paper is about dark energy and cosmology, which is entirely unrelated to neural language models or data memorization.",
+        "status": "ok"
+      },
+      "2510.21391v1": {
+        "search_position": 6,
+        "score": 1,
+        "reason": "The paper focuses on generative data augmentation for remote sensing imagery and layout-to-image synthesis, which is unrelated to the memorization of training data in neural language models.",
+        "status": "ok"
+      },
+      "2112.12938v2": {
+        "search_position": 7,
+        "score": 5,
+        "reason": "The paper directly addresses the problem of memorization of training data in neural language models and proposes a new framework, counterfactual memorization, to study and measure it.",
+        "status": "ok"
+      },
+      "1706.06749v1": {
+        "search_position": 8,
+        "score": 1,
+        "reason": "The paper focuses on cross-language adaptation for question-question similarity using adversarial training, which is unrelated to the memorization of training data in language models.",
+        "status": "ok"
+      },
+      "2203.12171v1": {
+        "search_position": 9,
+        "score": 5,
+        "reason": "The paper directly addresses the research query by performing an empirical study specifically focused on memorization of training data in the context of neural language models.",
+        "status": "ok"
+      },
+      "2411.15497v3": {
+        "search_position": 10,
+        "score": 1,
+        "reason": "The paper focuses on generative data augmentation for remote sensing object detection and does not address the memorization of training data in neural language models.",
+        "status": "ok"
+      },
+      "2503.21676v2": {
+        "search_position": 11,
+        "score": 4,
+        "reason": "The paper directly addresses parametric memory, knowledge acquisition, and the challenges of integrating/maintaining knowledge in language models, which is deeply connected to memorization phenomena in neural networks.",
+        "status": "ok"
+      }
+    },
+    "uncertainty_calibration": {
+      "2501.05032v2": {
+        "search_position": 0,
+        "score": 1,
+        "reason": "The paper focuses on enhancing conversational coherence, emotional intelligence, and human-like reasoning in LLMs. It does not address uncertainty quantification or calibration.",
+        "status": "ok"
+      },
+      "1706.07500v1": {
+        "search_position": 1,
+        "score": 1,
+        "reason": "The paper focuses on uncertainty quantification in kinetic models for socio-economic and life sciences, which is unrelated to the research query regarding uncertainty quantification and calibration in large language models.",
+        "status": "ok"
+      },
+      "2310.11435v1": {
+        "search_position": 2,
+        "score": 1,
+        "reason": "The paper focuses on uncertainty quantification for Computational Fluid Dynamics and turbulent flows, which is unrelated to the user's research on uncertainty quantification and calibration in large language models.",
+        "status": "ok"
+      },
+      "1012.2631v2": {
+        "search_position": 3,
+        "score": 1,
+        "reason": "The paper focuses on uncertainty estimation in physical wavelength calibration using the Monte Carlo method, which is unrelated to uncertainty quantification or calibration in large language models.",
+        "status": "ok"
+      },
+      "2402.14679v2": {
+        "search_position": 4,
+        "score": 1,
+        "reason": "The paper focuses on evaluating personality traits and behavioral consistency in LLMs through questionnaires, which does not address uncertainty quantification or model calibration.",
+        "status": "ok"
+      },
+      "1908.11476v1": {
+        "search_position": 5,
+        "score": 1,
+        "reason": "The paper focuses on uncertainty propagation in component-based engineering/computational systems rather than large language models or deep learning calibration.",
+        "status": "ok"
+      },
+      "2405.11357v3": {
+        "search_position": 6,
+        "score": 1,
+        "reason": "The paper focuses on character-level comprehension in LLMs and does not address uncertainty quantification or model calibration.",
+        "status": "ok"
+      },
+      "2406.05213v2": {
+        "search_position": 7,
+        "score": 5,
+        "reason": "The paper directly addresses uncertainty quantification and calibration specifically in the context of large language models and natural language generation, which is exactly the user's research topic.",
+        "status": "ok"
+      },
+      "1509.08130v7": {
+        "search_position": 8,
+        "score": 1,
+        "reason": "The paper focuses on uncertainty quantification within the domain of particle accelerator modeling and physics, which is unrelated to large language models.",
+        "status": "ok"
+      },
+      "2403.09676v1": {
+        "search_position": 9,
+        "score": 1,
+        "reason": "The paper focuses on AI deception, specifically sycophancy and strategic behavior, rather than the statistical uncertainty quantification or calibration of model outputs.",
+        "status": "ok"
+      },
+      "2309.02144v1": {
+        "search_position": 10,
+        "score": 4,
+        "reason": "The paper directly addresses the issue of assessment misalignment and proposes a method for calibrating model scores for reasoning outputs, which is highly relevant to uncertainty quantification and calibration in LLMs.",
+        "status": "ok"
+      },
+      "2506.21849v1": {
+        "search_position": 11,
+        "score": 5,
+        "reason": "The paper directly addresses uncertainty quantification for LLMs by formalizing the consistency hypothesis and proposing new black-box UQ methods, which is exactly the core of the user's research query.",
+        "status": "ok"
+      }
+    }
+  }
+}

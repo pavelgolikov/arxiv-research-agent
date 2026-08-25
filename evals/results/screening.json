@@ -1,0 +1,662 @@
+{
+  "config": {
+    "target_papers": 4,
+    "thresholds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "current_default": 4,
+    "labels": "0 irrelevant, 1 related, 2 central",
+    "model": "gemini-3.1-flash-lite"
+  },
+  "recommended_threshold": 3,
+  "agreement": {
+    "irrelevant": {
+      "mean_model_score": 1.1428571428571428,
+      "n": 28
+    },
+    "related": {
+      "mean_model_score": 4.0,
+      "n": 12
+    },
+    "central": {
+      "mean_model_score": 4.863636363636363,
+      "n": 44
+    }
+  },
+  "confusion": {
+    "1": {
+      "irrelevant": 24,
+      "related": 0,
+      "central": 0
+    },
+    "2": {
+      "irrelevant": 4,
+      "related": 1,
+      "central": 0
+    },
+    "3": {
+      "irrelevant": 0,
+      "related": 2,
+      "central": 1
+    },
+    "4": {
+      "irrelevant": 0,
+      "related": 5,
+      "central": 4
+    },
+    "5": {
+      "irrelevant": 0,
+      "related": 4,
+      "central": 39
+    }
+  },
+  "sweep": {
+    "1": {
+      "per_query": {
+        "agent_eval": {
+          "threshold": 1,
+          "selected": [
+            "2606.20023v2",
+            "2502.09809v1",
+            "2401.07324v3",
+            "2508.02866v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 0.6666666666666666,
+          "central_recall_ceiling": 1.0,
+          "central_available": 3
+        },
+        "self_improvement": {
+          "threshold": 1,
+          "selected": [
+            "2505.21444v2",
+            "2411.00750v2",
+            "2603.25681v2",
+            "2412.01951v2"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.4444444444444444,
+          "central_recall_ceiling": 0.4444444444444444,
+          "central_available": 9
+        },
+        "adversarial_reasoning": {
+          "threshold": 1,
+          "selected": [
+            "2407.15549v3",
+            "2606.30247v1",
+            "2504.07887v2",
+            "2202.07201v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        },
+        "interpretability": {
+          "threshold": 1,
+          "selected": [
+            "2511.14465v2",
+            "2402.03855v2",
+            "2511.09432v2",
+            "2603.18353v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "efficient_inference": {
+          "threshold": 1,
+          "selected": [
+            "2604.24971v1",
+            "2603.20397v1",
+            "2510.14973v2",
+            "2605.08840v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "memorization": {
+          "threshold": 1,
+          "selected": [
+            "2404.17143v2",
+            "2404.15146v3",
+            "2112.12938v2",
+            "2203.12171v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 4
+        },
+        "uncertainty_calibration": {
+          "threshold": 1,
+          "selected": [
+            "2406.05213v2",
+            "2506.21849v1",
+            "2309.02144v1",
+            "2501.05032v2"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 0.75,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        }
+      },
+      "pooled": {
+        "precision_central": 0.7857142857142857,
+        "precision_related": 0.9642857142857143,
+        "central_recall": 0.6825396825396826,
+        "central_recall_ceiling": 0.7301587301587301,
+        "underfilled_queries": 0
+      }
+    },
+    "2": {
+      "per_query": {
+        "agent_eval": {
+          "threshold": 2,
+          "selected": [
+            "2606.20023v2",
+            "2502.09809v1",
+            "2401.07324v3",
+            "2508.02866v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 0.6666666666666666,
+          "central_recall_ceiling": 1.0,
+          "central_available": 3
+        },
+        "self_improvement": {
+          "threshold": 2,
+          "selected": [
+            "2505.21444v2",
+            "2411.00750v2",
+            "2603.25681v2",
+            "2412.01951v2"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.4444444444444444,
+          "central_recall_ceiling": 0.4444444444444444,
+          "central_available": 9
+        },
+        "adversarial_reasoning": {
+          "threshold": 2,
+          "selected": [
+            "2407.15549v3",
+            "2606.30247v1",
+            "2504.07887v2",
+            "2202.07201v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        },
+        "interpretability": {
+          "threshold": 2,
+          "selected": [
+            "2511.14465v2",
+            "2402.03855v2",
+            "2511.09432v2",
+            "2603.18353v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "efficient_inference": {
+          "threshold": 2,
+          "selected": [
+            "2604.24971v1",
+            "2603.20397v1",
+            "2510.14973v2",
+            "2605.08840v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "memorization": {
+          "threshold": 2,
+          "selected": [
+            "2404.17143v2",
+            "2404.15146v3",
+            "2112.12938v2",
+            "2203.12171v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 4
+        },
+        "uncertainty_calibration": {
+          "threshold": 2,
+          "selected": [
+            "2406.05213v2",
+            "2506.21849v1",
+            "2309.02144v1"
+          ],
+          "selected_count": 3,
+          "underfilled": true,
+          "precision_central": 0.6666666666666666,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        }
+      },
+      "pooled": {
+        "precision_central": 0.8095238095238095,
+        "precision_related": 1.0,
+        "central_recall": 0.6825396825396826,
+        "central_recall_ceiling": 0.7301587301587301,
+        "underfilled_queries": 1
+      }
+    },
+    "3": {
+      "per_query": {
+        "agent_eval": {
+          "threshold": 3,
+          "selected": [
+            "2606.20023v2",
+            "2502.09809v1",
+            "2401.07324v3",
+            "2508.02866v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 0.6666666666666666,
+          "central_recall_ceiling": 1.0,
+          "central_available": 3
+        },
+        "self_improvement": {
+          "threshold": 3,
+          "selected": [
+            "2505.21444v2",
+            "2411.00750v2",
+            "2603.25681v2",
+            "2412.01951v2"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.4444444444444444,
+          "central_recall_ceiling": 0.4444444444444444,
+          "central_available": 9
+        },
+        "adversarial_reasoning": {
+          "threshold": 3,
+          "selected": [
+            "2407.15549v3",
+            "2606.30247v1",
+            "2504.07887v2",
+            "2202.07201v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        },
+        "interpretability": {
+          "threshold": 3,
+          "selected": [
+            "2511.14465v2",
+            "2402.03855v2",
+            "2511.09432v2",
+            "2603.18353v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "efficient_inference": {
+          "threshold": 3,
+          "selected": [
+            "2604.24971v1",
+            "2603.20397v1",
+            "2510.14973v2",
+            "2605.08840v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "memorization": {
+          "threshold": 3,
+          "selected": [
+            "2404.17143v2",
+            "2404.15146v3",
+            "2112.12938v2",
+            "2203.12171v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 4
+        },
+        "uncertainty_calibration": {
+          "threshold": 3,
+          "selected": [
+            "2406.05213v2",
+            "2506.21849v1",
+            "2309.02144v1"
+          ],
+          "selected_count": 3,
+          "underfilled": true,
+          "precision_central": 0.6666666666666666,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        }
+      },
+      "pooled": {
+        "precision_central": 0.8095238095238095,
+        "precision_related": 1.0,
+        "central_recall": 0.6825396825396826,
+        "central_recall_ceiling": 0.7301587301587301,
+        "underfilled_queries": 1
+      }
+    },
+    "4": {
+      "per_query": {
+        "agent_eval": {
+          "threshold": 4,
+          "selected": [
+            "2606.20023v2",
+            "2502.09809v1",
+            "2401.07324v3",
+            "2508.02866v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 0.6666666666666666,
+          "central_recall_ceiling": 1.0,
+          "central_available": 3
+        },
+        "self_improvement": {
+          "threshold": 4,
+          "selected": [
+            "2505.21444v2",
+            "2411.00750v2",
+            "2603.25681v2",
+            "2412.01951v2"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.4444444444444444,
+          "central_recall_ceiling": 0.4444444444444444,
+          "central_available": 9
+        },
+        "adversarial_reasoning": {
+          "threshold": 4,
+          "selected": [
+            "2407.15549v3",
+            "2606.30247v1"
+          ],
+          "selected_count": 2,
+          "underfilled": true,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 0.5,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        },
+        "interpretability": {
+          "threshold": 4,
+          "selected": [
+            "2511.14465v2",
+            "2402.03855v2",
+            "2511.09432v2",
+            "2603.18353v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "efficient_inference": {
+          "threshold": 4,
+          "selected": [
+            "2604.24971v1",
+            "2603.20397v1",
+            "2510.14973v2",
+            "2605.08840v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "memorization": {
+          "threshold": 4,
+          "selected": [
+            "2404.17143v2",
+            "2404.15146v3",
+            "2112.12938v2",
+            "2203.12171v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 4
+        },
+        "uncertainty_calibration": {
+          "threshold": 4,
+          "selected": [
+            "2406.05213v2",
+            "2506.21849v1",
+            "2309.02144v1"
+          ],
+          "selected_count": 3,
+          "underfilled": true,
+          "precision_central": 0.6666666666666666,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        }
+      },
+      "pooled": {
+        "precision_central": 0.8095238095238095,
+        "precision_related": 1.0,
+        "central_recall": 0.611111111111111,
+        "central_recall_ceiling": 0.7301587301587301,
+        "underfilled_queries": 2
+      }
+    },
+    "5": {
+      "per_query": {
+        "agent_eval": {
+          "threshold": 5,
+          "selected": [
+            "2606.20023v2",
+            "2502.09809v1",
+            "2401.07324v3",
+            "2508.02866v3"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 0.5,
+          "precision_related": 1.0,
+          "central_recall": 0.6666666666666666,
+          "central_recall_ceiling": 1.0,
+          "central_available": 3
+        },
+        "self_improvement": {
+          "threshold": 5,
+          "selected": [
+            "2505.21444v2",
+            "2411.00750v2",
+            "2603.25681v2",
+            "2412.01951v2"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.4444444444444444,
+          "central_recall_ceiling": 0.4444444444444444,
+          "central_available": 9
+        },
+        "adversarial_reasoning": {
+          "threshold": 5,
+          "selected": [],
+          "selected_count": 0,
+          "underfilled": true,
+          "precision_central": 0.0,
+          "precision_related": 0.0,
+          "central_recall": 0.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        },
+        "interpretability": {
+          "threshold": 5,
+          "selected": [
+            "2511.14465v2",
+            "2402.03855v2",
+            "2511.09432v2",
+            "2603.18353v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "efficient_inference": {
+          "threshold": 5,
+          "selected": [
+            "2604.24971v1",
+            "2603.20397v1",
+            "2510.14973v2",
+            "2605.08840v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 0.3333333333333333,
+          "central_recall_ceiling": 0.3333333333333333,
+          "central_available": 12
+        },
+        "memorization": {
+          "threshold": 5,
+          "selected": [
+            "2404.17143v2",
+            "2404.15146v3",
+            "2112.12938v2",
+            "2203.12171v1"
+          ],
+          "selected_count": 4,
+          "underfilled": false,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 4
+        },
+        "uncertainty_calibration": {
+          "threshold": 5,
+          "selected": [
+            "2406.05213v2",
+            "2506.21849v1"
+          ],
+          "selected_count": 2,
+          "underfilled": true,
+          "precision_central": 1.0,
+          "precision_related": 1.0,
+          "central_recall": 1.0,
+          "central_recall_ceiling": 1.0,
+          "central_available": 2
+        }
+      },
+      "pooled": {
+        "precision_central": 0.7857142857142857,
+        "precision_related": 0.8571428571428571,
+        "central_recall": 0.5396825396825397,
+        "central_recall_ceiling": 0.7301587301587301,
+        "underfilled_queries": 2
+      }
+    }
+  }
+}

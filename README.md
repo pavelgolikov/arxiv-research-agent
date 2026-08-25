@@ -7,9 +7,10 @@ through LangChain.
 
 ## Project status
 
-The pipeline runs end to end. The hand-labeled datasets the evaluation rests on are
-frozen and committed; the ablation and groundedness runs that consume them are in
-progress. No performance numbers appear here until those runs are committed.
+The pipeline runs end to end, and the evaluation it rests on is built: two frozen
+hand-labeled datasets, a four-way retrieval ablation with significance testing, a
+screening threshold sweep, and groundedness measured over live runs. Every number
+below is generated from `evals/results/*.json`.
 
 **Working today**
 
@@ -29,14 +30,15 @@ progress. No performance numbers appear here until those runs are committed.
 | Labeled retrieval dataset — 50 questions, 312 judged chunks | done |
 | Labeled screening dataset — 7 queries x 12 candidates | done |
 | Reproducible index rebuild with pool-coverage verification | done |
+| Retrieval ablation — 4 strategies x 3 metrics, paired-bootstrap intervals | done |
+| Screening threshold sweep over the real selection rule | done |
+| Groundedness — citation survival and independent re-validation | done |
+| `evals/results/*.json` + README tables generated from them | done |
 
 **Not built yet**
 
 | Area | Notes |
 | --- | --- |
-| Retrieval ablation | recall@5, MRR, nDCG@10 across the four `--retriever` settings |
-| Groundedness metrics | citation referential integrity and claim-support rate over generated reports |
-| `evals/results/*.json` | machine-readable output; the only place performance numbers may come from |
 | Automated test suite | no `tests/` directory exists; see Verification below |
 | Verified example report | one report with every citation manually checked, committed under `examples/` |
 | Repository cleanup | `results/` still holds pre-rewrite artifacts |
@@ -62,6 +64,10 @@ See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
 - `evals/` — evaluation, split by direction of data flow:
   - `build/` — dataset construction: arXiv search, corpus parsing, question
     generation, candidate pooling, and the offline labeling page. Run rarely.
+  - `metrics.py` — MRR, nDCG, recall, and the paired bootstrap, as pure functions.
+  - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py` — the metric
+    runners; each writes one file under `results/`.
+  - `render_tables.py` — regenerates this README's tables from those files.
   - `build_index.py` — rebuilds the vector index from the committed chunks and
     verifies that the labels still cover everything the retrievers return.
   - `data/`, `labels/`, `results/` — the frozen datasets, the hand labels, and the
@@ -176,8 +182,10 @@ Chroma index under `.arxiv-reviewer/chroma/`.
 them. When reranking is enabled the expanded candidates are fused and rescored
 once, so the result still honours `--top-k`.
 
-Which of these is actually better on this corpus is an open question until the
-ablation in `evals/` exists. No comparative claim is made here.
+Which of these is actually better on this corpus is measured, not asserted: see
+the retrieval ablation under Evaluation. The short version is that BM25 alone is
+clearly worst, hybrid trades paper-specific recall for facet recall, and the
+cross-encoder reranker's advantage is not distinguishable from noise at 50 questions.
 
 ## Grounding
 
@@ -213,6 +221,139 @@ Thirty of the fifty retrieval questions are the exact strings `analysis.py` asks
 every paper, so the benchmark measures the real workload rather than a proxy. The
 other twenty are paper-specific factual questions — named datasets, baselines,
 numbers — that probe precise retrieval.
+
+### Retrieval ablation
+
+Four strategies, fifty questions, scored at the depth the pools were judged at. Every
+figure comes from `evals/results/retrieval.json`.
+
+<!-- eval:retrieval -->
+| Strategy | MRR | nDCG@10 | recall@5 (specific) | recall@5 (facet) |
+| --- | --- | --- | --- | --- |
+| `dense` | 0.736 | 0.586 | 0.541 | 0.299 |
+| `bm25` | 0.627 | 0.423 | 0.345 | 0.264 |
+| `hybrid` | 0.750 | 0.606 | 0.443 | 0.371 |
+| `hybrid-rerank` | 0.771 | 0.623 | 0.528 | 0.391 |
+| _best achievable_ | — | — | _0.921_ | _0.714_ |
+<!-- /eval:retrieval -->
+
+The table alone would invite overclaiming, so each difference is resampled with a
+paired bootstrap over the per-question scores. Most of them do not survive it:
+
+<!-- eval:comparisons -->
+| Comparison | Metric | Difference | 95% CI | Distinguishable |
+| --- | --- | --- | --- | --- |
+| `dense` → `bm25` | mrr | -0.108 | [-0.248, +0.027] | no |
+| `dense` → `bm25` | ndcg@10 | -0.162 | [-0.262, -0.063] | **yes** |
+| `dense` → `bm25` | recall@5 (specific) | -0.196 | [-0.329, -0.079] | **yes** |
+| `dense` → `bm25` | recall@5 (facet) | -0.035 | [-0.123, +0.057] | no |
+| `dense` → `hybrid` | mrr | +0.015 | [-0.079, +0.103] | no |
+| `dense` → `hybrid` | ndcg@10 | +0.021 | [-0.039, +0.080] | no |
+| `dense` → `hybrid` | recall@5 (specific) | -0.098 | [-0.194, -0.013] | **yes** |
+| `dense` → `hybrid` | recall@5 (facet) | +0.071 | [+0.003, +0.141] | **yes** |
+| `dense` → `hybrid-rerank` | mrr | +0.035 | [-0.058, +0.129] | no |
+| `dense` → `hybrid-rerank` | ndcg@10 | +0.038 | [-0.041, +0.118] | no |
+| `dense` → `hybrid-rerank` | recall@5 (specific) | -0.013 | [-0.150, +0.115] | no |
+| `dense` → `hybrid-rerank` | recall@5 (facet) | +0.092 | [+0.006, +0.180] | **yes** |
+| `hybrid` → `hybrid-rerank` | mrr | +0.021 | [-0.079, +0.122] | no |
+| `hybrid` → `hybrid-rerank` | ndcg@10 | +0.017 | [-0.038, +0.074] | no |
+| `hybrid` → `hybrid-rerank` | recall@5 (specific) | +0.085 | [-0.042, +0.210] | no |
+| `hybrid` → `hybrid-rerank` | recall@5 (facet) | +0.021 | [-0.049, +0.090] | no |
+<!-- /eval:comparisons -->
+
+What this actually supports:
+
+- **BM25 alone is clearly worst.** It loses 0.162 nDCG@10 to dense, and the interval
+  is nowhere near zero.
+- **Hybrid retrieval trades one kind of question for another.** Against dense it gains
+  facet recall (+0.071) and loses paper-specific recall (-0.098). Fusing a keyword
+  retriever in helps diffuse questions and hurts precise ones.
+- **The cross-encoder reranker buys nothing this benchmark can distinguish.** Every
+  `hybrid` to `hybrid-rerank` comparison spans zero, including the +0.017 nDCG@10 it
+  appears to gain. It is the most expensive component in the stack — it pulls in
+  `torch` and `sentence-transformers` — and fifty questions cannot show it earning that.
+- **No MRR difference is distinguishable at all.** The first relevant chunk lands in
+  much the same place whichever strategy is used.
+
+`--multi-query` is excluded rather than scored. It expands each question into
+model-generated paraphrases, which retrieve chunks the frozen pools never contained,
+so its recall would be understated for reasons that have nothing to do with the
+technique.
+
+### Screening quality
+
+Threshold sweep over the real `select_papers_node`, scored against the labels. From
+`evals/results/screening.json`.
+
+<!-- eval:screening -->
+| Threshold | precision@4 (central) | precision@4 (related) | central recall | best achievable | queries under-filled |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 0.786 | 0.964 | 0.683 | _0.730_ | 0 |
+| 2 | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
+| 3 (**recommended**) | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
+| 4 (current) | 0.810 | 1.000 | 0.611 | _0.730_ | 2 |
+| 5 | 0.786 | 0.857 | 0.540 | _0.730_ | 2 |
+
+| Model score | labeled irrelevant | labeled related | labeled central |
+| --- | --- | --- | --- |
+| 1 | 24 | 0 | 0 |
+| 2 | 4 | 1 | 0 |
+| 3 | 0 | 2 | 1 |
+| 4 | 0 | 5 | 4 |
+| 5 | 0 | 4 | 39 |
+<!-- /eval:screening -->
+
+The confusion grid is the more interesting half. **No paper labeled irrelevant ever
+scored above 2**, and every paper scoring 1 was labeled irrelevant — the rubric
+separates cleanly at the bottom. It separates poorly at the top: scores 4 and 5 mix
+related and central papers, which is why precision@4 plateaus rather than climbing.
+
+The sweep chose **3** over the shipped default of 4. Both give identical precision,
+but 3 recovers more central papers (0.683 against 0.611) and under-fills one fewer
+query. Thresholds 2 and 3 select identically on this data, so the stricter of the two
+is taken.
+
+Two caveats the pooled numbers hide, which is why per-query figures are in the JSON.
+The `interpretability` and `efficient_inference` queries came back twelve-central-out-of-twelve,
+so their precision saturates at 1.0 no matter what is selected. And central recall is
+ceiling-bound: with twelve central papers and a target of four, no selection can exceed
+0.33.
+
+A live run surfaced the real bottleneck, and it is not the threshold. Asked for methods
+in language model self-improvement, arXiv returned one on-topic paper and nine about
+federated LoRA, topic modeling, robot platforms, and Byzantine-resilient SGD. The
+screener scored them 1 and 2 and was right to. Selection quality is capped by what
+`search_arxiv` returns, which applies no category filter.
+
+### Groundedness
+
+Measured over seven papers across two live runs, read from the LangGraph checkpoints
+rather than the rendered Markdown. From `evals/results/groundedness.json`.
+
+<!-- eval:groundedness -->
+| Measure | Value |
+| --- | --- |
+| Papers analyzed | 7 across 2 runs |
+| Claim-support rate | **91.8%** (123 of 134 proposed claims kept) |
+| Citation referential integrity | **92.1%** (128 of 139 proposed citations kept) |
+| Citations per surviving claim | 1.04 |
+| Independent re-validation | 100.0% (128 citations re-checked, 0 failures) |
+<!-- /eval:groundedness -->
+
+These are survival rates, not properties of the finished report. Citations that reach
+a report are valid by construction, because invalid ones were already discarded, so
+measuring the report itself would return 100% and prove nothing. What is measured is
+how much of what the model proposed actually held up.
+
+Building this metric found a real bug. The first run reported 48.6% citation integrity,
+which was not model hallucination: PDF extraction preserves the hyphens a typesetter
+inserted at line breaks, so a chunk reads `lead- ing` where the paper reads `leading`.
+A model quoting the passage faithfully wrote `leading`, and the validator rejected it.
+Across two sample papers this discarded 63% of citations that were verbatim. `normalize`
+now folds hyphenation on both sides, which took acceptance from 37% to 97% on the
+captured sample while still rejecting fabricated text, paraphrases, hallucinated chunk
+IDs, and chunks belonging to another paper. The numbers above are from runs after the
+fix. Before it, the pipeline was silently discarding about half of its own valid work.
 
 ### Pooling, and measuring what it misses
 
@@ -276,9 +417,13 @@ rebuilds it from the committed chunk file — identical text, no PDF downloads �
 `--verify` replays all four retrievers over all fifty questions to confirm every
 retrieved chunk was judged, writing `evals/results/index_coverage.json`.
 
-Re-embedding the entire corpus from scratch and re-checking still returns 2,000
-retrieved chunks with 0 unjudged, so the guarantee survives a clean clone. If drift
-ever breaks it, the check fails loudly instead of quietly lowering recall.
+Re-embedding the entire corpus from scratch and re-checking still holds, so the
+guarantee survives a clean clone. If drift ever breaks it, the check fails loudly
+instead of quietly lowering recall.
+
+<!-- eval:coverage -->
+Verified at pool depth 10: 2,000 retrieved chunks checked across 50 questions, 0 unjudged.
+<!-- /eval:coverage -->
 
 ## Verification
 
@@ -300,7 +445,10 @@ output, never from a development run.
 ## Limitations
 
 - arXiv is the only source; nothing outside it is searched.
-- Relevance screening is a model judgement over abstracts and is not yet measured.
+- Screening is capped by arXiv search, not by the screener: `search_arxiv` applies
+  no category filter, so an on-topic query can return mostly unrelated papers.
+- The retrieval ablation has 50 questions. That is enough to separate BM25 from
+  the rest and not enough to resolve differences of two or three points.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
 - Citation validation proves an excerpt exists on the cited page. It does not prove
   the excerpt supports the claim built on it.
