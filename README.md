@@ -279,12 +279,12 @@ Two live runs at the shipping defaults, read from the LangGraph checkpoints.
 <!-- eval:groundedness -->
 | Measure | Value |
 | --- | --- |
-| Papers analyzed | 8 across 2 runs |
-| Claim-support rate | **94.4%** (152 of 161 proposed claims kept) |
-| Citation referential integrity | **94.3%** (165 of 175 proposed citations resolved) |
-| Citation support integrity | not judged — run predates the check |
-| Citations per surviving claim | 1.09 |
-| Independent re-validation | 100.0% (165 citations re-checked, 0 failures) |
+| Papers analyzed | 4 across 1 runs |
+| Claim-support rate | **96.2%** (75 of 78 proposed claims kept) |
+| Citation referential integrity | **96.2%** (77 of 80 proposed citations resolved) |
+| Citation support integrity | **98.7%** (76 of 77 resolved citations judged to support their claim) |
+| Citations per surviving claim | 1.01 |
+| Independent re-validation | 100.0% (76 citations re-checked, 0 failures) |
 <!-- /eval:groundedness -->
 
 Rates count citations and claims surviving validation out of those the model proposed.
