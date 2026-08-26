@@ -36,7 +36,7 @@ re-validation; a hand-labeled claim-support sample, extended with constructed fa
 the support judge can be scored against it; reproducible index rebuild guarded by a
 pool-coverage check.
 
-**Engineering** — 151 tests requiring no network access and no API key; published
+**Engineering** — 157 tests requiring no network access and no API key; published
 numbers generated from committed JSON; graceful exit codes; a worked example with its
 verification record.
 
@@ -377,14 +377,15 @@ Regenerate the sheets with `python -m evals.build.claim_support` and
 .venv/bin/python -m pytest
 ```
 
-151 tests, no network access and no API key. An autouse fixture fails outbound
+157 tests, no network access and no API key. An autouse fixture fails outbound
 connections. Chroma runs against a temporary directory with deterministic embeddings.
 
 Coverage: graph terminal paths (no candidates, none selected, success, partial branch
 failure, synthesis fallback); concurrency 1 versus 3 producing identical output;
 citation validation against hallucinated chunk IDs, wrong-paper chunks, paraphrases,
 and PDF hyphenation; the support judge dropping unsupported citations, keeping partial
-ones, and failing closed on a verdict it never received; SQLite round trip and resume;
+ones, and failing closed on a verdict it never received; the methodology notice being
+written by the code and replacing one the model wrote; SQLite round trip and resume;
 retry classification and backoff; the eval pool-coverage guard and the judge's scoring
 arithmetic.
 
@@ -400,6 +401,8 @@ arithmetic.
   its measured agreement with a person. The failures it was tested against are quotes
   swapped between claims — the obvious kind. Nothing here shows it catches a quote that
   supports most of a claim but not the qualifier attached to it.
-- arXiv results are not peer reviewed.
+- arXiv carries preprints and papers already published in peer-reviewed venues
+  alike. The pipeline does not record which a given paper is, so a report makes no
+  claim either way.
 - Runs cost one model call per candidate screened (30 by default) plus twelve per
   selected paper: six to analyze its facets, six to judge the citations they produced.

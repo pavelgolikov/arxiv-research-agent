@@ -20,6 +20,61 @@ FACET_TITLES = {
     "relevance_to_query": "Relevance to the query",
 }
 
+# The Notice describes this pipeline's own guarantees, so the model is never asked to
+# write it. Nothing in the synthesis payload records which checks ran, so a model told
+# to produce that section has to invent it: one live run described arXiv sources as
+# "peer-reviewed literature", which no check in the pipeline can catch because the
+# sentence carries no citation. The text below is written here and inserted instead,
+# and a Notice the model writes anyway is replaced rather than trusted.
+METHOD_NOTICE_HEADING = "## Method and Limitations Notice"
+
+METHOD_NOTICE = (
+    "Every claim below was generated from retrieved excerpts of the cited paper "
+    "and kept only when its citation resolved to a real chunk of that paper, its "
+    "quoted excerpt was found in that chunk, and that excerpt was judged to "
+    "support the claim it was cited for. Claims failing any of these checks were "
+    "discarded rather than reported.\n\n"
+    # Stated rather than omitted, and stated in neither direction: arXiv carries both
+    # preprints and papers already published in peer-reviewed venues, and nothing in
+    # the record this pipeline keeps distinguishes them.
+    "Sources are arXiv records. Some arXiv papers are also published in peer-reviewed "
+    "venues and some are not; this pipeline does not record which, so no claim is "
+    "made either way."
+)
+
+
+def method_notice_section() -> str:
+    """Return the Notice as a Markdown section."""
+
+    return f"{METHOD_NOTICE_HEADING}\n\n{METHOD_NOTICE}"
+
+
+def strip_method_notice(markdown: str) -> str:
+    """Remove a Notice section the model wrote despite not being asked for one."""
+
+    start = markdown.find(METHOD_NOTICE_HEADING)
+    if start == -1:
+        return markdown
+
+    following = markdown.find("\n## ", start + len(METHOD_NOTICE_HEADING))
+    if following == -1:
+        return markdown[:start].rstrip() + "\n"
+    return markdown[:start].rstrip() + "\n\n" + markdown[following:].lstrip("\n")
+
+
+def with_method_notice(markdown: str) -> str:
+    """Replace any model-written Notice with the one this module owns."""
+
+    body = strip_method_notice(markdown)
+    section = method_notice_section()
+
+    # Keep the section where the report has always carried it, between the search
+    # summary and the overview, rather than appending it to the end.
+    index = body.find("\n## Overview")
+    if index == -1:
+        return body.rstrip() + "\n\n" + section + "\n"
+    return body[:index].rstrip() + "\n\n" + section + "\n" + body[index:]
+
 
 def selected_analyses(state: ReviewerState) -> list[GroundedAnalysis]:
     """Return successful analyses in original arXiv search order."""
@@ -128,13 +183,7 @@ def render_markdown_fallback(state: ReviewerState) -> str:
         f"- Supported claims: {total_claims}",
         f"- Claims dropped in citation validation: {total_dropped}",
         "",
-        "## Method and Limitations Notice",
-        "",
-        "Every claim below was generated from retrieved excerpts of the cited paper "
-        "and kept only when its citation resolved to a real chunk of that paper, its "
-        "quoted excerpt was found in that chunk, and that excerpt was judged to "
-        "support the claim it was cited for. Claims failing any of these checks were "
-        "discarded rather than reported.",
+        method_notice_section(),
         "",
         "## Overview",
         "",
@@ -317,11 +366,17 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
         "Use only the claims provided here. Do not invent papers, claims, results, or "
         "citations. Preserve every citation as a Markdown link of the form "
         "[p. N](https://arxiv.org/pdf/ARXIV_ID#page=N) using the arxiv_id and page "
-        "recorded with each claim. Output Markdown only, with no code fences.\n\n"
+        "recorded with each claim. Output Markdown only, with no code fences.\n"
+        "Do not write a methodology, validation, or limitations section, and do not "
+        "describe how the claims were produced or checked. That section is written by "
+        "this program and inserted into your output.\n"
+        "Do not describe the publication, peer-review, or venue status of any paper. "
+        "That is not in the payload: some arXiv papers are also published in "
+        "peer-reviewed venues and some are not, and this pipeline does not know "
+        "which.\n\n"
         "Required sections:\n"
         "# Literature Review: <user query>\n"
         "## Search Summary\n"
-        "## Method and Limitations Notice\n"
         "## Overview\n"
         "## Key Papers\n"
         "## Comparison Table\n"
@@ -344,7 +399,7 @@ def write_markdown_node(state: ReviewerState) -> ReviewerState:
         markdown = render_markdown_fallback(state)
         status = "partial"
     else:
-        markdown = markdown.rstrip() + "\n" + render_failures(state)
+        markdown = with_method_notice(markdown).rstrip() + "\n" + render_failures(state)
 
     write_atomically(output, markdown)
     return {"markdown": markdown, "status": status}

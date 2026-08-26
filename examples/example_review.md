@@ -1,41 +1,40 @@
 # Literature Review: How is mechanistic interpretability used to understand transformer internals?
 
 ## Search Summary
-This review examines recent literature on mechanistic interpretability (MI), a field dedicated to reverse-engineering the computational algorithms learned by neural networks. The focus is on methods for decomposing model internals, evaluating interpretability techniques, and overcoming challenges related to model scale and tool consistency.
+Mechanistic interpretability (MI) has emerged as a rigorous framework for reverse-engineering the internal computational processes of neural networks. Current research focuses on decomposing complex, polysemantic model representations into interpretable features and mapping the causal circuits that drive specific model behaviors.
 
 ## Method and Limitations Notice
-This review synthesizes findings from four selected research papers. The claims are limited to the provided scope; therefore, this document does not constitute an exhaustive overview of the entire field. The included papers cover diagnostic tooling, representational analysis, and synthetic testbeds.
+This review synthesizes findings from selected peer-reviewed literature. It is limited to the provided claims and does not encompass the entirety of the field. Note that while MI provides significant insights, researchers face ongoing challenges regarding computational scalability, the fidelity of linear approximations in non-linear models, and the difficulty of validating interpretations without ground-truth labels.
 
 ## Overview
-Mechanistic interpretability aims to explain internal model behavior by accessing and modifying specific internal components such as layers, attention mechanisms, and MLP outputs [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1), [p. 2](https://arxiv.org/pdf/2511.14465v2#page=2). Researchers attempt to decompose dense, entangled activations into interpretable features—a necessity because models often compress multiple concepts into fewer dimensions via superposition [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1). While early approaches relied on manual PyTorch hooks [p. 2](https://arxiv.org/pdf/2511.14465v2#page=2), modern research employs specialized frameworks to test internal representations and validate the functional roles of model weights [p. 1](https://arxiv.org/pdf/2409.13714v1#page=1).
+Mechanistic interpretability aims to translate the "black box" of deep learning into transparent, verifiable algorithmic processes [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1). In the context of transformers, researchers analyze internal components—such as layers, attention heads, and MLP modules—to understand how models implement capabilities like in-context learning [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1), [p. 2](https://arxiv.org/pdf/2511.14465v2#page=2), [p. 2](https://arxiv.org/pdf/2606.16939v1#page=2).
 
 ## Key Papers
-* **[Dumas (2025)](https://arxiv.org/pdf/2511.14465v2):** Introduces `nnterp`, a unified interface for analyzing 50+ transformer variants. It addresses the fragmentation of tooling by enabling consistent interventions like the logit lens, patchscopes, and activation steering [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1), [p. 2](https://arxiv.org/pdf/2511.14465v2#page=2).
-* **[Golechha & Dao (2024)](https://arxiv.org/pdf/2402.03855v2):** Explores the challenges of interpretability by investigating dishonesty representations in `Mistral-7B`. The study highlights the insufficiency of current linear representation methods in explaining model behavior [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1).
-* **[Erdogan & Lucic (2025)](https://arxiv.org/pdf/2511.09432v2):** Proposes Equivariant Sparse Autoencoders (SAEs). This work improves the disentanglement of features by incorporating priors about data symmetries, addressing the unidentifiability issues of vanilla SAEs [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1).
-* **[Thurnherr & Scheurer (2024)](https://arxiv.org/pdf/2409.13714v1):** Develops `TracrBench`, a dataset of 121 transformer models generated from RASP programs, providing ground truth mappings to evaluate interpretability methods [p. 1](https://arxiv.org/pdf/2409.13714v1#page=1), [p. 3](https://arxiv.org/pdf/2409.13714v1#page=3).
+* **[2511.14465v2](https://arxiv.org/pdf/2511.14465v2):** Introduces *nnterp*, a standardized interface that bridges the gap between consistent API design and model-specific compatibility, supporting over 50 model variants across 21 architecture families.
+* **[2606.16939v1](https://arxiv.org/pdf/2606.16939v1):** Presents *CircuitLasso*, a scalable approach for discovering sparse circuits using observational data, significantly reducing the computational cost compared to traditional intervention-based methods.
+* **[2511.09432v2](https://arxiv.org/pdf/2511.09432v2):** Proposes *Equivariant Sparse Autoencoders (SAEs)* to better disentangle features in symmetric data, demonstrating that incorporating mathematical priors improves feature recovery.
+* **[2402.03855v2](https://arxiv.org/pdf/2402.03855v2):** Explores the challenges of studying hidden representations, specifically regarding the "dishonesty" of models, and highlights the limitations of current linear representation methods.
 
 ## Comparison Table
 
-| Paper | Focus Area | Key Tool/Method | Goal |
-| :--- | :--- | :--- | :--- |
-| Dumas [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1) | Tooling | `nnterp` | Standardize interfaces across architectures |
-| Golechha & Dao [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1) | Analysis | Representation Study | Understand complex behaviors (dishonesty) |
-| Erdogan & Lucic [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1) | Methodology | Equivariant SAEs | Improve feature disentanglement under symmetry |
-| Thurnherr & Scheurer [p. 1](https://arxiv.org/pdf/2409.13714v1#page=1) | Evaluation | `TracrBench` | Provide ground-truth for method validation |
+| Method / Tool | Primary Focus | Key Advantage |
+| :--- | :--- | :--- |
+| **nnterp** | Standardized Interface | Unified API for 21+ architecture families [p. 4](https://arxiv.org/pdf/2511.14465v2#page=4) |
+| **CircuitLasso** | Circuit Discovery | Highly scalable; uses observational data [p. 1](https://arxiv.org/pdf/2606.16939v1#page=1) |
+| **Equivariant SAEs** | Feature Disentanglement | Better recovery on symmetric datasets [p. 4](https://arxiv.org/pdf/2511.09432v2#page=4) |
 
 ## Research Themes
-* **Tool Standardization:** A major pain point is the tradeoff between custom implementation fidelity and the lack of standardization across architectures. Frameworks like `nnterp` seek to bridge this gap [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1).
-* **Representational Analysis:** Beyond simple token-alignment, researchers are increasingly focused on identifying linear directions and features associated with high-level model behaviors [p. 9](https://arxiv.org/pdf/2402.03855v2#page=9).
-* **Symmetry and Disentanglement:** Methods such as Sparse Autoencoders are being refined to better handle superposition, with new approaches using equivariant priors to avoid redundant feature learning [p. 2](https://arxiv.org/pdf/2511.09432v2#page=2).
+* **Tooling and Standardization:** There is a critical need to overcome the fragmentation of interpretability tools. Standardized interfaces are essential for ensuring that interventions are numerically accurate and replicable across diverse transformer architectures [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1).
+* **Sparse Autoencoders (SAEs) and Feature Discovery:** SAEs are the standard for addressing "superposition," where models entangle multiple concepts in limited dimensions [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1). Recent work extends this by incorporating geometric priors to ensure features are more faithful to the underlying data [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1).
+* **Scalable Circuit Learning:** Interpreting large language models requires moving beyond individual neurons to identifying "circuits"—the functional pathways of information. Novel methods like *CircuitLasso* are shifting the focus toward observational, efficient discovery over compute-intensive intervention testing [p. 4](https://arxiv.org/pdf/2606.16939v1#page=4).
 
 ## Research Gaps
-* **Scalability and Complexity:** Current interpretability methods often struggle to scale to the complex capabilities and safety-critical vulnerabilities of modern, large-scale models [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1).
-* **Evaluation Frameworks:** There is a persistent lack of ground truth mappings, making it difficult to verify if an interpretability technique is accurately capturing the internal logic of a model [p. 1](https://arxiv.org/pdf/2409.13714v1#page=1).
-* **Tool Robustness:** Many existing validation tests provide sanity checks rather than formal correctness guarantees, leaving room for subtle bugs in interpretability research [p. 4](https://arxiv.org/pdf/2511.14465v2#page=4).
+* **High-Dimensional Scaling:** Current methods often struggle to scale to the massive feature spaces produced by modern SAEs, leading to high computational costs when analyzing non-linear dependencies [p. 2](https://arxiv.org/pdf/2606.16939v1#page=2), [p. 14](https://arxiv.org/pdf/2606.16939v1#page=14).
+* **Representation Fidelity:** Existing linear techniques often fail to provide verifiable explanations of how representations influence long-term model generation [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1), [p. 8](https://arxiv.org/pdf/2402.03855v2#page=8).
+* **Architecture Generalization:** Many tools, such as *nnterp*, are currently limited by specific architectural implementations (e.g., incompatibility with Flash Attention or lack of support for non-causal architectures) [p. 4](https://arxiv.org/pdf/2511.14465v2#page=4).
 
 ## Suggested Reading Order
-1. **[Thurnherr & Scheurer (2024)](https://arxiv.org/pdf/2409.13714v1):** Understand the difficulty of evaluation and the need for ground-truth benchmarks.
-2. **[Dumas (2025)](https://arxiv.org/pdf/2511.14465v2):** Learn about current practical tooling used for active model intervention.
-3. **[Erdogan & Lucic (2025)](https://arxiv.org/pdf/2511.09432v2):** Deepen knowledge on how to mathematically refine feature extraction (SAEs).
-4. **[Golechha & Dao (2024)](https://arxiv.org/pdf/2402.03855v2):** Explore the limitations of existing methods when applied to complex, non-trivial model behaviors.
+1. **[2402.03855v2](https://arxiv.org/pdf/2402.03855v2):** Understand the foundational challenges and limitations of existing MI representations.
+2. **[2511.14465v2](https://arxiv.org/pdf/2511.14465v2):** Review the modern tooling landscape and the importance of standardized interfaces.
+3. **[2511.09432v2](https://arxiv.org/pdf/2511.09432v2):** Explore advanced methods for feature disentanglement using SAEs.
+4. **[2606.16939v1](https://arxiv.org/pdf/2606.16939v1):** Examine the state-of-the-art in scalable circuit discovery.

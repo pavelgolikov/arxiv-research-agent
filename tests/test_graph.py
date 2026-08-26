@@ -8,6 +8,7 @@ would leave the machine — the model, arXiv, and PDF downloads — are replaced
 import pytest
 
 from arxiv_reviewer.analysis import RELEVANCE_THRESHOLD, select_papers_node
+from arxiv_reviewer.reporting import METHOD_NOTICE
 from arxiv_reviewer.review_types import ScreenOutcome
 from arxiv_reviewer.workflow import build_graph, open_checkpointer, thread_config
 
@@ -84,6 +85,13 @@ class TestTerminalPaths:
         final = run_graph([make_paper("a1")], thread_id="fallback")
         assert final["status"] == "partial"
         assert "# Literature Review" in final["markdown"]
+
+    def test_the_notice_reaches_the_report_the_model_wrote(self, run_graph):
+        # The fake model returns markdown with no Notice at all, exactly as the real
+        # one is now instructed to. The section still has to be in the report.
+        final = run_graph([make_paper("a1")], thread_id="notice")
+        assert final["status"] == "complete"
+        assert METHOD_NOTICE in final["markdown"]
 
 
 class TestDeterminism:

@@ -4,9 +4,12 @@ from arxiv_reviewer.reporting import (
     citation_link,
     escape_cell,
     failed_outcomes,
+    METHOD_NOTICE,
+    METHOD_NOTICE_HEADING,
     render_markdown_fallback,
     run_status,
     selected_analyses,
+    with_method_notice,
 )
 from arxiv_reviewer.review_types import (
     AnalysisOutcome,
@@ -130,3 +133,45 @@ class TestFallbackRenderer:
     def test_handles_a_run_with_no_papers(self):
         markdown = render_markdown_fallback(state_with())
         assert "No relevant papers were selected." in markdown
+
+
+class TestMethodNotice:
+    """The Notice is written here, not by the model, and says only what is known."""
+
+    def test_the_fallback_renderer_carries_it(self):
+        markdown = render_markdown_fallback(state_with(ok_outcome("a", 0)))
+        assert METHOD_NOTICE in markdown
+
+    def test_it_claims_review_status_in_neither_direction(self):
+        # arXiv carries preprints and already-published papers alike, and nothing in
+        # the pipeline's record separates them, so both assertions would be wrong.
+        assert "does not record which" in METHOD_NOTICE
+        assert "not peer reviewed" not in METHOD_NOTICE
+
+    def test_it_is_inserted_ahead_of_the_overview(self):
+        markdown = with_method_notice(
+            "# Review\n\n## Search Summary\n\nsummary\n\n## Overview\n\nbody\n"
+        )
+        assert METHOD_NOTICE in markdown
+        assert markdown.index(METHOD_NOTICE_HEADING) < markdown.index("## Overview")
+
+    def test_a_notice_the_model_invented_is_replaced(self):
+        # The live failure this guards: the model called arXiv sources peer-reviewed
+        # in a section carrying no citation, so no validation check could see it.
+        invented = (
+            "# Review\n\n## Search Summary\n\nsummary\n\n"
+            f"{METHOD_NOTICE_HEADING}\n\n"
+            "This review synthesizes findings from selected peer-reviewed literature.\n\n"
+            "## Overview\n\nbody\n"
+        )
+        markdown = with_method_notice(invented)
+
+        assert "peer-reviewed literature" not in markdown
+        assert markdown.count(METHOD_NOTICE_HEADING) == 1
+        assert METHOD_NOTICE in markdown
+        assert "## Overview" in markdown and "body" in markdown
+
+    def test_a_report_without_an_overview_still_gets_it(self):
+        markdown = with_method_notice("# Review\n\n## Key Papers\n\nbody\n")
+        assert METHOD_NOTICE in markdown
+        assert "## Key Papers" in markdown
