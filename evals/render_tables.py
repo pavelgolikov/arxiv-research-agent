@@ -18,7 +18,7 @@ from pathlib import Path
 
 from arxiv_reviewer.rag import RETRIEVER_KINDS
 
-from .config import EVALS_DIR, RESULTS_DIR
+from .config import EVALS_DIR, LABELS_DIR, RESULTS_DIR
 
 TARGETS = (EVALS_DIR.parent / "README.md", EVALS_DIR.parent / "DESIGN.md")
 
@@ -26,6 +26,7 @@ RETRIEVAL_FILE = RESULTS_DIR / "retrieval.json"
 SCREENING_FILE = RESULTS_DIR / "screening.json"
 GROUNDEDNESS_FILE = RESULTS_DIR / "groundedness.json"
 COVERAGE_FILE = RESULTS_DIR / "index_coverage.json"
+CLAIM_SUPPORT_FILE = LABELS_DIR / "claim_support_labels.json"
 
 
 def load(path: Path) -> dict | None:
@@ -147,6 +148,38 @@ def groundedness_table(data: dict) -> str:
     )
 
 
+def claim_support_table(data: dict) -> str:
+    """Render the hand-judged claim-support rates with their intervals."""
+
+    sample = data["sample"]
+    counts = data["counts"]
+    strict_low, strict_high = data["strict_ci"]
+    lenient_low, lenient_high = data["lenient_ci"]
+
+    return "\n".join(
+        [
+            "| Measure | Rate | 95% CI |",
+            "| --- | --- | --- |",
+            f"| Excerpt establishes the claim | **{data['strict_support_rate']:.1%}** "
+            f"({counts['2']} of {sample['size']}) "
+            f"| [{strict_low:.0%}, {strict_high:.0%}] |",
+            f"| Excerpt supports it at least partly | **{data['lenient_support_rate']:.1%}** "
+            f"({counts['2']} + {counts['1']} of {sample['size']}) "
+            f"| [{lenient_low:.0%}, {lenient_high:.0%}] |",
+            f"| Excerpt does not support the claim | {counts['0']} of {sample['size']} | — |",
+        ]
+    )
+
+
+def claim_support_facets(data: dict) -> str:
+    """Render where the partial grades fell."""
+
+    lines = ["| Facet | Partial grades |", "| --- | --- |"]
+    for facet, stats in data["by_facet"].items():
+        lines.append(f"| `{facet}` | {stats['partial']} of {stats['n']} |")
+    return "\n".join(lines)
+
+
 def coverage_line(data: dict) -> str:
     """Render the one-line statement that the pools still cover every ranked chunk."""
 
@@ -165,6 +198,7 @@ def render() -> dict[str, str]:
     screening = load(SCREENING_FILE)
     groundedness = load(GROUNDEDNESS_FILE)
     coverage = load(COVERAGE_FILE)
+    claim_support = load(CLAIM_SUPPORT_FILE)
 
     if retrieval:
         blocks["retrieval"] = retrieval_table(retrieval)
@@ -175,6 +209,9 @@ def render() -> dict[str, str]:
         blocks["groundedness"] = groundedness_table(groundedness)
     if coverage:
         blocks["coverage"] = coverage_line(coverage)
+    if claim_support:
+        blocks["claim_support"] = claim_support_table(claim_support)
+        blocks["claim_support_facets"] = claim_support_facets(claim_support)
 
     return blocks
 

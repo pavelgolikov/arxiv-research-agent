@@ -31,7 +31,8 @@ call; page-anchored citations into the source PDF.
 312 judged chunks; 7 screening queries × 12 candidates); TREC-style pooling with measured
 pooling bias; four-way retrieval ablation with paired-bootstrap confidence intervals;
 threshold sweep over the real selection rule; groundedness metrics with independent
-re-validation; reproducible index rebuild guarded by a pool-coverage check.
+re-validation; a hand-labeled claim-support sample; reproducible index rebuild guarded
+by a pool-coverage check.
 
 **Engineering** — 121 tests requiring no network access and no API key; published
 numbers generated from committed JSON; graceful exit codes; a worked example with its
@@ -58,6 +59,8 @@ packaging, CI, web UI.
   - `metrics.py` — MRR, nDCG, recall, paired bootstrap.
   - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py` — metric runners.
   - `measure_categories.py`, `measure_depth.py` — search-quality studies.
+  - `build/claim_support.py` — samples citations for hand-grading and collects the
+    result into `labels/`.
   - `build_index.py` — rebuilds the vector index from committed chunks; `--verify`
     checks that the labels cover everything the retrievers return.
   - `render_tables.py` — regenerates the tables in `README.md` and `DESIGN.md`.
@@ -265,7 +268,37 @@ Two live runs at the shipping defaults, read from the LangGraph checkpoints.
 <!-- /eval:groundedness -->
 
 Rates count citations and claims surviving validation out of those the model proposed.
-Manual spot-check of 12 citations from the example report: 8 confirmed, 4 rejected.
+
+### Claim support
+
+Validation is referential: it proves an excerpt exists on the page it cites, not that it
+supports the claim. That judgment is hand-labeled — 40 of 165 citations drawn uniformly
+at random from the runs above, graded 2 (establishes the claim), 1 (supports it partly),
+or 0 (no support).
+
+<!-- eval:claim_support -->
+| Measure | Rate | 95% CI |
+| --- | --- | --- |
+| Excerpt establishes the claim | **77.5%** (31 of 40) | [62%, 88%] |
+| Excerpt supports it at least partly | **100.0%** (31 + 9 of 40) | [91%, 100%] |
+| Excerpt does not support the claim | 0 of 40 | — |
+<!-- /eval:claim_support -->
+
+Partial grades concentrate in one facet:
+
+<!-- eval:claim_support_facets -->
+| Facet | Partial grades |
+| --- | --- |
+| `experimental_setup` | 6 of 8 |
+| `limitations` | 0 of 7 |
+| `main_findings` | 2 of 9 |
+| `method` | 0 of 5 |
+| `relevance_to_query` | 0 of 4 |
+| `research_problem` | 1 of 7 |
+<!-- /eval:claim_support_facets -->
+
+`evals/labels/claim_support_labels.json` carries each grade with its claim and excerpt.
+Regenerate the sheet with `python -m evals.build.claim_support`.
 
 ## Tests
 
@@ -290,8 +323,9 @@ the eval pool-coverage guard.
 - `--max-results` is divided across the planned queries.
 - The retrieval ablation has 50 questions.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
-- Citation validation proves an excerpt exists on the cited page, not that it supports
-  the claim built on it.
+- Citation validation is referential, not semantic: it proves an excerpt exists on the
+  cited page. Claim support is hand-labeled instead — 77.5% of a 40-citation random
+  sample fully establish their claim, 100% support it at least partly.
 - arXiv results are not peer reviewed.
 - Runs cost one model call per candidate screened (30 by default) plus six per selected
   paper.

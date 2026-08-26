@@ -133,29 +133,30 @@ families.”
 
 ## Result
 
-Spot-checked by hand on 2026-08-25: **8 of 12 confirmed, 4 rejected** (items 1, 3, 9,
-and 11). The human reviewer disagreed that those four excerpts support the claims
-built on them.
+Spot-checked by hand: **8 of 12 confirmed, 4 rejected** (items 1, 3, 9, and 11). None
+was a fabrication, none pointed at the wrong paper, and none cited a chunk that does not
+exist. All four were real quotes asked to carry more than they say:
 
-That gap is the point of doing this. The automated checks pass at 100% because they
-ask a narrower question — does this quote exist, on this page, in this paper — and a
-quote can be entirely real without establishing the sentence it is attached to. The
-four rejections share three causes, none of which a deterministic check can see:
-
-- **Truncation cuts the supporting half.** Item 3's excerpt stops mid-word at 300
+- **Truncation cut the supporting half.** Item 3's excerpt stops mid-word at 300
   characters (`EVIDENCE_EXCERPT_CHARS`), just before the clause that would have
   supported the second half of the claim.
-- **The quote's referent lies outside the quote.** Item 11 says "the difference of
-  these vectors" — the claim calls them activation vectors, which is correct in the
-  paper but not established by the quoted span alone.
-- **The claim adds a word the quote does not carry.** Item 9's excerpt supports
-  "crucial for understanding models"; the claim says "understanding *and
-  controlling*". Item 1 quotes the paper's title rather than a passage.
+- **The quote's referent lay outside the quote.** Item 11 says "the difference of these
+  vectors" — the claim calls them activation vectors, which is correct in the paper but
+  not established by the quoted span alone.
+- **The claim added a word the quote does not carry.** Item 9's excerpt supports
+  "crucial for understanding models"; the claim says "understanding *and controlling*".
+  Item 1 quotes the paper's title rather than a passage.
 
-None of these are fabrications, and no rejected citation points at the wrong paper or
-a chunk that does not exist. They are cases of a real quote being asked to carry more
-than it says, which is exactly the limitation the README states: citation validation
-proves an excerpt exists where it is claimed to, not that it supports the claim.
+### This sample is not the project's claim-support figure
 
-A human-judged support rate of 8/12 on a small sample sits well below the 94.3%
-machine-checked referential integrity, and both numbers are worth reading together.
+These twelve were chosen deliberately — spread across papers and facets, and seeded with
+two citations already flagged as weak — so they oversample known problems. Read as a
+rate, 8 of 12 carries a 95% interval of [39%, 86%], which is close to uninformative.
+
+The measured figure comes from a uniform random sample of 40 citations across both
+committed runs: **77.5% fully establish their claim, 100% support it at least partly,
+and none fails outright.** See `evals/labels/claim_support_labels.json` and
+[`DESIGN.md`](../DESIGN.md#4-grounding).
+
+What this document is good for is the *failure modes* above, which the larger sample
+confirms but does not itemize.

@@ -1,0 +1,379 @@
+{
+  "question": "does the excerpt support the claim built on it",
+  "grades": "2 establishes the claim, 1 supports it partly, 0 does not support it",
+  "sample": {
+    "size": 40,
+    "drawn_from": 165,
+    "seed": 20260825,
+    "selection": "uniform random"
+  },
+  "counts": {
+    "2": 31,
+    "1": 9,
+    "0": 0
+  },
+  "strict_support_rate": 0.775,
+  "strict_ci": [
+    0.6249660359590695,
+    0.8768404674532148
+  ],
+  "lenient_support_rate": 1.0,
+  "lenient_ci": [
+    0.9123754607496077,
+    1.0
+  ],
+  "by_facet": {
+    "experimental_setup": {
+      "n": 8,
+      "partial": 6,
+      "unsupported": 0
+    },
+    "limitations": {
+      "n": 7,
+      "partial": 0,
+      "unsupported": 0
+    },
+    "main_findings": {
+      "n": 9,
+      "partial": 2,
+      "unsupported": 0
+    },
+    "method": {
+      "n": 5,
+      "partial": 0,
+      "unsupported": 0
+    },
+    "relevance_to_query": {
+      "n": 4,
+      "partial": 0,
+      "unsupported": 0
+    },
+    "research_problem": {
+      "n": 7,
+      "partial": 1,
+      "unsupported": 0
+    }
+  },
+  "labels": [
+    {
+      "item": 1,
+      "chunk_id": "2511.14465v2:p7:c0",
+      "facet": "experimental_setup",
+      "claim": "The library supports and has been tested with various specific model classes, including GPT-2, LLaMA, Gemma, Bloom, and Mistral.",
+      "excerpt": "The following model classes were tested and work with nnterp: • BloomForCausalLM • BloomModel • Ernie4_5_MoeForCausalLM • GPT2LMHeadModel • GPTBigCodeForCausalLM • GPTJForCausalLM • Gemma2ForCausalLM • Gemma3ForCausalLM • Gemma3ForConditionalGeneration • GemmaForCausalLM • Glm4ForCausalLM",
+      "grade": 1
+    },
+    {
+      "item": 2,
+      "chunk_id": "2511.14465v2:p4:c2",
+      "facet": "limitations",
+      "claim": "The library is incompatible with certain attention implementations, such as Flash Attention for attention probabilities.",
+      "excerpt": "The library also inherits NNsight’s limitations, including incompatibility with some attention implementations (e.g., Flash Attention for attention probabilities).",
+      "grade": 2
+    },
+    {
+      "item": 3,
+      "chunk_id": "2511.14465v2:p1:c1",
+      "facet": "method",
+      "claim": "The authors propose nnterp, a library that enables mechanistic interpretability by providing a standardized interface for transformer models.",
+      "excerpt": "original HuggingFace implementations. Through automatic module renaming and\ncomprehensive validation testing, nnterp enables researchers to write interven-\ntion code once and deploy it across 50+ model variants spanning 16 architecture\nfamilies.",
+      "grade": 2
+    },
+    {
+      "item": 4,
+      "chunk_id": "2511.14465v2:p1:c1",
+      "facet": "method",
+      "claim": "nnterp includes built-in implementations of common interpretability methods, including logit lens, patchscope, and activation steering.",
+      "excerpt": "The library includes built-in implementations of common interpretabil-\nity methods (logit lens, patchscope, activation steering)",
+      "grade": 2
+    },
+    {
+      "item": 5,
+      "chunk_id": "2511.14465v2:p2:c3",
+      "facet": "relevance_to_query",
+      "claim": "Early approaches to mechanistic interpretability utilized manual PyTorch hooks to intercept model activations.",
+      "excerpt": "Early mechanistic interpretability relied on manual PyTorch hooks to intercept activations [Elhage et al., 2021].",
+      "grade": 2
+    },
+    {
+      "item": 6,
+      "chunk_id": "2511.14465v2:p2:c2",
+      "facet": "research_problem",
+      "claim": "The existing fragmentation in interpretability tooling creates friction, forcing researchers to choose between limited toolsets or maintaining multiple codebases for different architectures.",
+      "excerpt": "This fragmentation creates significant friction. Researchers must either commit to a single tool’s limitations or maintain parallel codebases for different architectures.",
+      "grade": 2
+    },
+    {
+      "item": 7,
+      "chunk_id": "2402.03855v2:p1:c3",
+      "facet": "limitations",
+      "claim": "Current mechanistic interpretability methods may not scale to handle more complex capabilities and vulnerabilities.",
+      "excerpt": "leading to the concern that the current mechanistic interpretability pipeline, especially with expensive, human-generated hypotheses, would simply not scale to reasonably complex capabilities and vulnerabilities.",
+      "grade": 2
+    },
+    {
+      "item": 8,
+      "chunk_id": "2402.03855v2:p4:c1",
+      "facet": "limitations",
+      "claim": "Token-aligned evaluation and interpretability methods are limited by potential false positives in nuanced or dishonest scenarios.",
+      "excerpt": "In this case, token-aligned evaluation and interpretability (using a first-token-based metric) would just lead to false positives because the honest-looking answer is actually dishonest. This severely restricts the applicability of current methods, especially on nuanced behaviors.",
+      "grade": 2
+    },
+    {
+      "item": 9,
+      "chunk_id": "2402.03855v2:p9:c0",
+      "facet": "limitations",
+      "claim": "Existing mechanistic interpretability tools are insufficient for answering significant questions regarding model representations, indicating a need for new research frameworks.",
+      "excerpt": "As a case study, we explore linear representations for dishonesty using the current tooling in mechanistic interpretability and show that they do not help answer most of the important questions that arise while studying representations. We posit the need of new frameworks",
+      "grade": 2
+    },
+    {
+      "item": 10,
+      "chunk_id": "2402.03855v2:p9:c0",
+      "facet": "research_problem",
+      "claim": "The paper argues that studying feature and behavior representations is essential for understanding and controlling AI models.",
+      "excerpt": "In this position paper, we discuss the existing literature to formalize representations and motivate that studying representations for features and behaviors is crucial for understanding models.",
+      "grade": 1
+    },
+    {
+      "item": 11,
+      "chunk_id": "2402.03855v2:p1:c4",
+      "facet": "research_problem",
+      "claim": "Existing methods for finding linear representations fail to explain how models work and do not provide verifiable interpretations.",
+      "excerpt": "While these are much more complicated behaviors than those for which circuit-level analyses have been successful, this method fails to answer “how a model works” and does not yield concrete, verifiable interpretations.",
+      "grade": 2
+    },
+    {
+      "item": 12,
+      "chunk_id": "2511.09432v2:p3:c4",
+      "facet": "experimental_setup",
+      "claim": "The models evaluated consist of CNNs, MLPs, and Transformers.",
+      "excerpt": "Then we evaluate on a synthetic dataset with geometric shapes as well as real-world galaxy and cell images (samples in Figure 7 in the Appendix) using 3 types of base models with varying size and complexity: CNNs, MLPs, and Transformers.",
+      "grade": 2
+    },
+    {
+      "item": 13,
+      "chunk_id": "2511.09432v2:p6:c5",
+      "facet": "limitations",
+      "claim": "Approaches that discover symmetries from data often struggle with scalability.",
+      "excerpt": "Laird et al. (2024) propose the MatrixNet architecture to learn matrix representation of group elements while staying faithful to the group axioms. However, such approaches do not scale well",
+      "grade": 2
+    },
+    {
+      "item": 14,
+      "chunk_id": "2511.09432v2:p4:c4",
+      "facet": "main_findings",
+      "claim": "Equivariant SAEs outperform baseline SAEs in feature recovery and detection tasks, particularly as interference increases.",
+      "excerpt": "Despite worse reconstructions (first plot), Equivariant SAEs outperform the baseline SAEs on feature recovery and detection as the number of features and thus interference increases.",
+      "grade": 2
+    },
+    {
+      "item": 15,
+      "chunk_id": "2511.09432v2:p12:c2",
+      "facet": "main_findings",
+      "claim": "Equivariant SAEs achieve better performance on feature recovery and detection tasks while using fewer parameters than baseline SAEs and the group crosscoder.",
+      "excerpt": "Despite worse reconstructions, Equivariant SAEs outperform baselines in feature recovery and detection (especially top-1 detection which is more challenging) with significantly fewer parameters than the wide counterparts of the baseline SAEs as well as the group crosscoder.",
+      "grade": 2
+    },
+    {
+      "item": 16,
+      "chunk_id": "2511.09432v2:p12:c3",
+      "facet": "main_findings",
+      "claim": "Equivariant SAEs remain accurate in feature recovery and detection when using randomly chosen canonical representatives, though performance slightly decreases.",
+      "excerpt": "While the results vary more compared to the fixed canonical representative setup used in the main paper, the Equivariant SAEs remain accurate in feature recovery and detection despite a slight decrease in performance.",
+      "grade": 2
+    },
+    {
+      "item": 17,
+      "chunk_id": "2511.09432v2:p2:c3",
+      "facet": "research_problem",
+      "claim": "Accounting for symmetries is difficult for vanilla SAEs because they must disentangle both the feature and the transformation from the model's activations.",
+      "excerpt": "This makes interpretation with SAEs harder, as a vanilla SAE would need to disentangle both the feature and the transformation from the activation.",
+      "grade": 2
+    },
+    {
+      "item": 18,
+      "chunk_id": "2409.13714v1:p4:c2",
+      "facet": "limitations",
+      "claim": "The evaluation of novel interpretability methods is difficult.",
+      "excerpt": "Evaluating novel interpretability methods is challenging (Casper, 2020).",
+      "grade": 2
+    },
+    {
+      "item": 19,
+      "chunk_id": "2409.13714v1:p4:c1",
+      "facet": "main_findings",
+      "claim": "For RASP programs, GPT-4o performed best on the difficulty-weighted score metric with a score of 0.31, while GPT-4-turbo achieved 0.29.",
+      "excerpt": "with gpt-4-turbo achieving a score of 0.29 (out of 1.0) and gpt-4o performing best with a score of 0.31.",
+      "grade": 1
+    },
+    {
+      "item": 20,
+      "chunk_id": "2409.13714v1:p4:c1",
+      "facet": "main_findings",
+      "claim": "Claude-3-5-sonnet achieved a pass rate of 0.45 and a difficulty-weighted score of 0.27.",
+      "excerpt": "Claude-3-5-sonnet has a similar pass rate (0.45) to claude-3-opus (0.46), however, it achieves a higher difficulty-weighted score (0.27), than claude-3-opus (0.23).",
+      "grade": 2
+    },
+    {
+      "item": 21,
+      "chunk_id": "2409.13714v1:p2:c2",
+      "facet": "method",
+      "claim": "The proposed method involves compiling RASP programs, which are generated by LLMs, into functional transformer weights to create models with known ground truth mappings.",
+      "excerpt": "We create TracrBench, a dataset of 121 RASP programs, by leveraging LLMs and manual annotation when they fail. These programs are then compiled into functional transformer weights using Tracr, resulting in transformer models with a known mapping between weights and their functional form.",
+      "grade": 2
+    },
+    {
+      "item": 22,
+      "chunk_id": "2409.13714v1:p1:c3",
+      "facet": "relevance_to_query",
+      "claim": "The RASP programming language is used to model and analyze transformer behavior by mapping core components like attention and feed-forward computation into simple primitives.",
+      "excerpt": "Restricted Access Sequence Processing Language (RASP) (Weiss et al., 2021) maps the core components of a transformer-encoder, i.e., attention and feed-forward computation, into simple primitives, forming a programming language to model and analyze transformer behavior.",
+      "grade": 2
+    },
+    {
+      "item": 23,
+      "chunk_id": "2409.13714v1:p1:c0",
+      "facet": "research_problem",
+      "claim": "Interpretability research is hindered by a lack of models with fully understood internals, specifically ground truth mappings between weights and functional roles.",
+      "excerpt": "Moreover, the lack of ground truth mappings between model weights and their functional roles hinders the effective evaluation of interpretability methods, impeding overall progress.",
+      "grade": 2
+    },
+    {
+      "item": 24,
+      "chunk_id": "2604.24971v1:p4:c1",
+      "facet": "experimental_setup",
+      "claim": "The models used are SmolLM2-1.7B-Instruct for proof-of-concept and Llama-3-8B-Instruct for primary validation.",
+      "excerpt": "Models.\n• SmolLM2-1.7B-Instruct (HuggingFaceTB): proof-of-concept scale, CPU inference.\n• Llama-3-8B-Instruct (Meta): primary validation, 32 layers, GQA (8 KV heads), 4-bit NF4\nweights, bfloat16 KV cache, Kaggle T4×2.",
+      "grade": 2
+    },
+    {
+      "item": 25,
+      "chunk_id": "2604.24971v1:p4:c1",
+      "facet": "experimental_setup",
+      "claim": "Datasets used for evaluation include custom documents (Apollo 11 mission, ARPANET/Internet topology history), WikiText-2 2K, and WikiText-2 4K.",
+      "excerpt": "Shared contexts.\n• Short context (≈600 tokens): Apollo 11 mission document (SmolLM2-1.7B only).\n• Long context (1,851 tokens): ARPANET/Internet topology history",
+      "grade": 1
+    },
+    {
+      "item": 26,
+      "chunk_id": "2604.24971v1:p9:c0",
+      "facet": "limitations",
+      "claim": "The observed perplexity findings require further controlled ablation to confirm them causally.",
+      "excerpt": "The −0.26% finding on SmolLM2-1.7B and the PPL improvement trend on Llama-3-8B are consistent with the regularization hypothesis but require controlled ablation to confirm causally.",
+      "grade": 2
+    },
+    {
+      "item": 27,
+      "chunk_id": "2604.24971v1:p6:c0",
+      "facet": "main_findings",
+      "claim": "The PolyKV compression achieves a 2.91× compression ratio that remains consistent across different model architectures like SmolLM2-1.7B and Llama-3-8B.",
+      "excerpt": "The 2.91× compression ratio is identical across SmolLM2-1.7B and Llama-3-8B, confirming it is a mathematical property of the compression scheme rather than a model-specific artifact.",
+      "grade": 2
+    },
+    {
+      "item": 28,
+      "chunk_id": "2604.24971v1:p9:c1",
+      "facet": "method",
+      "claim": "The authors propose PolyKV, a shared, asymmetrically-compressed KV cache pool designed for multi-agent LLM inference.",
+      "excerpt": "We presented PolyKV, a shared asymmetrically-compressed KV cache pool for multi-agent LLM inference.",
+      "grade": 2
+    },
+    {
+      "item": 29,
+      "chunk_id": "2607.17715v1:p2:c4",
+      "facet": "method",
+      "claim": "The core component of the C2KV framework is the C2Extractor, which is described as a lightweight sidecar module.",
+      "excerpt": "The core of C2KV is its C2Extractor, a lightweight sidecar mod-",
+      "grade": 2
+    },
+    {
+      "item": 30,
+      "chunk_id": "2607.17715v1:p9:c5",
+      "facet": "relevance_to_query",
+      "claim": "Merging and low-rank approaches like MiniCache and ReCalKV reduce memory usage by consolidating redundant KV states across attention heads or layers.",
+      "excerpt": "Merging and Low-rank approaches like Mini-Cache [23] or ReCalKV [32] consolidate redundant KV states across layers or attention heads.",
+      "grade": 2
+    },
+    {
+      "item": 31,
+      "chunk_id": "2504.09936v2:p5:c3",
+      "facet": "experimental_setup",
+      "claim": "The evaluation uses Llama-2, Llama-3, and Mistral as base models, comparing them against cache eviction methods like Streaming, H2O, and PyramidInfer, and cache merging methods like CaM and D2O.",
+      "excerpt": "Our evaluation is based on several representative LLMs, including Llama-2 (Touvron et al. 2023b), Llama-3 (Grattafiori, Dubey et al. 2024), and Mistral (Jiang et al. 2023). We compare our method against multiple baseline approaches: representative cache eviction methods such as Streaming (Xiao et al",
+      "grade": 1
+    },
+    {
+      "item": 32,
+      "chunk_id": "2504.09936v2:p5:c3",
+      "facet": "experimental_setup",
+      "claim": "The experimental setup involves no model training and uses a merging threshold of 0.8, with token selection and cache allocation following the strategy from PyramidInfer.",
+      "excerpt": "In our main experiments, we set the merging threshold T to 0.8. For token selection and cache allocation, we follow the strategy recommended by PyramidInfer (Yang et al. 2024a)",
+      "grade": 1
+    },
+    {
+      "item": 33,
+      "chunk_id": "2504.09936v2:p6:c2",
+      "facet": "main_findings",
+      "claim": "KeepKV outperforms existing state-of-the-art KV-cache merging methods like D2O in throughput and methods like CaM and D2O in accuracy.",
+      "excerpt": "Furthermore, KeepKV also surpasses existing KV-cache merging methods, like CaM(Zhang et al. 2024) and D2O(Wan et al. 2024b)",
+      "grade": 1
+    },
+    {
+      "item": 34,
+      "chunk_id": "2504.09936v2:p9:c5",
+      "facet": "research_problem",
+      "claim": "Prior research on KV cache merging lacks systematic theoretical foundations for selecting merging candidates and assigning merging weights.",
+      "excerpt": "Despite this, key challenges such as the selection of merging candidates and the assignment of merging weights remain largely unexplored, with a lack of systematic theoretical foundations.",
+      "grade": 2
+    },
+    {
+      "item": 35,
+      "chunk_id": "2405.12532v2:p7:c3",
+      "facet": "experimental_setup",
+      "claim": "The study evaluates performance using the LLaMA 2-13B and 70B models on tasks including GSM8K, MMLU, and the LEval benchmark for long context capabilities.",
+      "excerpt": "In the LEval that tests the long context ability, we show that the \"local\" strategy that is similar to the technique used in StreamingLLM causes a huge decline in memorization of history.",
+      "grade": 1
+    },
+    {
+      "item": 36,
+      "chunk_id": "2405.12532v2:p7:c2",
+      "facet": "experimental_setup",
+      "claim": "Baselines used for efficiency and performance comparisons include full cache methods like Accelerate and DeepSpeed, the H2O KV cache compression method, and a \"local\" strategy.",
+      "excerpt": "We compare the efficiency of PyramidInfer with other full cache methods, including Accelerate (HuggingFace, 2021), Deepspeed2 (Aminabadi et al., 2022). We also select H2O3 (Zhang et al., 2023), a KV cache compression method, as another baseline.",
+      "grade": 1
+    },
+    {
+      "item": 37,
+      "chunk_id": "2405.12532v2:p1:c1",
+      "facet": "main_findings",
+      "claim": "PyramidInfer achieves a 2.2x improvement in throughput compared to Accelerate.",
+      "excerpt": "Experimental results show PyramidInfer improves 2.2x throughput compared to Accelerate with over 54% GPU memory reduction in KV cache.",
+      "grade": 2
+    },
+    {
+      "item": 38,
+      "chunk_id": "2405.12532v2:p1:c1",
+      "facet": "main_findings",
+      "claim": "The number of influential keys and values decreases as layers progress.",
+      "excerpt": "we find that the number of crucial keys and values that influence future generations decreases layer by layer",
+      "grade": 2
+    },
+    {
+      "item": 39,
+      "chunk_id": "2405.12532v2:p5:c3",
+      "facet": "relevance_to_query",
+      "claim": "PyramidInfer can compress the KV cache in both the prefill and generation phases.",
+      "excerpt": "PyramidInfer can not only\nreduce the KV cache in the generation phase but\nalso in the prefill phase",
+      "grade": 2
+    },
+    {
+      "item": 40,
+      "chunk_id": "2405.12532v2:p1:c2",
+      "facet": "research_problem",
+      "claim": "Large language models face a significant challenge due to the immense GPU memory usage required for inference, which hinders their deployment at scale.",
+      "excerpt": "However, these large models meet up with a substantial challenge of immense GPU memory usage in the inference, due to the model and computational complexity. This hinders deploying LLMs at scale to meet the thousands of demands for chatting with chatbots.",
+      "grade": 2
+    }
+  ]
+}

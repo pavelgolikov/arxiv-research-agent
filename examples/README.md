@@ -21,9 +21,12 @@ candidates were screened from abstracts, four papers were selected and downloade
 
 Every statement in the review carries a page-anchored link, and every one of those
 links was checked back to a real chunk of the paper it names. Twelve were then read by
-hand against the pages they cite: 8 held up, 4 did not. `VERIFICATION.md` records which
-checks were automated, which needed reading, and why the four failed — the reasons are
-more interesting than the count.
+hand against the pages they cite; `VERIFICATION.md` records which checks were automated,
+which needed reading, and the failure modes it surfaced.
+
+That twelve was a deliberate sample and is not the project's claim-support rate. The
+measured figure comes from 40 citations drawn at random — see
+[`DESIGN.md`](../DESIGN.md#4-grounding).
 
 The claims here are the model's, drawn only from retrieved excerpts of the cited
 papers. Citation validation proves an excerpt exists where it is claimed to; it does

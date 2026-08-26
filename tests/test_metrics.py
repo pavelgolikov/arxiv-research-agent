@@ -12,6 +12,7 @@ from evals.metrics import (
     recall_at,
     recall_ceiling,
     reciprocal_rank,
+    wilson_interval,
 )
 
 # Two chunks that fully answer the question, one that partially answers it.
@@ -112,3 +113,23 @@ class TestMean:
 
     def test_average(self):
         assert mean([1.0, 0.0]) == 0.5
+
+
+class TestWilsonInterval:
+    def test_contains_the_observed_proportion(self):
+        low, high = wilson_interval(31, 40)
+        assert low < 31 / 40 < high
+
+    def test_stays_inside_zero_and_one_on_a_clean_sweep(self):
+        # 40 of 40 is exactly where the normal approximation runs past 1.0.
+        low, high = wilson_interval(40, 40)
+        assert 0.0 <= low <= 1.0 and high == 1.0
+        assert low > 0.9
+
+    def test_narrows_as_the_sample_grows(self):
+        small = wilson_interval(8, 12)
+        large = wilson_interval(80, 120)
+        assert (large[1] - large[0]) < (small[1] - small[0])
+
+    def test_empty_sample(self):
+        assert wilson_interval(0, 0) == (0.0, 0.0)

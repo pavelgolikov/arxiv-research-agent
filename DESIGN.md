@@ -276,28 +276,71 @@ Before the fix, the pipeline was silently discarding about half of its own valid
 
 ### What manual verification found
 
-Twelve citations of the example report were checked by hand against the pages they
-cite. **Eight were confirmed and four were rejected.** None was a fabrication, none
-pointed at the wrong paper, and none cited a chunk that does not exist. All four were
-real quotes asked to carry more than they say, in three distinct ways:
+Referential integrity and claim support are different questions. The deterministic
+checks answer the first: does this quote exist, on this page, in this paper. Only a
+reader can answer the second: does the quote establish the sentence built on it.
 
-- **Truncation cut the supporting half.** One excerpt stops mid-word at 300 characters
-  (`EVIDENCE_EXCERPT_CHARS`), just before the clause that would have supported the
-  claim's second half.
-- **The referent lay outside the quote.** One says "the difference of these vectors";
-  the claim calls them activation vectors, which is correct in the paper but not
-  established by the quoted span alone.
-- **The claim added a word the quote does not carry.** One excerpt supports "crucial for
-  understanding models" while the claim says "understanding *and controlling*". Another
-  quotes the paper's title rather than a passage.
+**First attempt, and why it was wrong.** Twelve citations of the example report were
+read by hand and 8 were confirmed. That sample was drawn deliberately — spread across
+papers and facets, and seeded with two citations already flagged as weak — so it
+oversampled known problems. Its interval also spanned [39%, 86%], wide enough to be
+close to uninformative.
 
-This is the most useful number in the repository. A human-judged support rate of 8/12
-sits well below 94.3% machine-checked referential integrity, and the gap is not a
-defect — it is the precise boundary of what a deterministic check can prove. The two
-numbers belong side by side.
+**Second attempt.** Forty of the 165 citations in the committed groundedness runs,
+drawn uniformly at random with a fixed seed, graded `2` establishes the claim, `1`
+supports it partly, `0` no support. The draw landed evenly without stratification: 2 to
+6 citations from each of the 8 papers, 4 to 9 from each of the 6 facets.
 
-Two of the four failures have mechanical causes that could be addressed: raising the
-excerpt limit, and prompting for self-contained passages. Neither has been tried.
+<!-- eval:claim_support -->
+| Measure | Rate | 95% CI |
+| --- | --- | --- |
+| Excerpt establishes the claim | **77.5%** (31 of 40) | [62%, 88%] |
+| Excerpt supports it at least partly | **100.0%** (31 + 9 of 40) | [91%, 100%] |
+| Excerpt does not support the claim | 0 of 40 | — |
+<!-- /eval:claim_support -->
+
+The targeted sample understated support by 11 points, which is what a deliberately
+adversarial draw should be expected to do. **No citation in the random sample failed
+outright.**
+
+### Where claim support falls short
+
+<!-- eval:claim_support_facets -->
+| Facet | Partial grades |
+| --- | --- |
+| `experimental_setup` | 6 of 8 |
+| `limitations` | 0 of 7 |
+| `main_findings` | 2 of 9 |
+| `method` | 0 of 5 |
+| `relevance_to_query` | 0 of 4 |
+| `research_problem` | 1 of 7 |
+<!-- /eval:claim_support_facets -->
+
+Five facets are essentially clean. `experimental_setup` accounts for two thirds of every
+partial grade in the sample, and the claims show why — they are enumerations:
+
+- "model classes including GPT-2, LLaMA, Gemma, Bloom, and Mistral"
+- "Datasets include custom documents (Apollo 11 mission, ARPA...)"
+- "uses Llama-2, Llama-3, and Mistral as base models"
+- "Baselines include full cache..."
+
+The facet asks *"What datasets, baselines, and experimental setup are used?"*, whose
+true answer is a list scattered through a paper. The model aggregates the list into one
+claim and cites one fragment of it, so the excerpt supports part of the enumeration
+rather than all of it. This is the diffuse-relevance problem from section 1 reappearing
+at the claim layer rather than the retrieval layer.
+
+**Excerpt truncation is not the cause.** Only 1 of the 9 partial grades sits at the
+300-character `EVIDENCE_EXCERPT_CHARS` cap, and partial excerpts average slightly longer
+than fully supporting ones (198 against 183 characters). Raising the limit would move
+one item. A fix would have to act on the claim rather than the quote — requiring one
+citation per enumerated item, or prompting `experimental_setup` for narrower claims.
+Neither has been tried.
+
+`evals/labels/claim_support_labels.json` stores each grade alongside its claim and
+excerpt, so it is self-contained enough to score an automated claim-support judge
+against. No such judge is implemented: without labeled ground truth a judge is one
+model's opinion of another's output, and this dataset is what would make one checkable.
 
 ---
 

@@ -102,3 +102,29 @@ def paired_bootstrap(
     )
     observed = sum(differences) / size
     return observed, means[int(0.025 * iterations)], means[int(0.975 * iterations)]
+
+
+def wilson_interval(
+    successes: int,
+    total: int,
+    z: float = 1.96,
+) -> tuple[float, float]:
+    """Return a 95% confidence interval for a proportion.
+
+    Used wherever a rate comes from a hand-labeled sample. Forty judgments pin a rate
+    down only so far, and the normal approximation misbehaves near 0 and 1 — the Wilson
+    form stays inside [0, 1] and is well behaved for a clean sweep such as 40 of 40.
+    """
+
+    if total == 0:
+        return 0.0, 0.0
+
+    proportion = successes / total
+    denominator = 1 + z * z / total
+    centre = (proportion + z * z / (2 * total)) / denominator
+    spread = (
+        z
+        * math.sqrt(proportion * (1 - proportion) / total + z * z / (4 * total * total))
+        / denominator
+    )
+    return max(0.0, centre - spread), min(1.0, centre + spread)
