@@ -6,7 +6,9 @@ file. This script makes that mechanical instead of a matter of discipline: it re
 never drift away from the run that produced it.
 
 Blocks are delimited by `<!-- eval:NAME -->` and `<!-- /eval:NAME -->`. Text outside
-those markers is never touched.
+those markers is never touched, and a block is written to whichever target files
+contain its markers — the README carries the headline tables, `DESIGN.md` the
+methodology ones, and either may carry both.
 """
 
 import argparse
@@ -18,7 +20,7 @@ from arxiv_reviewer.rag import RETRIEVER_KINDS
 
 from .config import EVALS_DIR, RESULTS_DIR
 
-README = EVALS_DIR.parent / "README.md"
+TARGETS = (EVALS_DIR.parent / "README.md", EVALS_DIR.parent / "DESIGN.md")
 
 RETRIEVAL_FILE = RESULTS_DIR / "retrieval.json"
 SCREENING_FILE = RESULTS_DIR / "screening.json"
@@ -214,19 +216,33 @@ def main() -> None:
         print("\n(pass --write to update README.md in place)")
         return
 
-    original = README.read_text(encoding="utf-8")
-    updated, replaced = inject(original, blocks)
+    placed: set[str] = set()
+    changed = False
 
-    missing = sorted(set(blocks) - set(replaced))
-    if missing:
-        print(f"no marker in README for: {', '.join(missing)}")
+    for target in TARGETS:
+        if not target.exists():
+            continue
 
-    if updated == original:
-        print("README already up to date.")
-        return
+        original = target.read_text(encoding="utf-8")
+        updated, replaced = inject(original, blocks)
+        placed.update(replaced)
 
-    README.write_text(updated, encoding="utf-8")
-    print(f"updated {README} ({', '.join(sorted(replaced))})")
+        if updated == original:
+            print(f"{target.name} already up to date.")
+            continue
+
+        target.write_text(updated, encoding="utf-8")
+        changed = True
+        print(f"updated {target.name} ({', '.join(sorted(replaced))})")
+
+    # A block with no marker anywhere would silently go unpublished, which is exactly
+    # the drift these markers exist to prevent.
+    orphaned = sorted(set(blocks) - placed)
+    if orphaned:
+        print(f"\nno marker in any target for: {', '.join(orphaned)}")
+
+    if not changed and not orphaned:
+        print("all generated tables match their results files.")
 
 
 if __name__ == "__main__":

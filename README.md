@@ -1,59 +1,49 @@
 # arXiv Research Agent
 
 A LangGraph workflow that searches arXiv, screens candidates against a research
-question, indexes the selected papers into a vector store, extracts claims that
-cite the pages they came from, and writes a Markdown literature review with Gemini
-through LangChain.
+question, indexes the selected papers into a vector store, extracts claims that cite
+the pages they came from, and writes a Markdown literature review with Gemini through
+LangChain.
 
 **Built with:** LangGraph, LangChain, Chroma, BM25, cross-encoder reranking, Gemini,
 Pydantic, SQLite, PyMuPDF, pytest.
 
-See [`examples/example_review.md`](examples/example_review.md) for a complete run. Its
-79 citations were machine-checked and then **manually verified** by hand — with a
-result worth reading: [`examples/VERIFICATION.md`](examples/VERIFICATION.md).
+Example output: [`examples/example_review.md`](examples/example_review.md).
+Its citations were machine-checked and manually verified —
+[`examples/VERIFICATION.md`](examples/VERIFICATION.md).
 
-## Project status
+## Features
 
-The pipeline runs end to end, and the evaluation it rests on is built: two frozen
-hand-labeled datasets, a four-way retrieval ablation with significance testing, a
-screening threshold sweep, and groundedness measured over live runs. Every number
-below is generated from `evals/results/*.json`.
+**Retrieval and RAG** — page-preserving PDF parsing; chunking with stable `chunk_id`s;
+persistent Chroma vector index; dense, BM25, hybrid reciprocal-rank-fusion, and
+cross-encoder reranking retrievers; multi-query expansion.
 
-**What is built**
+**Agent orchestration (LangGraph)** — `Send` map-reduce fan-out for screening and
+analysis; reducer-backed state with deterministic ordering independent of concurrency;
+SQLite checkpointing behind `run` / `resume` / `status`; typed per-branch failures with
+retry classification and partial reports.
 
-| Area | State |
-| --- | --- |
-| Page-preserving PDF parsing, chunking with stable `chunk_id`s | done |
-| Chroma vector index, persisted per run thread | done |
-| Dense / BM25 / hybrid (RRF) / cross-encoder rerank retrieval | done |
-| Multi-query expansion | done |
-| Per-facet grounded analysis with deterministic citation validation | done |
-| Page-anchored citations in the report | done |
-| Parallel screening and analysis via LangGraph `Send` + reducers | done |
-| Deterministic ordering independent of concurrency | done |
-| Abstract-first screening (PDFs fetched only for selected papers) | done |
-| Retries, typed per-branch failures, partial reports | done |
-| SQLite checkpointing with real `run` / `resume` / `status` | done |
-| Labeled retrieval dataset — 50 questions, 312 judged chunks | done |
-| Labeled screening dataset — 7 queries x 12 candidates | done |
-| Reproducible index rebuild with pool-coverage verification | done |
-| Retrieval ablation — 4 strategies x 3 metrics, paired-bootstrap intervals | done |
-| Screening threshold sweep over the real selection rule | done |
-| Groundedness — citation survival and independent re-validation | done |
-| `evals/results/*.json` + README tables generated from them | done |
-| Test suite — 121 tests, no network and no API key required | done |
-| Verified example report with a record of what was checked how | done |
-| Graceful top-level failure with a real exit code | done |
+**Grounding and citation validation** — per-facet retrieval scoped to one paper; claims
+that must carry chunk-level evidence; deterministic three-check validation with no model
+call; page-anchored citations into the source PDF.
 
-Deliberately out of scope for now: LangSmith tracing, human-in-the-loop
-`interrupt`, `pyproject.toml` packaging, CI, and any web UI or service.
+**Evaluation and benchmarking** — two hand-labeled datasets (50 retrieval questions with
+312 judged chunks; 7 screening queries × 12 candidates); TREC-style pooling with measured
+pooling bias; four-way retrieval ablation with paired-bootstrap confidence intervals;
+threshold sweep over the real selection rule; groundedness metrics with independent
+re-validation; reproducible index rebuild guarded by a pool-coverage check.
 
-See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
+**Engineering** — 121 tests requiring no network access and no API key; published
+numbers generated from committed JSON; graceful exit codes; a worked example with its
+verification record.
+
+Not included: LangSmith tracing, human-in-the-loop `interrupt`, `pyproject.toml`
+packaging, CI, web UI.
 
 ## Repository layout
 
 - `arxiv_lit_reviewer.py` — command-line entry point (`run`, `resume`, `status`).
-- `arxiv_reviewer/` — application package, split by responsibility:
+- `arxiv_reviewer/` — application package:
   - `workflow.py` — graph construction, fan-out, SQLite persistence, run/resume/status.
   - `retrieval.py` — arXiv search, PDF download, page-preserving parsing.
   - `rag.py` — chunking, embedding, Chroma index, retriever strategies.
@@ -62,26 +52,23 @@ See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
   - `review_types.py` — Pydantic models and the typed graph state.
   - `failures.py` — retry classification and retrying.
   - `gemini_client.py` — model access through LangChain.
-- `evals/` — evaluation, split by direction of data flow:
-  - `build/` — dataset construction: arXiv search, corpus parsing, question
-    generation, candidate pooling, and the offline labeling page. Run rarely.
-  - `metrics.py` — MRR, nDCG, recall, and the paired bootstrap, as pure functions.
-  - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py` — the metric
-    runners; each writes one file under `results/`.
-  - `measure_categories.py`, `measure_depth.py` — one-question studies behind the
-    search-quality findings in Evaluation.
-  - `render_tables.py` — regenerates this README's tables from those files.
-  - `build_index.py` — rebuilds the vector index from the committed chunks and
-    verifies that the labels still cover everything the retrievers return.
-  - `data/`, `labels/`, `results/` — the frozen datasets, the hand labels, and the
-    metric output. All committed; `index/` is not.
-- `examples/` — one complete run, with a record of exactly which citation checks
-  were automated and which needed reading (`examples/VERIFICATION.md`).
-- `tests/` — pytest suite; runs with no network access and no API key.
-- `PORTFOLIO_PLAN.md` — roadmap for the current upgrade.
+- `evals/`
+  - `build/` — dataset construction: arXiv search, corpus parsing, question generation,
+    candidate pooling, offline labeling page.
+  - `metrics.py` — MRR, nDCG, recall, paired bootstrap.
+  - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py` — metric runners.
+  - `measure_categories.py`, `measure_depth.py` — search-quality studies.
+  - `build_index.py` — rebuilds the vector index from committed chunks; `--verify`
+    checks that the labels cover everything the retrievers return.
+  - `render_tables.py` — regenerates the tables in `README.md` and `DESIGN.md`.
+  - `data/`, `labels/`, `results/` — frozen datasets, hand labels, metric output.
+    Committed. `index/` is not.
+- `examples/` — one complete run with its verification record.
+- `tests/` — pytest suite.
+- `DESIGN.md` — evaluation methodology, experiments, rejected alternatives.
 
-Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` holds
-LangGraph checkpoints and `chroma/` holds the persistent vector index.
+Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` and
+`chroma/`.
 
 ## Setup
 
@@ -92,9 +79,8 @@ python3 -m venv .venv
 
 Set `GOOGLE_API_KEY` (or `GEMINI_API_KEY`) in a `.env` file at the repository root.
 
-The cross-encoder reranker pulls in `sentence-transformers` and `torch`, which
-dominate install size. Selecting a different `--retriever` avoids loading the
-model at runtime, but the dependency is still installed.
+The cross-encoder reranker requires `sentence-transformers` and `torch`. Other
+`--retriever` values do not load the model at runtime.
 
 ## Run
 
@@ -103,22 +89,20 @@ model at runtime, but the dependency is still installed.
   --query "What is the latest and greatest in model self-improvement?"
 ```
 
-The command prints a thread ID before it starts work. Use it to inspect or continue
-the run:
+The command prints a thread ID before starting work:
 
 ```bash
 .venv/bin/python arxiv_lit_reviewer.py status --thread-id THREAD_ID
 .venv/bin/python arxiv_lit_reviewer.py resume --thread-id THREAD_ID
 ```
 
-`status` reads the checkpoint database only, so it needs no API key and makes no
-network calls. `resume` restarts at the last incomplete step, so papers that were
-already downloaded, indexed, or analyzed are not processed again.
+`status` reads the checkpoint database only: no API key, no network calls. `resume`
+restarts at the last incomplete step; finished branches are not re-executed.
 
-Exit codes: `0` when a report was produced, including `partial` and `empty` runs,
-which still write output; `1` when the run itself could not continue or was
-interrupted; `2` for invalid arguments or an unknown thread ID. A failed run prints
-what went wrong and the thread ID, and the thread stays resumable.
+Exit codes: `0` when a report was produced, including `partial` and `empty` runs; `1`
+when the run could not continue or was interrupted; `2` for invalid arguments or an
+unknown thread ID. A failed run prints the error and the thread ID, and the thread
+stays resumable.
 
 ### Options
 
@@ -154,38 +138,28 @@ flowchart TD
     render --> DONE([end])
 ```
 
-PDFs are downloaded only for papers that survive screening, so a rejected candidate
-costs one abstract-only model call and no download.
+Screening reads title, authors, date, and abstract only. PDFs are downloaded for
+selected papers.
 
-Screening reads only title, authors, date, and abstract, so PDFs are downloaded
-only for papers that survive selection. Both stages fan out with LangGraph `Send`
-and collect into reducer-backed lists, which arrive in completion order and are
-then sorted deterministically: identical reports come out at any
+Screening and analysis fan out with LangGraph `Send` into reducer-backed lists, then
+sort by (score descending, original search position). Output is identical at any
 `--max-concurrency`.
 
-A branch that fails does not stop its siblings. Transient failures (timeouts,
-connection errors, HTTP 408/425/429/5xx, provider `RESOURCE_EXHAUSTED` /
-`UNAVAILABLE` / `DEADLINE_EXCEEDED` / `INTERNAL`) are retried three times with
-exponential backoff and jitter. Anything else — an unparseable PDF, an
-oversized download, a schema violation — is recorded as a typed failure. The run
-finishes with whatever succeeded, the report is marked `partial`, and every
-failure is listed in a `Failures` section appended after synthesis so it cannot
-be omitted.
+A failing branch does not stop its siblings. Timeouts, connection errors, HTTP
+408/425/429/5xx, and provider `RESOURCE_EXHAUSTED` / `UNAVAILABLE` /
+`DEADLINE_EXCEEDED` / `INTERNAL` are retried three times with exponential backoff and
+jitter. Other errors — unparseable PDF, oversized download, schema violation — are
+recorded as typed failures. The run finishes with whatever succeeded, the report is
+marked `partial`, and failures are listed in a `Failures` section.
 
-Retrying happens inside each branch rather than through LangGraph's node-level
-`RetryPolicy`. In langgraph 1.2.10 a node `error_handler` runs but does not
-suppress the original exception for tasks dispatched by `Send`, so a single bad
-paper would still abort the whole run. `RetryPolicy` is kept on `search`, where
-failing the run and resuming later is the intended behavior.
+Retries run inside each branch. `RetryPolicy` is applied to `search` only.
 
-Interrupted runs resume from the last checkpoint. Branches that already finished
-are not re-executed, so their downloads and model calls are not paid for twice.
+Interrupted runs resume from the last checkpoint.
 
 ## Retrieval
 
-Paper text is split into overlapping ~1000-character chunks that keep their page
-numbers, embedded with `models/gemini-embedding-001`, and stored in a persistent
-Chroma index under `.arxiv-reviewer/chroma/`.
+Paper text is split into overlapping ~1000-character chunks carrying their page numbers,
+embedded with `models/gemini-embedding-001`, and stored in a persistent Chroma index.
 
 | `--retriever` | Strategy |
 | --- | --- |
@@ -194,54 +168,44 @@ Chroma index under `.arxiv-reviewer/chroma/`.
 | `hybrid` | Both, fused with reciprocal rank fusion. |
 | `hybrid-rerank` | Hybrid candidates rescored by a `ms-marco-MiniLM-L-6-v2` cross-encoder. |
 
-`--multi-query` expands each question into paraphrases and retrieves for all of
-them. When reranking is enabled the expanded candidates are fused and rescored
-once, so the result still honours `--top-k`.
-
-Which of these is actually better on this corpus is measured, not asserted: see
-the retrieval ablation under Evaluation. The short version is that BM25 alone is
-clearly worst, hybrid trades paper-specific recall for facet recall, and the
-cross-encoder reranker's advantage is not distinguishable from noise at 50 questions.
+`--multi-query` expands each question into paraphrases and retrieves for all of them.
+With reranking enabled the expanded candidates are fused and rescored once, honouring
+`--top-k`.
 
 ## Grounding
 
-Papers are not summarized from their full text. Each selected paper is analyzed
-one facet at a time — research problem, method, experimental setup, main
-findings, limitations, and relevance to the query — and each facet is answered
-only from chunks retrieved for that facet, scoped to that paper.
+Each selected paper is analyzed one facet at a time — research problem, method,
+experimental setup, main findings, limitations, relevance to the query — from chunks
+retrieved for that facet and scoped to that paper.
 
-The model must return every statement as a claim carrying at least one citation,
-where a citation is a `chunk_id` plus an excerpt quoted from that chunk. Each
-citation is then checked without calling a model:
+Every statement is returned as a claim carrying at least one citation: a `chunk_id` plus
+an excerpt quoted from that chunk. Each citation is checked without a model call:
 
-1. the cited chunk must exist among the chunks the model was shown,
-2. it must belong to the paper being analyzed, and
-3. the quoted excerpt must actually occur in that chunk, ignoring whitespace and case.
+1. the cited chunk exists among the chunks the model was shown,
+2. it belongs to the paper being analyzed, and
+3. the quoted excerpt occurs in that chunk, ignoring case, whitespace, and hyphenation.
 
-Citations failing any check are discarded, and a claim left with no surviving
-citation is discarded with it. The report records how many were dropped, so a
-paper whose analysis was partly rejected is visible rather than silently thinner.
-Surviving claims render as page-anchored links into the source PDF.
+Failing citations are discarded; a claim left with none is discarded with it. The report
+records the counts. Surviving claims render as page-anchored links into the source PDF.
 
 ## Evaluation
 
-Two hand-labeled datasets live under `evals/`, frozen and committed so results are
-reproducible and do not drift as arXiv re-ranks its search results.
+Two hand-labeled datasets under `evals/`, frozen and committed. Tables below are
+generated from `evals/results/*.json` by `python -m evals.render_tables --write`.
 
 | Dataset | Size |
 | --- | --- |
 | Retrieval | 5 papers, 570 chunks, 50 questions, 312 judged-relevant chunks (246 fully answering, 66 partial) |
 | Screening | 7 queries x 12 candidates, each labeled irrelevant / related / central |
 
-Thirty of the fifty retrieval questions are the exact strings `analysis.py` asks of
-every paper, so the benchmark measures the real workload rather than a proxy. The
-other twenty are paper-specific factual questions — named datasets, baselines,
-numbers — that probe precise retrieval.
+Thirty of the fifty retrieval questions are the strings `analysis.py` asks of every
+paper. The other twenty are paper-specific factual questions.
+
+Methodology, experiments, and rejected alternatives: [`DESIGN.md`](DESIGN.md).
 
 ### Retrieval ablation
 
-Four strategies, fifty questions, scored at the depth the pools were judged at. Every
-figure comes from `evals/results/retrieval.json`.
+Four strategies, fifty questions, scored at pool depth.
 
 <!-- eval:retrieval -->
 | Strategy | MRR | nDCG@10 | recall@5 (specific) | recall@5 (facet) |
@@ -253,53 +217,14 @@ figure comes from `evals/results/retrieval.json`.
 | _best achievable_ | — | — | _0.921_ | _0.714_ |
 <!-- /eval:retrieval -->
 
-The table alone would invite overclaiming, so each difference is resampled with a
-paired bootstrap over the per-question scores. Most of them do not survive it:
-
-<!-- eval:comparisons -->
-| Comparison | Metric | Difference | 95% CI | Distinguishable |
-| --- | --- | --- | --- | --- |
-| `dense` → `bm25` | mrr | -0.108 | [-0.248, +0.027] | no |
-| `dense` → `bm25` | ndcg@10 | -0.162 | [-0.262, -0.063] | **yes** |
-| `dense` → `bm25` | recall@5 (specific) | -0.196 | [-0.329, -0.079] | **yes** |
-| `dense` → `bm25` | recall@5 (facet) | -0.035 | [-0.123, +0.057] | no |
-| `dense` → `hybrid` | mrr | +0.015 | [-0.079, +0.103] | no |
-| `dense` → `hybrid` | ndcg@10 | +0.021 | [-0.039, +0.080] | no |
-| `dense` → `hybrid` | recall@5 (specific) | -0.098 | [-0.194, -0.013] | **yes** |
-| `dense` → `hybrid` | recall@5 (facet) | +0.071 | [+0.003, +0.141] | **yes** |
-| `dense` → `hybrid-rerank` | mrr | +0.035 | [-0.058, +0.129] | no |
-| `dense` → `hybrid-rerank` | ndcg@10 | +0.038 | [-0.041, +0.118] | no |
-| `dense` → `hybrid-rerank` | recall@5 (specific) | -0.013 | [-0.150, +0.115] | no |
-| `dense` → `hybrid-rerank` | recall@5 (facet) | +0.092 | [+0.006, +0.180] | **yes** |
-| `hybrid` → `hybrid-rerank` | mrr | +0.021 | [-0.079, +0.122] | no |
-| `hybrid` → `hybrid-rerank` | ndcg@10 | +0.017 | [-0.038, +0.074] | no |
-| `hybrid` → `hybrid-rerank` | recall@5 (specific) | +0.085 | [-0.042, +0.210] | no |
-| `hybrid` → `hybrid-rerank` | recall@5 (facet) | +0.021 | [-0.049, +0.090] | no |
-<!-- /eval:comparisons -->
-
-What this actually supports:
-
-- **BM25 alone is clearly worst.** It loses 0.162 nDCG@10 to dense, and the interval
-  is nowhere near zero.
-- **Hybrid retrieval trades one kind of question for another.** Against dense it gains
-  facet recall (+0.071) and loses paper-specific recall (-0.098). Fusing a keyword
-  retriever in helps diffuse questions and hurts precise ones.
-- **The cross-encoder reranker buys nothing this benchmark can distinguish.** Every
-  `hybrid` to `hybrid-rerank` comparison spans zero, including the +0.017 nDCG@10 it
-  appears to gain. It is the most expensive component in the stack — it pulls in
-  `torch` and `sentence-transformers` — and fifty questions cannot show it earning that.
-- **No MRR difference is distinguishable at all.** The first relevant chunk lands in
-  much the same place whichever strategy is used.
-
-`--multi-query` is excluded rather than scored. It expands each question into
-model-generated paraphrases, which retrieve chunks the frozen pools never contained,
-so its recall would be understated for reasons that have nothing to do with the
-technique.
+Paired-bootstrap 95% intervals exclude zero for 5 of 16 pairwise comparisons; full
+intervals in [`DESIGN.md`](DESIGN.md#2-reading-the-ablation-honestly). Recall is split
+by question type and reported against the best score achievable at that cutoff.
+`--multi-query` is not scored: its paraphrases retrieve chunks outside the frozen pools.
 
 ### Screening quality
 
-Threshold sweep over the real `select_papers_node`, scored against the labels. From
-`evals/results/screening.json`.
+Threshold sweep over `select_papers_node`, scored against the labels.
 
 <!-- eval:screening -->
 | Threshold | precision@4 (central) | precision@4 (related) | central recall | best achievable | queries under-filled |
@@ -319,51 +244,15 @@ Threshold sweep over the real `select_papers_node`, scored against the labels. F
 | 5 | 0 | 4 | 39 |
 <!-- /eval:screening -->
 
-The confusion grid is the more interesting half. **No paper labeled irrelevant ever
-scored above 2**, and every paper scoring 1 was labeled irrelevant — the rubric
-separates cleanly at the bottom. It separates poorly at the top: scores 4 and 5 mix
-related and central papers, which is why precision@4 plateaus rather than climbing.
-
-The sweep chose **3**, which is now the shipped default; it was 4. Both give identical precision,
-but 3 recovers more central papers (0.683 against 0.611) and under-fills one fewer
-query. Thresholds 2 and 3 select identically on this data, so the stricter of the two
-is taken.
-
-Two caveats the pooled numbers hide, which is why per-query figures are in the JSON.
-The `interpretability` and `efficient_inference` queries came back twelve-central-out-of-twelve,
-so their precision saturates at 1.0 no matter what is selected. And central recall is
-ceiling-bound: with twelve central papers and a target of four, no selection can exceed
-0.33.
-
-A live run surfaced the real bottleneck, and it is not the threshold. Asked for methods
-in language model self-improvement, arXiv returned one on-topic paper and nine about
-federated LoRA, topic modeling, robot platforms, and Byzantine-resilient SGD. The
-screener scored them 1 and 2 and was right to. Selection quality is capped by what
-`search_arxiv` returns, and two follow-up measurements say why.
-
-**An arXiv category filter would not help** (`evals/results/categories.json`). Fetching
-the categories of all 84 frozen candidates shows the papers labeled irrelevant living in
-the same categories as the central ones — irrelevant in cs.CV 10, cs.CL 8, cs.LG 8;
-central in cs.LG 27, cs.CL 24, cs.AI 23. Restricting to any CS category drops only 7 of
-28 irrelevant papers and moves central density from 52% to 57%. Every tighter filter
-costs central papers: `cs.CL` alone would discard 20 of the 44. Off-topic *for a query*
-is not the same as off-topic *by category*, and a junk candidate costs one abstract-only
-model call while a lost central paper is unrecoverable. Not implemented, deliberately.
-
-**Search depth does help** (`evals/results/search_depth.json`). `search_node` divides
-the result budget across the planned queries, so three queries at `--max-results 10`
-give each query four slots. Replaying one run's exact queries at ten slots each took
-relevant papers from 3 to 8 — and the density barely moved, 25% to 27%. arXiv's
-relevance ranking is flat over the first ten results: ranks 4-9 yielded 5 of 18
-relevant against 3 of 12 for ranks 0-3. Searching deeper costs one cheap screening
-call per extra candidate and does not dilute quality, which makes it the fix for
-thin reviews. `--max-results` now defaults to 30 rather than 10 for that reason.
+Threshold 3 is the shipped default. Per-query figures are in
+`evals/results/screening.json`. Two search-quality studies —
+[`evals/results/categories.json`](evals/results/categories.json) and
+[`evals/results/search_depth.json`](evals/results/search_depth.json) — set
+`--max-results` to 30 and rejected an arXiv category filter.
 
 ### Groundedness
 
-Measured over two live runs at the shipping defaults, read from the LangGraph
-checkpoints rather than the rendered Markdown — the report keeps only page links, but
-the checkpoint keeps the chunk IDs. From `evals/results/groundedness.json`.
+Two live runs at the shipping defaults, read from the LangGraph checkpoints.
 
 <!-- eval:groundedness -->
 | Measure | Value |
@@ -375,154 +264,34 @@ the checkpoint keeps the chunk IDs. From `evals/results/groundedness.json`.
 | Independent re-validation | 100.0% (165 citations re-checked, 0 failures) |
 <!-- /eval:groundedness -->
 
-These are survival rates, not properties of the finished report. Citations that reach
-a report are valid by construction, because invalid ones were already discarded, so
-measuring the report itself would return 100% and prove nothing. What is measured is
-how much of what the model proposed actually held up.
+Rates count citations and claims surviving validation out of those the model proposed.
+Manual spot-check of 12 citations from the example report: 8 confirmed, 4 rejected.
 
-Building this metric found a real bug. The first run reported 48.6% citation integrity,
-which was not model hallucination: PDF extraction preserves the hyphens a typesetter
-inserted at line breaks, so a chunk reads `lead- ing` where the paper reads `leading`.
-A model quoting the passage faithfully wrote `leading`, and the validator rejected it.
-Across two sample papers this discarded 63% of citations that were verbatim. `normalize`
-now folds hyphenation on both sides, which took acceptance from 37% to 97% on the
-captured sample while still rejecting fabricated text, paraphrases, hallucinated chunk
-IDs, and chunks belonging to another paper. The numbers above are from runs after the
-fix. Before it, the pipeline was silently discarding about half of its own valid work.
-
-The example under [`examples/`](examples/) is one of these runs. Every page link it
-renders was traced back to a validated citation, which is worth checking separately:
-synthesis is a language model writing Markdown and could in principle invent one.
-
-**Manual verification found the limit of these numbers.** Twelve of the example's
-citations were checked by hand against the pages they cite, and **8 of 12 were
-confirmed while 4 were rejected** — not as fabrications, but as real quotes asked to
-carry more than they say. One excerpt was truncated at 300 characters just before the
-clause that would have supported the claim; one relied on a pronoun whose referent sat
-outside the quoted span; two attached a qualifier the quote did not contain. A
-deterministic check cannot see any of this, which is why 94.3% referential integrity
-and a human-judged support rate of 8/12 belong side by side. The failure modes are
-itemized in [`examples/VERIFICATION.md`](examples/VERIFICATION.md).
-
-### Pooling, and measuring what it misses
-
-Judging every chunk against every question would be 5,700 decisions. Instead the
-dataset uses **pooling**, the standard TREC approach: each of the four retrievers
-contributes its top 10 for a question, and only the union is judged — 14 to 23
-chunks per question instead of the whole paper.
-
-Pooling has a known flaw. A chunk that no retriever returns is never judged, so it
-counts as irrelevant by default and recall comes out higher than it should be.
-Rather than assume the pools were deep enough, three chunks per question that **no**
-retriever returned were sampled into the pool and judged blind alongside the rest.
-If those come back relevant, the pools were too shallow.
-
-They came back relevant more often than the 5% budgeted for, and how they split is
-the useful part:
-
-| Question type | Sampled unpooled chunks judged relevant |
-| --- | --- |
-| Facet — "what are the main findings?" | 14 / 90 = **15.6%** |
-| Paper-specific — "which datasets were used?" | 0 / 60 = **0%** |
-| Overall | 14 / 150 = 9.3% |
-
-This is not a pool-depth problem, and deepening the pools would not fix it. Those
-chunks were sampled from chunks *no retriever ranked at all*, whereas raising the
-depth to 20 reaches ranks 11-20 — a different population. The actual cause is that
-broad facet questions have diffuse relevance: "what are the main quantitative
-results?" is genuinely answered by dozens of chunks spread through a 157-chunk
-paper, while a precise question has two or three answers and the retrievers find
-them. So the pools were kept as they are and the metrics were chosen to suit them.
-
-### What the bias can and cannot touch
-
-Pool depth is 10 and every retriever contributed its top 10, so at any cutoff
-k <= 10 **every chunk appearing in a ranked list has a label**. No unjudged chunk can
-enter a result list and be silently scored as irrelevant. The numerator of every
-metric is therefore exact, and only denominators are exposed:
-
-| Metric | Exposure |
-| --- | --- |
-| MRR | None. Every ranked chunk is judged. |
-| nDCG@10 | Ideal DCG only, on the 24 of 30 facet questions whose ideal top 10 is not already filled with top-grade chunks — and identically for all four retrievers, since they share one ground truth. The absolute level is slightly optimistic; the comparison between retrievers is not. |
-| recall@5 | Directly. The size of the relevant set is exactly what the missed chunks corrupt. |
-
-recall@5 was the weakest metric here even before this: with a mean of 7.7 relevant
-chunks per facet question, five slots cannot hold them all, so it is capped at 71%
-on facet questions however good the retriever is — 92% on paper-specific ones,
-where the relevant sets are smaller.
-
-The ablation therefore leads with **MRR and nDCG@10**, and reports **recall@5 split
-by question type** rather than pooled into a single figure: clean on the
-paper-specific half, flagged on the facet half. `bpref` and `infAP`, estimators
-built for incomplete judgments, are the fully rigorous alternative and are not
-implemented here.
-
-### Keeping the guarantee true
-
-"Every ranked chunk is judged" holds only while the index matches the one the pools
-were built from. `evals/index/` is not committed, so `python -m evals.build_index`
-rebuilds it from the committed chunk file — identical text, no PDF downloads — and
-`--verify` replays all four retrievers over all fifty questions to confirm every
-retrieved chunk was judged, writing `evals/results/index_coverage.json`.
-
-Re-embedding the entire corpus from scratch and re-checking still holds, so the
-guarantee survives a clean clone. If drift ever breaks it, the check fails loudly
-instead of quietly lowering recall.
-
-<!-- eval:coverage -->
-Verified at pool depth 10: 2,000 retrieved chunks checked across 50 questions, 0 unjudged.
-<!-- /eval:coverage -->
-
-## Verification
+## Tests
 
 ```bash
 .venv/bin/python -m pytest
 ```
 
-The suite runs with **no network access and no API key**. An autouse fixture fails any
-outbound connection, so a missing fake surfaces as a test error rather than a silent
-real call, and two tests assert that guard still works. Chroma is deliberately *not*
-faked: it runs against a temporary directory with deterministic embeddings, so the
-graph tests exercise real chunking, indexing, per-paper retrieval, and citation
-validation. Only the calls that would leave the machine are stubbed.
+121 tests, no network access and no API key. An autouse fixture fails outbound
+connections. Chroma runs against a temporary directory with deterministic embeddings.
 
-What it covers:
-
-- **Graph terminal paths** — no candidates, none selected, full success, a partial run
-  where one branch fails while its siblings finish, and synthesis failing over to the
-  deterministic renderer.
-- **Determinism** — concurrency 1 and 3 must produce identical selection and identical
-  rendered Markdown, since reducers collect in completion order.
-- **Citation validation** — valid citations, hallucinated chunk IDs, chunks from the
-  wrong paper, paraphrases, and the PDF-hyphenation case that once discarded half of
-  every run's valid work.
-- **Persistence** — state survives a round trip through SQLite with structured claims
-  intact, and a finished thread is not re-executed.
-- **Retry classification** — transport errors, retryable and permanent status codes,
-  provider codes, and backoff growth with an injected clock.
-- **Eval guards** — the pool-coverage check that keeps the ablation honest must raise
-  when a retrieved chunk was never judged.
-
-Every number in this README is generated from `evals/results/*.json` by
-`python -m evals.render_tables --write`. Nothing is typed by hand.
+Coverage: graph terminal paths (no candidates, none selected, success, partial branch
+failure, synthesis fallback); concurrency 1 versus 3 producing identical output;
+citation validation against hallucinated chunk IDs, wrong-paper chunks, paraphrases,
+and PDF hyphenation; SQLite round trip and resume; retry classification and backoff;
+the eval pool-coverage guard.
 
 ## Limitations
 
-- arXiv is the only source; nothing outside it is searched.
-- Screening is capped by arXiv search, not by the screener. A category filter was
-  measured and rejected: the off-topic papers are cross-listed into the same
-  categories as the relevant ones. Searching deeper is the fix that works.
-- `--max-results` is divided across the planned queries, so the default of 30 leaves
-  each query about ten slots. Lowering it makes reviews thin, and the cause is
-  search depth rather than screening being too strict.
-- The retrieval ablation has 50 questions. That is enough to separate BM25 from
-  the rest and not enough to resolve differences of two or three points.
+- arXiv is the only source.
+- Candidate quality is bounded by arXiv search. A category filter was measured and
+  rejected; see [`DESIGN.md`](DESIGN.md#3-screening-and-search-quality).
+- `--max-results` is divided across the planned queries.
+- The retrieval ablation has 50 questions.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
-- Citation validation proves an excerpt exists on the cited page. It does not prove
-  the excerpt supports the claim built on it — hand-checking 12 citations of the
-  example confirmed 8 and rejected 4, against 94.3% machine-checked integrity.
+- Citation validation proves an excerpt exists on the cited page, not that it supports
+  the claim built on it.
 - arXiv results are not peer reviewed.
-- Runs cost model calls: one per candidate screened (30 by default), plus six per
-  selected paper. Screening reads abstracts only, so a rejected candidate costs one
-  short call and no download.
+- Runs cost one model call per candidate screened (30 by default) plus six per selected
+  paper.
