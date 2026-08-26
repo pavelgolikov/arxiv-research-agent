@@ -70,14 +70,14 @@ BERTScore”
 • DbrxForCausalLM
 • GptOssForCausalLM”
 - **Page:** [2511.14465v2 p. 7](https://arxiv.org/pdf/2511.14465v2#page=7)
-- **Grade (2 / 1 / 0):** `0`
+- **Grade (2 / 1 / 0):** `2`
 
 ### 44. `2511.09432v2:p3:c4` — experimental_setup
 
 - **Claim:** The study uses the Shapes synthetic dataset, as well as the GalaxyMNIST and MLL23 real-world datasets.
 - **Excerpt:** “Then we evaluate on a synthetic dataset with geometric shapes as well as real-world galaxy and cell images (samples in Figure 7 in the Appendix) using 3 types of base models with varying size and complexity: CNNs, MLPs, and Transformers.”
 - **Page:** [2511.09432v2 p. 3](https://arxiv.org/pdf/2511.09432v2#page=3)
-- **Grade (2 / 1 / 0):** `0`
+- **Grade (2 / 1 / 0):** `1`
 
 ### 45. `2604.24971v1:p9:c0` — limitations
 
@@ -107,14 +107,14 @@ BERTScore”
 - **Claim:** As mechanistic interpretability scales to larger models, tools that provide both correct implementation and interface usability are required for robust, reproducible research.
 - **Excerpt:** “Mechanistic interpretability research aims to reverse-engineer the computational mechanisms within neural networks [Elhage et al., 2021, Olah et al., 2020]. For transformer language models, this requires tools that can reliably access and modify internal representations across diverse architectures.”
 - **Page:** [2511.14465v2 p. 1](https://arxiv.org/pdf/2511.14465v2#page=1)
-- **Grade (2 / 1 / 0):** `0`
+- **Grade (2 / 1 / 0):** `1`
 
 ### 49. `2604.24971v1:p9:c1` — relevance_to_query
 
 - **Claim:** The PolyKV system uses a shared asymmetrically-compressed KV cache pool, writing a single compressed cache and distributing it to concurrent agents.
 - **Excerpt:** “PolyKV writes a single compressed cache (K at int8, V at TurboQuant MSE 3-bit) once and distributes it to N concurrent agents via direct DynamicCache injection, achieving a stable 2.91× memory reduction”
 - **Page:** [2604.24971v1 p. 9](https://arxiv.org/pdf/2604.24971v1#page=9)
-- **Grade (2 / 1 / 0):** `0`
+- **Grade (2 / 1 / 0):** `2`
 
 ### 50. `2511.09432v2:p1:c3` — research_problem
 
@@ -201,7 +201,7 @@ also in the prefill phase”
 - **Excerpt:** “nnterp also provides model.{layers/mlps/attentions}_input/output[layer_idx] which
 allow to get and set the input and output of the specified layer.”
 - **Page:** [2511.14465v2 p. 3](https://arxiv.org/pdf/2511.14465v2#page=3)
-- **Grade (2 / 1 / 0):** `0`
+- **Grade (2 / 1 / 0):** `2`
 
 ### 62. `2409.13714v1:p4:c0` — main_findings
 
@@ -243,7 +243,7 @@ allow to get and set the input and output of the specified layer.”
 - **Claim:** PolyKV utilizes asymmetric compression, specifically using q8_0 for Keys and FWHT combined with Lloyd-Max 3-bit quantization for Values.
 - **Excerpt:** “Asymmetric TurboQuant MSE compression in a shared pool. q8_0 for Keys and FWHT+Lloyd-Max 3-bit for Values, achieving 2.91× compression”
 - **Page:** [2604.24971v1 p. 2](https://arxiv.org/pdf/2604.24971v1#page=2)
-- **Grade (2 / 1 / 0):** `0`
+- **Grade (2 / 1 / 0):** `2`
 
 ### 68. `2504.09936v2:p1:c4` — research_problem
 

@@ -9,10 +9,27 @@
     "note": "published rates cover this sample only, not the judge set"
   },
   "judge_set": {
-    "size": 0,
-    "by_pair": {},
-    "scored_labels": 40,
-    "unsupported_available": 0
+    "size": 30,
+    "by_pair": {
+      "mismatched": {
+        "n": 20,
+        "counts": {
+          "2": 0,
+          "1": 5,
+          "0": 15
+        }
+      },
+      "real": {
+        "n": 10,
+        "counts": {
+          "2": 7,
+          "1": 3,
+          "0": 0
+        }
+      }
+    },
+    "scored_labels": 70,
+    "unsupported_available": 15
   },
   "counts": {
     "2": 31,
@@ -461,6 +478,306 @@
       "excerpt": "However, these large models meet up with a substantial challenge of immense GPU memory usage in the inference, due to the model and computational complexity. This hinders deploying LLMs at scale to meet the thousands of demands for chatting with chatbots.",
       "grade": 2,
       "pair": "real"
+    },
+    {
+      "item": 41,
+      "set": "judge",
+      "chunk_id": "2604.24971v1:p5:c1",
+      "facet": "experimental_setup",
+      "claim": "Memory savings increase with the number of agents, reaching 88.5% at 3 agents and 97.7% at 15 agents.",
+      "excerpt": "Test 5\nLlama-3-8B\n1,837\n3\nWikiText-2 2K\nBERTScore\nTest 6\nLlama-3-8B\n1,837\n5\nWikiText-2 2K\nBERTScore\nTest 7\nLlama-3-8B\n1,837\n10\nWikiText-2 2K\nBERTScore\nTest 8\nLlama-3-8B\n7,194\n10\nWikiText-2 4K\nBERTScore\nTest 9\nLlama-3-8B\n7,194\n15\nWikiText-2 4K\nBERTScore",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 42,
+      "set": "judge",
+      "chunk_id": "2607.17715v1:p8:c4",
+      "facet": "main_findings",
+      "claim": "C2KV consistently maintains performance on large models like Qwen3-14B while enabling substantial KV compression.",
+      "excerpt": "The results show that C2KV consistently maintains strong performance across all tasks while enabling substantial KV compression.",
+      "grade": 1,
+      "pair": "real"
+    },
+    {
+      "item": 43,
+      "set": "judge",
+      "chunk_id": "2511.14465v2:p7:c1",
+      "facet": "limitations",
+      "claim": "Support for attention probabilities for certain model classes like DbrxForCausalLM and GptOssForCausalLM is currently a work in progress.",
+      "excerpt": "Support for attention probabilities is still a work in progress for the following model classes:\n• DbrxForCausalLM\n• GptOssForCausalLM",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 44,
+      "set": "judge",
+      "chunk_id": "2511.09432v2:p3:c4",
+      "facet": "experimental_setup",
+      "claim": "The study uses the Shapes synthetic dataset, as well as the GalaxyMNIST and MLL23 real-world datasets.",
+      "excerpt": "Then we evaluate on a synthetic dataset with geometric shapes as well as real-world galaxy and cell images (samples in Figure 7 in the Appendix) using 3 types of base models with varying size and complexity: CNNs, MLPs, and Transformers.",
+      "grade": 1,
+      "pair": "mismatched"
+    },
+    {
+      "item": 45,
+      "set": "judge",
+      "chunk_id": "2604.24971v1:p9:c0",
+      "facet": "limitations",
+      "claim": "The prefill attention computation on Kaggle T4x2 hardware is limited by an out-of-memory error for Llama-3-8B when context lengths exceed approximately 8,000 tokens.",
+      "excerpt": "On Kaggle T4×2 hardware, the prefill attention computation OOMs beyond ≈8,000 tokens for Llama-3-8B. This is a hardware constraint, not a PolyKV limitation",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 46,
+      "set": "judge",
+      "chunk_id": "2511.14465v2:p7:c1",
+      "facet": "limitations",
+      "claim": "Researchers use interpretability methods such as the logit lens, patchscopes, and activation steering to analyze transformer internals.",
+      "excerpt": "Support for attention probabilities is still a work in progress for the following model classes:\n• DbrxForCausalLM\n• GptOssForCausalLM",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 47,
+      "set": "judge",
+      "chunk_id": "2511.09432v2:p1:c0",
+      "facet": "relevance_to_query",
+      "claim": "Experiments were conducted on a single NVIDIA RTX 3090 GPU with 24GB of memory.",
+      "excerpt": "In particular, their activations entangle many concepts into fewer dimensions, a phenomenon known as superposition. Mechanistic interpretability methods such as sparse autoencoders (SAEs) can disentangle these dense activations into sparse sums of interpretable features",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 48,
+      "set": "judge",
+      "chunk_id": "2511.14465v2:p1:c1",
+      "facet": "relevance_to_query",
+      "claim": "As mechanistic interpretability scales to larger models, tools that provide both correct implementation and interface usability are required for robust, reproducible research.",
+      "excerpt": "Mechanistic interpretability research aims to reverse-engineer the computational mechanisms within neural networks [Elhage et al., 2021, Olah et al., 2020]. For transformer language models, this requires tools that can reliably access and modify internal representations across diverse architectures.",
+      "grade": 1,
+      "pair": "mismatched"
+    },
+    {
+      "item": 49,
+      "set": "judge",
+      "chunk_id": "2604.24971v1:p9:c1",
+      "facet": "relevance_to_query",
+      "claim": "The PolyKV system uses a shared asymmetrically-compressed KV cache pool, writing a single compressed cache and distributing it to concurrent agents.",
+      "excerpt": "PolyKV writes a single compressed cache (K at int8, V at TurboQuant MSE 3-bit) once and distributes it to N concurrent agents via direct DynamicCache injection, achieving a stable 2.91× memory reduction",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 50,
+      "set": "judge",
+      "chunk_id": "2511.09432v2:p1:c3",
+      "facet": "research_problem",
+      "claim": "The study uses the Shapes synthetic dataset, as well as the GalaxyMNIST and MLL23 real-world datasets.",
+      "excerpt": "In this paper, our main research question is: How should mechanistic interpretability methods such as SAEs account for symmetries, and what benefits does doing so provide?",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 51,
+      "set": "judge",
+      "chunk_id": "2402.03855v2:p1:c1",
+      "facet": "relevance_to_query",
+      "claim": "Directly unembedding the dishonesty direction results in a probability distribution with arbitrary top-k tokens, indicating that these representations are not naively used by the model.",
+      "excerpt": "Tools such as saliency maps (Simonyan et al., 2013), the logit lens (nostalgebraist, 2020), and activation and path patching (Wang et al., 2022) have helped us understand how simple functions and capabilities are implemented inside neural network models.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 52,
+      "set": "judge",
+      "chunk_id": "2504.09936v2:p6:c3",
+      "facet": "main_findings",
+      "claim": "Merging-based strategies reduce memory usage by combining KV pairs.",
+      "excerpt": "Nonetheless, KeepKV achieves higher throughput than the state-of-the-art (SOTA) merging-based algorithm, D2O (Wan et al. 2024b).",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 53,
+      "set": "judge",
+      "chunk_id": "2607.17715v1:p2:c4",
+      "facet": "method",
+      "claim": "The C2KV framework utilizes a position-agnostic, Composable and Compressed KV cache manifold to allow KV segments to be used at arbitrary positions within long-context prompts.",
+      "excerpt": "Unlike prior methods that directly compress or cache the original KV states, which are inherently context-dependent, C2KV constructs a Composable and Compressed KV cache manifold. This manifold is specifically designed to be position-agnostic",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 54,
+      "set": "judge",
+      "chunk_id": "2607.17715v1:p12:c4",
+      "facet": "limitations",
+      "claim": "Eviction strategies like SnapKV and RocketKV reduce KV cache size by identifying and keeping tokens based on attention scores or importance.",
+      "excerpt": "First, C2KV focuses on document-level reuse and assumes that reusable content can be identified and extracted offline. Extending the extractor to support online or incremental KV extraction is an important direction.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 55,
+      "set": "judge",
+      "chunk_id": "2511.14465v2:p2:c2",
+      "facet": "research_problem",
+      "claim": "Future work includes adding support for non-causal and encoder-decoder architectures, as well as automated architecture detection.",
+      "excerpt": "This fragmentation creates significant friction. Researchers must either commit to a single tool’s limitations or maintain parallel codebases for different architectures.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 56,
+      "set": "judge",
+      "chunk_id": "2511.09432v2:p1:c0",
+      "facet": "relevance_to_query",
+      "claim": "Mechanistic interpretability methods are used to disentangle activations that have compressed many concepts into fewer dimensions, a phenomenon called superposition.",
+      "excerpt": "In particular, their activations entangle many concepts into fewer dimensions, a phenomenon known as superposition. Mechanistic interpretability methods such as sparse autoencoders (SAEs) can disentangle these dense activations into sparse sums of interpretable features",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 57,
+      "set": "judge",
+      "chunk_id": "2405.12532v2:p5:c3",
+      "facet": "relevance_to_query",
+      "claim": "PyramidInfer can reduce GPU memory usage in the KV cache by over 54%.",
+      "excerpt": "PyramidInfer can not only\nreduce the KV cache in the generation phase but\nalso in the prefill phase",
+      "grade": 1,
+      "pair": "mismatched"
+    },
+    {
+      "item": 58,
+      "set": "judge",
+      "chunk_id": "2409.13714v1:p1:c0",
+      "facet": "research_problem",
+      "claim": "The authors introduce TracrBench, an approach for generating interpretability testbeds by using large language models to generate RASP programs.",
+      "excerpt": "Moreover, the lack of ground truth mappings between model weights and their functional roles hinders the effective evaluation of interpretability methods, impeding overall progress.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 59,
+      "set": "judge",
+      "chunk_id": "2402.03855v2:p1:c0",
+      "facet": "relevance_to_query",
+      "claim": "The researchers investigated honesty by calculating the first principal component of the difference of activation vectors across layers for a given dataset.",
+      "excerpt": "Mechanistic interpretability (MI) aims to understand AI models by reverse-engineering the exact algorithms neural networks learn.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 60,
+      "set": "judge",
+      "chunk_id": "2402.03855v2:p5:c3",
+      "facet": "main_findings",
+      "claim": "The hypothesis that continual dishonesty injections are unnecessary for open-ended dishonesty generation is disproven, as shown by comparing output log probabilities with and without injection.",
+      "excerpt": "We test this by comparing the models’ output log probabilities at every token position both with and without the injection. Fig. 4 disproves the hypothesis and shows",
+      "grade": 1,
+      "pair": "real"
+    },
+    {
+      "item": 61,
+      "set": "judge",
+      "chunk_id": "2511.14465v2:p3:c2",
+      "facet": "method",
+      "claim": "The library provides accessor methods for internal activations that allow researchers to get and set inputs and outputs for layers, MLPs, and attention modules.",
+      "excerpt": "nnterp also provides model.{layers/mlps/attentions}_input/output[layer_idx] which\nallow to get and set the input and output of the specified layer.",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 62,
+      "set": "judge",
+      "chunk_id": "2409.13714v1:p4:c0",
+      "facet": "main_findings",
+      "claim": "Mechanistic interpretability aims to achieve an understanding of transformer-based models, though this is difficult due to their high number of parameters and the lack of ground truth mappings between model weights and functional roles.",
+      "excerpt": "In comparison, when generating Python programs for the target algorithms, gpt-4-turbo achieves a pass rate of 96%.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 63,
+      "set": "judge",
+      "chunk_id": "2405.12532v2:p2:c2",
+      "facet": "research_problem",
+      "claim": "PyramidInfer reduces KV cache memory usage by layer-wise selecting and retaining crucial context.",
+      "excerpt": "We call this Inference Context Redundancy (ICR) hypothesis. It inspires us to compress the KV cache by only computing the keys and values that record the context information.",
+      "grade": 1,
+      "pair": "mismatched"
+    },
+    {
+      "item": 64,
+      "set": "judge",
+      "chunk_id": "2402.03855v2:p9:c2",
+      "facet": "experimental_setup",
+      "claim": "To evaluate feature representations, the authors utilize the method established by Marks & Tegmark (2023) to compute linear directions for truthfulness.",
+      "excerpt": "We would also like to thank Neel Nanda and Joseph Bloom for building and maintaining the TransformerLens (Nanda & Bloom, 2022) library that was used for several experiments in this work.",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 65,
+      "set": "judge",
+      "chunk_id": "2511.14465v2:p4:c3",
+      "facet": "research_problem",
+      "claim": "Mechanistic interpretability research faces a tradeoff where custom implementations provide consistent interfaces but risk numerical mismatch, while direct access methods lack standardization across architectures.",
+      "excerpt": "As mechanistic interpretability scales to larger models and broader architectural diversity, tools that balance correctness with usability become essential. nnterp represents a step toward more robust and reproducible interpretability research.",
+      "grade": 1,
+      "pair": "mismatched"
+    },
+    {
+      "item": 66,
+      "set": "judge",
+      "chunk_id": "2402.03855v2:p1:c1",
+      "facet": "relevance_to_query",
+      "claim": "The TransformerLens library was utilized to perform several experiments in the study.",
+      "excerpt": "Elhage et al. (2021) discovered specialized attention heads called “induction heads” that are found to play an important role in the emergence of in-context learning in language models",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 67,
+      "set": "judge",
+      "chunk_id": "2604.24971v1:p2:c0",
+      "facet": "method",
+      "claim": "PolyKV utilizes asymmetric compression, specifically using q8_0 for Keys and FWHT combined with Lloyd-Max 3-bit quantization for Values.",
+      "excerpt": "Asymmetric TurboQuant MSE compression in a shared pool. q8_0 for Keys and FWHT+Lloyd-Max 3-bit for Values, achieving 2.91× compression",
+      "grade": 2,
+      "pair": "real"
+    },
+    {
+      "item": 68,
+      "set": "judge",
+      "chunk_id": "2504.09936v2:p1:c4",
+      "facet": "research_problem",
+      "claim": "Existing KV cache merging methods lack solid theoretical foundations and inevitably lead to output perturbation, also known as 'Attention Sag'.",
+      "excerpt": "Nevertheless, these methods vary widely in merge candidate selection and merging weight computation, and lack solid theoretical foundations. We observe that existing strategies inevitably induce attention inconsistencies and output perturbation.",
+      "grade": 1,
+      "pair": "real"
+    },
+    {
+      "item": 69,
+      "set": "judge",
+      "chunk_id": "2607.17715v1:p3:c5",
+      "facet": "research_problem",
+      "claim": "Evaluation is conducted on LongBench datasets including HotpotQA, 2WikiMQA, MuSiQue, MultiNews, SAMSum, QMSum, and GovReport.",
+      "excerpt": "As illustrated in Figure 3, existing reuse methods reduce prefill cost by loading cached KVs from memory, but still do not address this storage pressure",
+      "grade": 0,
+      "pair": "mismatched"
+    },
+    {
+      "item": 70,
+      "set": "judge",
+      "chunk_id": "2607.17715v1:p2:c4",
+      "facet": "method",
+      "claim": "C2KV improves both request startup latency and steady-state generation efficiency.",
+      "excerpt": "Unlike prior methods that directly compress or cache the original KV states, which are inherently context-dependent, C2KV constructs a Composable and Compressed KV cache manifold. This manifold is specifically designed to be position-agnostic",
+      "grade": 0,
+      "pair": "mismatched"
     }
   ]
 }

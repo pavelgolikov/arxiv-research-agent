@@ -291,19 +291,14 @@ Rates count citations and claims surviving validation out of those the model pro
 
 ### Claim support
 
-A citation can be word-for-word correct and still prove nothing. The example run has
-one that quotes the paper's own title to support a claim about what its authors propose:
-right paper, right page, quoted exactly — and it restates the claim instead of
-evidencing it. All three checks above pass it. It took a person reading the page to
-notice.
+Validation runs in two layers: three exact checks prove the quote exists where it says
+it does, then a model grades whether that quote actually supports the claim, and the
+failures are discarded.
 
-That is what the fourth check is for, and it is a model marking another model's
-homework, so the question is how well it marks. The answer comes from citations a person
-graded by hand.
-
-Start with 40 of the 165 citations above, picked at random and read one by one against
-their claims. They were graded before the support check existed, so nothing the judge
-does could have shaped them.
+How well that model grades is measured against citations a person graded by hand — 40 of
+the 165 above, picked at random and read one by one against their claims. They were
+graded before the support check existed, so nothing the judge does could have shaped
+them.
 
 <!-- eval:claim_support -->
 | Measure | Rate | 95% CI |
@@ -340,11 +335,16 @@ the page it names. It just belongs to a different sentence.
 
 The 20 swaps sit shuffled among the 10 real ones with nothing marking which is which,
 and they are read and graded like everything else rather than written down as `0` by
-assumption. Assuming would be wrong often enough to matter: a quote pulled from
-elsewhere in the same paper sometimes supports the claim anyway, and scoring the judge
-for "missing" one would penalize it for being right.
+assumption. That assumption would have been wrong on **5 of the 20**: a quote pulled
+from elsewhere in the same paper still supported part of the claim it landed on. Scoring
+those as failures would have marked the judge wrong for keeping them.
 
 <!-- eval:claim_judge -->
+| Measure | Rate | 95% CI |
+| --- | --- | --- |
+| Rejects a citation a reader also rejected (catch rate) | **100.0%** (15 of 15) | [80%, 100%] |
+| Rejects a citation a reader kept (false-drop rate) | **3.6%** (2 of 55) | [1%, 12%] |
+| Exact grade agreement | **87.1%** (61 of 70) | [77%, 93%] |
 <!-- /eval:claim_judge -->
 
 Two numbers come out of this, and they measure opposite mistakes:
@@ -355,8 +355,16 @@ Two numbers come out of this, and they measure opposite mistakes:
   This is what it costs, in correct work deleted from the report.
 
 A judge that rejects everything scores a perfect catch rate, so neither number means
-anything without the other. The 77.5% and 100% figures above come from the random 40
-alone, so the 20 deliberately broken citations cannot drag them down.
+anything without the other.
+
+Both false drops landed on swapped citations that turned out to support their new claim
+anyway — two of those five ambiguous items. Against the 50 citations the pipeline
+actually produced, it dropped none: **0 of 50**. The pooled 3.6% is the figure to quote,
+since those five are real disagreements about genuinely borderline quotes, but the two
+error types are not spread evenly and the real citations are what a report is built from.
+
+The 77.5% and 100% figures further up come from the random 40 alone, so the 20
+deliberately broken citations cannot drag them down.
 
 `evals/labels/claim_support_labels.json` carries each grade with its claim and excerpt.
 Regenerate the sheets with `python -m evals.build.claim_support` and

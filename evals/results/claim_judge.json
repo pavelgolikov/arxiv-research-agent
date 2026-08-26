@@ -1,0 +1,811 @@
+{
+  "config": {
+    "labels": "evals/labels/claim_support_labels.json",
+    "threshold": 1,
+    "batching": "one citation per call; production grades a facet per call",
+    "note": "Negatives are citations whose excerpt was swapped for another quote from the same paper, then hand-graded rather than assumed to be 0."
+  },
+  "scored": 70,
+  "unsupported_labels": 15,
+  "unjudged": 0,
+  "exact_agreement": {
+    "n": 61,
+    "of": 70,
+    "rate": 0.8714285714285714,
+    "ci": [
+      0.7733503128681549,
+      0.9308597800875773
+    ]
+  },
+  "shipped": {
+    "threshold": 1,
+    "false_drop": {
+      "n": 2,
+      "of": 55,
+      "rate": 0.03636363636363636,
+      "ci": [
+        0.010029330855724924,
+        0.1232369297490173
+      ]
+    },
+    "catch": {
+      "n": 15,
+      "of": 15,
+      "rate": 1.0,
+      "ci": [
+        0.7961107336956521,
+        1.0
+      ]
+    },
+    "keep_agreement": {
+      "n": 68,
+      "of": 70,
+      "rate": 0.9714285714285714,
+      "ci": [
+        0.9016755648760818,
+        0.9921295531061937
+      ]
+    }
+  },
+  "strict": {
+    "threshold": 2,
+    "false_drop": {
+      "n": 10,
+      "of": 55,
+      "rate": 0.18181818181818182,
+      "ci": [
+        0.10187561448030712,
+        0.3033071133856924
+      ]
+    },
+    "catch": {
+      "n": 15,
+      "of": 15,
+      "rate": 1.0,
+      "ci": [
+        0.7961107336956521,
+        1.0
+      ]
+    },
+    "keep_agreement": {
+      "n": 63,
+      "of": 70,
+      "rate": 0.9,
+      "ci": [
+        0.8076687752123195,
+        0.9507113248938537
+      ]
+    }
+  },
+  "by_pair": {
+    "mismatched": {
+      "threshold": 1,
+      "false_drop": {
+        "n": 2,
+        "of": 5,
+        "rate": 0.4,
+        "ci": [
+          0.1176182311592533,
+          0.769280067791163
+        ]
+      },
+      "catch": {
+        "n": 15,
+        "of": 15,
+        "rate": 1.0,
+        "ci": [
+          0.7961107336956521,
+          1.0
+        ]
+      },
+      "keep_agreement": {
+        "n": 18,
+        "of": 20,
+        "rate": 0.9,
+        "ci": [
+          0.6989617935882066,
+          0.9721341060158468
+        ]
+      }
+    },
+    "real": {
+      "threshold": 1,
+      "false_drop": {
+        "n": 0,
+        "of": 50,
+        "rate": 0.0,
+        "ci": [
+          0.0,
+          0.07135003417431873
+        ]
+      },
+      "catch": {
+        "n": 0,
+        "of": 0,
+        "rate": null,
+        "ci": null
+      },
+      "keep_agreement": {
+        "n": 50,
+        "of": 50,
+        "rate": 1.0,
+        "ci": [
+          0.9286499658256813,
+          1.0
+        ]
+      }
+    }
+  },
+  "confusion": {
+    "2": {
+      "2": 38,
+      "1": 0,
+      "0": 0,
+      "unjudged": 0
+    },
+    "1": {
+      "2": 7,
+      "1": 8,
+      "0": 2,
+      "unjudged": 0
+    },
+    "0": {
+      "2": 0,
+      "1": 0,
+      "0": 15,
+      "unjudged": 0
+    }
+  },
+  "disagreements": [
+    {
+      "item": 57,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 1,
+      "judge": 0,
+      "claim": "PyramidInfer can reduce GPU memory usage in the KV cache by over 54%."
+    },
+    {
+      "item": 65,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 1,
+      "judge": 0,
+      "claim": "Mechanistic interpretability research faces a tradeoff where custom implementations provide consistent interfaces but risk numerical mismatch, while direct access methods lack standardization across architectures."
+    }
+  ],
+  "items": [
+    {
+      "item": 1,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 1,
+      "claim": "The library supports and has been tested with various specific model classes, including GPT-2, LLaMA, Gemma, Bloom, and Mistral."
+    },
+    {
+      "item": 2,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "The library is incompatible with certain attention implementations, such as Flash Attention for attention probabilities."
+    },
+    {
+      "item": 3,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "The authors propose nnterp, a library that enables mechanistic interpretability by providing a standardized interface for transformer models."
+    },
+    {
+      "item": 4,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "nnterp includes built-in implementations of common interpretability methods, including logit lens, patchscope, and activation steering."
+    },
+    {
+      "item": 5,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "relevance_to_query",
+      "human": 2,
+      "judge": 2,
+      "claim": "Early approaches to mechanistic interpretability utilized manual PyTorch hooks to intercept model activations."
+    },
+    {
+      "item": 6,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 2,
+      "judge": 2,
+      "claim": "The existing fragmentation in interpretability tooling creates friction, forcing researchers to choose between limited toolsets or maintaining multiple codebases for different architectures."
+    },
+    {
+      "item": 7,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "Current mechanistic interpretability methods may not scale to handle more complex capabilities and vulnerabilities."
+    },
+    {
+      "item": 8,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "Token-aligned evaluation and interpretability methods are limited by potential false positives in nuanced or dishonest scenarios."
+    },
+    {
+      "item": 9,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "Existing mechanistic interpretability tools are insufficient for answering significant questions regarding model representations, indicating a need for new research frameworks."
+    },
+    {
+      "item": 10,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 1,
+      "judge": 2,
+      "claim": "The paper argues that studying feature and behavior representations is essential for understanding and controlling AI models."
+    },
+    {
+      "item": 11,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 2,
+      "judge": 2,
+      "claim": "Existing methods for finding linear representations fail to explain how models work and do not provide verifiable interpretations."
+    },
+    {
+      "item": 12,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 2,
+      "judge": 2,
+      "claim": "The models evaluated consist of CNNs, MLPs, and Transformers."
+    },
+    {
+      "item": 13,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "Approaches that discover symmetries from data often struggle with scalability."
+    },
+    {
+      "item": 14,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "Equivariant SAEs outperform baseline SAEs in feature recovery and detection tasks, particularly as interference increases."
+    },
+    {
+      "item": 15,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "Equivariant SAEs achieve better performance on feature recovery and detection tasks while using fewer parameters than baseline SAEs and the group crosscoder."
+    },
+    {
+      "item": 16,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "Equivariant SAEs remain accurate in feature recovery and detection when using randomly chosen canonical representatives, though performance slightly decreases."
+    },
+    {
+      "item": 17,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 2,
+      "judge": 2,
+      "claim": "Accounting for symmetries is difficult for vanilla SAEs because they must disentangle both the feature and the transformation from the model's activations."
+    },
+    {
+      "item": 18,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "The evaluation of novel interpretability methods is difficult."
+    },
+    {
+      "item": 19,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 1,
+      "judge": 2,
+      "claim": "For RASP programs, GPT-4o performed best on the difficulty-weighted score metric with a score of 0.31, while GPT-4-turbo achieved 0.29."
+    },
+    {
+      "item": 20,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "Claude-3-5-sonnet achieved a pass rate of 0.45 and a difficulty-weighted score of 0.27."
+    },
+    {
+      "item": 21,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "The proposed method involves compiling RASP programs, which are generated by LLMs, into functional transformer weights to create models with known ground truth mappings."
+    },
+    {
+      "item": 22,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "relevance_to_query",
+      "human": 2,
+      "judge": 2,
+      "claim": "The RASP programming language is used to model and analyze transformer behavior by mapping core components like attention and feed-forward computation into simple primitives."
+    },
+    {
+      "item": 23,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 2,
+      "judge": 2,
+      "claim": "Interpretability research is hindered by a lack of models with fully understood internals, specifically ground truth mappings between weights and functional roles."
+    },
+    {
+      "item": 24,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 2,
+      "judge": 2,
+      "claim": "The models used are SmolLM2-1.7B-Instruct for proof-of-concept and Llama-3-8B-Instruct for primary validation."
+    },
+    {
+      "item": 25,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 1,
+      "claim": "Datasets used for evaluation include custom documents (Apollo 11 mission, ARPANET/Internet topology history), WikiText-2 2K, and WikiText-2 4K."
+    },
+    {
+      "item": 26,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "The observed perplexity findings require further controlled ablation to confirm them causally."
+    },
+    {
+      "item": 27,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "The PolyKV compression achieves a 2.91× compression ratio that remains consistent across different model architectures like SmolLM2-1.7B and Llama-3-8B."
+    },
+    {
+      "item": 28,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "The authors propose PolyKV, a shared, asymmetrically-compressed KV cache pool designed for multi-agent LLM inference."
+    },
+    {
+      "item": 29,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "The core component of the C2KV framework is the C2Extractor, which is described as a lightweight sidecar module."
+    },
+    {
+      "item": 30,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "relevance_to_query",
+      "human": 2,
+      "judge": 2,
+      "claim": "Merging and low-rank approaches like MiniCache and ReCalKV reduce memory usage by consolidating redundant KV states across attention heads or layers."
+    },
+    {
+      "item": 31,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 1,
+      "claim": "The evaluation uses Llama-2, Llama-3, and Mistral as base models, comparing them against cache eviction methods like Streaming, H2O, and PyramidInfer, and cache merging methods like CaM and D2O."
+    },
+    {
+      "item": 32,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 2,
+      "claim": "The experimental setup involves no model training and uses a merging threshold of 0.8, with token selection and cache allocation following the strategy from PyramidInfer."
+    },
+    {
+      "item": 33,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 1,
+      "judge": 1,
+      "claim": "KeepKV outperforms existing state-of-the-art KV-cache merging methods like D2O in throughput and methods like CaM and D2O in accuracy."
+    },
+    {
+      "item": 34,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 2,
+      "judge": 2,
+      "claim": "Prior research on KV cache merging lacks systematic theoretical foundations for selecting merging candidates and assigning merging weights."
+    },
+    {
+      "item": 35,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 1,
+      "claim": "The study evaluates performance using the LLaMA 2-13B and 70B models on tasks including GSM8K, MMLU, and the LEval benchmark for long context capabilities."
+    },
+    {
+      "item": 36,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 1,
+      "claim": "Baselines used for efficiency and performance comparisons include full cache methods like Accelerate and DeepSpeed, the H2O KV cache compression method, and a \"local\" strategy."
+    },
+    {
+      "item": 37,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "PyramidInfer achieves a 2.2x improvement in throughput compared to Accelerate."
+    },
+    {
+      "item": 38,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 2,
+      "judge": 2,
+      "claim": "The number of influential keys and values decreases as layers progress."
+    },
+    {
+      "item": 39,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "relevance_to_query",
+      "human": 2,
+      "judge": 2,
+      "claim": "PyramidInfer can compress the KV cache in both the prefill and generation phases."
+    },
+    {
+      "item": 40,
+      "set": "uniform",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 2,
+      "judge": 2,
+      "claim": "Large language models face a significant challenge due to the immense GPU memory usage required for inference, which hinders their deployment at scale."
+    },
+    {
+      "item": 41,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "experimental_setup",
+      "human": 0,
+      "judge": 0,
+      "claim": "Memory savings increase with the number of agents, reaching 88.5% at 3 agents and 97.7% at 15 agents."
+    },
+    {
+      "item": 42,
+      "set": "judge",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 1,
+      "judge": 2,
+      "claim": "C2KV consistently maintains performance on large models like Qwen3-14B while enabling substantial KV compression."
+    },
+    {
+      "item": 43,
+      "set": "judge",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "Support for attention probabilities for certain model classes like DbrxForCausalLM and GptOssForCausalLM is currently a work in progress."
+    },
+    {
+      "item": 44,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "experimental_setup",
+      "human": 1,
+      "judge": 2,
+      "claim": "The study uses the Shapes synthetic dataset, as well as the GalaxyMNIST and MLL23 real-world datasets."
+    },
+    {
+      "item": 45,
+      "set": "judge",
+      "pair": "real",
+      "facet": "limitations",
+      "human": 2,
+      "judge": 2,
+      "claim": "The prefill attention computation on Kaggle T4x2 hardware is limited by an out-of-memory error for Llama-3-8B when context lengths exceed approximately 8,000 tokens."
+    },
+    {
+      "item": 46,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "limitations",
+      "human": 0,
+      "judge": 0,
+      "claim": "Researchers use interpretability methods such as the logit lens, patchscopes, and activation steering to analyze transformer internals."
+    },
+    {
+      "item": 47,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 0,
+      "judge": 0,
+      "claim": "Experiments were conducted on a single NVIDIA RTX 3090 GPU with 24GB of memory."
+    },
+    {
+      "item": 48,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 1,
+      "judge": 1,
+      "claim": "As mechanistic interpretability scales to larger models, tools that provide both correct implementation and interface usability are required for robust, reproducible research."
+    },
+    {
+      "item": 49,
+      "set": "judge",
+      "pair": "real",
+      "facet": "relevance_to_query",
+      "human": 2,
+      "judge": 2,
+      "claim": "The PolyKV system uses a shared asymmetrically-compressed KV cache pool, writing a single compressed cache and distributing it to concurrent agents."
+    },
+    {
+      "item": 50,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 0,
+      "judge": 0,
+      "claim": "The study uses the Shapes synthetic dataset, as well as the GalaxyMNIST and MLL23 real-world datasets."
+    },
+    {
+      "item": 51,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 0,
+      "judge": 0,
+      "claim": "Directly unembedding the dishonesty direction results in a probability distribution with arbitrary top-k tokens, indicating that these representations are not naively used by the model."
+    },
+    {
+      "item": 52,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "main_findings",
+      "human": 0,
+      "judge": 0,
+      "claim": "Merging-based strategies reduce memory usage by combining KV pairs."
+    },
+    {
+      "item": 53,
+      "set": "judge",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "The C2KV framework utilizes a position-agnostic, Composable and Compressed KV cache manifold to allow KV segments to be used at arbitrary positions within long-context prompts."
+    },
+    {
+      "item": 54,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "limitations",
+      "human": 0,
+      "judge": 0,
+      "claim": "Eviction strategies like SnapKV and RocketKV reduce KV cache size by identifying and keeping tokens based on attention scores or importance."
+    },
+    {
+      "item": 55,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 0,
+      "judge": 0,
+      "claim": "Future work includes adding support for non-causal and encoder-decoder architectures, as well as automated architecture detection."
+    },
+    {
+      "item": 56,
+      "set": "judge",
+      "pair": "real",
+      "facet": "relevance_to_query",
+      "human": 2,
+      "judge": 2,
+      "claim": "Mechanistic interpretability methods are used to disentangle activations that have compressed many concepts into fewer dimensions, a phenomenon called superposition."
+    },
+    {
+      "item": 57,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 1,
+      "judge": 0,
+      "claim": "PyramidInfer can reduce GPU memory usage in the KV cache by over 54%."
+    },
+    {
+      "item": 58,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 0,
+      "judge": 0,
+      "claim": "The authors introduce TracrBench, an approach for generating interpretability testbeds by using large language models to generate RASP programs."
+    },
+    {
+      "item": 59,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 0,
+      "judge": 0,
+      "claim": "The researchers investigated honesty by calculating the first principal component of the difference of activation vectors across layers for a given dataset."
+    },
+    {
+      "item": 60,
+      "set": "judge",
+      "pair": "real",
+      "facet": "main_findings",
+      "human": 1,
+      "judge": 2,
+      "claim": "The hypothesis that continual dishonesty injections are unnecessary for open-ended dishonesty generation is disproven, as shown by comparing output log probabilities with and without injection."
+    },
+    {
+      "item": 61,
+      "set": "judge",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "The library provides accessor methods for internal activations that allow researchers to get and set inputs and outputs for layers, MLPs, and attention modules."
+    },
+    {
+      "item": 62,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "main_findings",
+      "human": 0,
+      "judge": 0,
+      "claim": "Mechanistic interpretability aims to achieve an understanding of transformer-based models, though this is difficult due to their high number of parameters and the lack of ground truth mappings between model weights and functional roles."
+    },
+    {
+      "item": 63,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 1,
+      "judge": 1,
+      "claim": "PyramidInfer reduces KV cache memory usage by layer-wise selecting and retaining crucial context."
+    },
+    {
+      "item": 64,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "experimental_setup",
+      "human": 0,
+      "judge": 0,
+      "claim": "To evaluate feature representations, the authors utilize the method established by Marks & Tegmark (2023) to compute linear directions for truthfulness."
+    },
+    {
+      "item": 65,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 1,
+      "judge": 0,
+      "claim": "Mechanistic interpretability research faces a tradeoff where custom implementations provide consistent interfaces but risk numerical mismatch, while direct access methods lack standardization across architectures."
+    },
+    {
+      "item": 66,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "relevance_to_query",
+      "human": 0,
+      "judge": 0,
+      "claim": "The TransformerLens library was utilized to perform several experiments in the study."
+    },
+    {
+      "item": 67,
+      "set": "judge",
+      "pair": "real",
+      "facet": "method",
+      "human": 2,
+      "judge": 2,
+      "claim": "PolyKV utilizes asymmetric compression, specifically using q8_0 for Keys and FWHT combined with Lloyd-Max 3-bit quantization for Values."
+    },
+    {
+      "item": 68,
+      "set": "judge",
+      "pair": "real",
+      "facet": "research_problem",
+      "human": 1,
+      "judge": 2,
+      "claim": "Existing KV cache merging methods lack solid theoretical foundations and inevitably lead to output perturbation, also known as 'Attention Sag'."
+    },
+    {
+      "item": 69,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "research_problem",
+      "human": 0,
+      "judge": 0,
+      "claim": "Evaluation is conducted on LongBench datasets including HotpotQA, 2WikiMQA, MuSiQue, MultiNews, SAMSum, QMSum, and GovReport."
+    },
+    {
+      "item": 70,
+      "set": "judge",
+      "pair": "mismatched",
+      "facet": "method",
+      "human": 0,
+      "judge": 0,
+      "claim": "C2KV improves both request startup latency and steady-state generation efficiency."
+    }
+  ]
+}

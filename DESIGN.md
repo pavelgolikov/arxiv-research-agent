@@ -371,12 +371,25 @@ pipeline would ever produce — the deterministic checks reject it before the ju
 it — whereas right-paper-wrong-sentence is exactly what those checks pass through, and
 it is what the sheet has always told the labeler to grade `0`.
 
-**They are labeled, not assumed.** A swapped quote can still support the claim by
-coincidence; scoring the judge for "missing" one would be scoring it against a mistake.
-So the swaps go through the same sheet, mixed unmarked among the real citations with the
-key held in a separate file, and are graded by reading like everything else.
+**They are labeled, not assumed.** The swaps go through the same sheet, mixed unmarked
+among the real citations with the key held in a separate file, and are graded by reading
+like everything else. This was not a formality: **5 of the 20 swaps were graded `1`**,
+because a quote pulled from elsewhere in the same paper still supported part of the claim
+it landed on.
+
+Writing those five down as `0` by assumption would have scored the judge wrong in both
+directions at once. It rejected two of them and kept three. Under the assumption, the two
+rejections would have counted as catches when they are really false drops, and the three
+keeps would have counted as misses when the judge was right. The measured catch rate
+would have read 85% instead of 100%, and the false-drop rate 0% instead of 3.6% — both
+moving away from the truth.
 
 <!-- eval:claim_judge -->
+| Measure | Rate | 95% CI |
+| --- | --- | --- |
+| Rejects a citation a reader also rejected (catch rate) | **100.0%** (15 of 15) | [80%, 100%] |
+| Rejects a citation a reader kept (false-drop rate) | **3.6%** (2 of 55) | [1%, 12%] |
+| Exact grade agreement | **87.1%** (61 of 70) | [77%, 93%] |
 <!-- /eval:claim_judge -->
 
 Two rates come out, measuring opposite mistakes. The **catch rate** — of the citations a
@@ -385,8 +398,13 @@ rate** — of the citations a person accepted, how many the judge threw out — 
 costs, in correct work deleted from the report. A judge that rejects everything scores a
 perfect catch rate, so a single accuracy figure would let one hide behind the other.
 
+**Where the false drops fell.** Both are swapped citations from those five ambiguous
+items. On the 50 citations the pipeline actually produced the judge dropped nothing at
+all, which is the number that describes its effect on a real report — though five
+borderline items is far too few to call that rate settled.
+
 **What this does not establish.** The constructed swaps are the easy end of the failure
-mode. The failure that actually worries a reader is subtler — a quote that supports most
+mode, and the judge caught all 15 of the unambiguous ones. The failure that actually worries a reader is subtler — a quote that supports most
 of a claim, or supports it without the qualifier the claim attaches — and nothing here
 shows the judge catches those. The `experimental_setup` enumerations above are that
 failure in its mildest form, and they are graded `1`, which the shipped threshold keeps.
