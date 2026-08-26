@@ -1,0 +1,7 @@
+# `label_tool.html` is written by `evals/build/label_tool.py` from
+# `label_tool_template.html` with the candidate chunks inlined, so it is a 1.3 MB build
+# artifact rather than authored source. It is committed because the labels point back at
+# the exact page they were produced on. Marking it generated keeps it out of the
+# repository language statistics and collapses it in diffs; the hand-written template
+# beside it is still counted.
+evals/build/label_tool.html linguist-generated=true
