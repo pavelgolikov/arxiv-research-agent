@@ -69,7 +69,12 @@ packaging, CI, web UI.
   - `render_tables.py` — regenerates the tables in `README.md` and `DESIGN.md`.
   - `data/`, `labels/`, `results/` — frozen datasets, hand labels, metric output.
     Committed. `index/` is not.
-- `examples/` — one complete run with its verification record.
+  - `results/reports/run2.md` — the rendered report behind the second of the two runs
+    the claim-support labels were drawn from, kept as the raw output those labels point
+    back to. It predates the current synthesis prompt, so its opening notice is the
+    model's own wording rather than the fixed text the program now inserts.
+- `examples/` — one complete run, its verification record, and the sheet the citations
+  were graded on.
 - `tests/` — pytest suite.
 - `DESIGN.md` — evaluation methodology, experiments, rejected alternatives.
 
@@ -274,12 +279,14 @@ Threshold 3 is the shipped default. Per-query figures are in
 
 ### Groundedness
 
-Two live runs at the shipping defaults, read from the LangGraph checkpoints.
+One live run at the shipping defaults, read from the LangGraph checkpoints. It is
+the first run made with the support judge in the pipeline, so it is the first whose
+citations were graded as well as resolved.
 
 <!-- eval:groundedness -->
 | Measure | Value |
 | --- | --- |
-| Papers analyzed | 4 across 1 runs |
+| Papers analyzed | 4 across 1 run |
 | Claim-support rate | **96.2%** (75 of 78 proposed claims kept) |
 | Citation referential integrity | **96.2%** (77 of 80 proposed citations resolved) |
 | Citation support integrity | **98.7%** (76 of 77 resolved citations judged to support their claim) |
@@ -289,16 +296,22 @@ Two live runs at the shipping defaults, read from the LangGraph checkpoints.
 
 Rates count citations and claims surviving validation out of those the model proposed.
 
+Every citation in the shipped example was also read against its page by hand — 76 of 76,
+no rejections, 90.8% exact agreement with the support judge:
+[`examples/VERIFICATION.md`](examples/VERIFICATION.md).
+
 ### Claim support
 
 Validation runs in two layers: three exact checks prove the quote exists where it says
 it does, then a model grades whether that quote actually supports the claim, and the
 failures are discarded.
 
-How well that model grades is measured against citations a person graded by hand — 40 of
-the 165 above, picked at random and read one by one against their claims. They were
-graded before the support check existed, so nothing the judge does could have shaped
-them.
+How well that model grades is measured against citations a person graded by hand — 40
+picked at random from the 165 citations of two earlier runs, read one by one against
+their claims. Those runs are not the one measured above: they predate the support check,
+which is exactly what makes their labels usable, since nothing the judge does could have
+shaped them. The draw is recorded with the labels in
+[`evals/labels/claim_support_labels.json`](evals/labels/claim_support_labels.json).
 
 <!-- eval:claim_support -->
 | Measure | Rate | 95% CI |
@@ -406,3 +419,7 @@ arithmetic.
   claim either way.
 - Runs cost one model call per candidate screened (30 by default) plus twelve per
   selected paper: six to analyze its facets, six to judge the citations they produced.
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).

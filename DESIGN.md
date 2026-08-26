@@ -293,16 +293,23 @@ does the quote establish the sentence built on it — is now put to a model on e
 but it was answered by a reader first, and it had to be: the labels below are what the
 judge is scored against, and they would be worthless if a model had written them.
 
-**First attempt, and why it was wrong.** Twelve citations of the example report were
-read by hand and 8 were confirmed. That sample was drawn deliberately — spread across
+**First attempt, and why it was wrong.** Twelve citations of an earlier example report
+were read by hand and 8 were confirmed. That sample was drawn deliberately — spread across
 papers and facets, and seeded with two citations already flagged as weak — so it
 oversampled known problems. Its interval also spanned [39%, 86%], wide enough to be
 close to uninformative.
 
-**Second attempt.** Forty of the 165 citations in the committed groundedness runs,
-drawn uniformly at random with a fixed seed, graded `2` establishes the claim, `1`
-supports it partly, `0` no support. The draw landed evenly without stratification: 2 to
-6 citations from each of the 8 papers, 4 to 9 from each of the 6 facets.
+**Second attempt.** Forty of the 165 citations produced by two earlier runs, drawn
+uniformly at random with a fixed seed, graded `2` establishes the claim, `1` supports it
+partly, `0` no support. The draw landed evenly without stratification: 2 to 6 citations
+from each of those 8 papers, 4 to 9 from each of the 6 facets. It is recorded under
+`sample` in `evals/labels/claim_support_labels.json`.
+
+Those two runs predate the support judge, and the groundedness table no longer reports
+them — it measures the first run made with the judge in place. They remain the right
+source for these labels regardless, because a judged run cannot supply them: the judge
+has already discarded the citations it rejected, so a sample drawn from what survives
+contains none of the failures the judge would need to be scored on.
 
 <!-- eval:claim_support -->
 | Measure | Rate | 95% CI |
@@ -315,6 +322,34 @@ supports it partly, `0` no support. The draw landed evenly without stratificatio
 The targeted sample understated support by 11 points, which is what a deliberately
 adversarial draw should be expected to do. **No citation in the random sample failed
 outright.**
+
+### The shipped example, read end to end
+
+The sample above is 40 citations drawn from two runs. The example the repository ships is
+smaller and could therefore be read in full: all **76** citations of `judged-example-2`
+were graded against the pages they cite — 63 establish their claim, 13 support it partly,
+and none fail. `examples/VERIFICATION.md` carries the record, and
+`examples/verification_sheet.md` the grades themselves.
+
+Because the support judge graded the same 76 during the run, the two can be set against
+each other on real pipeline output rather than on a constructed set:
+
+| | reader OK | reader WEAK |
+| --- | --- | --- |
+| judge `2` establishes | 62 | 6 |
+| judge `1` supports partly | 1 | 7 |
+
+Exact agreement is 90.8%, close to the 87.1% measured against the judge set, and the
+seven disagreements run in both directions — six generous, one strict. All seven are
+disagreements about **scope**: how far the claim reaches past the sentence quoted for it.
+The widest, `#33`, attaches a diagnosis to an excerpt that states only a need. None is a
+disagreement about whether the quote is real or says what it appears to say, which is the
+part the deterministic checks already settle.
+
+This measures agreement on kept citations, not correctness, and it cannot measure a catch
+rate: the judge's one rejection was gone before the sheet was built, and no reader verdict
+was `0`. That is the same ceiling the 40-citation sample runs into, and the reason the
+judge set exists.
 
 ### Where claim support falls short
 

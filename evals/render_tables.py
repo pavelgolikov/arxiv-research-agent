@@ -146,7 +146,8 @@ def groundedness_table(data: dict) -> str:
         [
             "| Measure | Value |",
             "| --- | --- |",
-            f"| Papers analyzed | {totals['papers']} across {totals['runs']} runs |",
+            f"| Papers analyzed | {totals['papers']} across {totals['runs']} "
+            f"run{'s' if totals['runs'] != 1 else ''} |",
             f"| Claim-support rate | **{totals['claim_support_rate']:.1%}** "
             f"({totals['claims_kept']} of {proposed_claims} proposed claims kept) |",
             f"| Citation referential integrity | **{totals['citation_integrity']:.1%}** "
