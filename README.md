@@ -5,6 +5,13 @@ question, indexes the selected papers into a vector store, extracts claims that
 cite the pages they came from, and writes a Markdown literature review with Gemini
 through LangChain.
 
+**Built with:** LangGraph, LangChain, Chroma, BM25, cross-encoder reranking, Gemini,
+Pydantic, SQLite, PyMuPDF, pytest.
+
+See [`examples/example_review.md`](examples/example_review.md) for a complete run, and
+[`examples/VERIFICATION.md`](examples/VERIFICATION.md) for exactly which of its 79
+citations were checked by code and which needed reading.
+
 ## Project status
 
 The pipeline runs end to end, and the evaluation it rests on is built: two frozen
@@ -12,7 +19,7 @@ hand-labeled datasets, a four-way retrieval ablation with significance testing, 
 screening threshold sweep, and groundedness measured over live runs. Every number
 below is generated from `evals/results/*.json`.
 
-**Working today**
+**What is built**
 
 | Area | State |
 | --- | --- |
@@ -34,15 +41,9 @@ below is generated from `evals/results/*.json`.
 | Screening threshold sweep over the real selection rule | done |
 | Groundedness — citation survival and independent re-validation | done |
 | `evals/results/*.json` + README tables generated from them | done |
-
-**Not built yet**
-
-| Area | Notes |
-| --- | --- |
-| Automated test suite | no `tests/` directory exists; see Verification below |
-| Verified example report | one report with every citation manually checked, committed under `examples/` |
-| Repository cleanup | `results/` still holds pre-rewrite artifacts |
-| Graceful top-level failure | `EXIT_FAILED` is defined but never returned; a mid-run crash prints a traceback |
+| Test suite — 121 tests, no network and no API key required | done |
+| Verified example report with a record of what was checked how | done |
+| Graceful top-level failure with a real exit code | done |
 
 Deliberately out of scope for now: LangSmith tracing, human-in-the-loop
 `interrupt`, `pyproject.toml` packaging, CI, and any web UI or service.
@@ -74,9 +75,9 @@ See `PORTFOLIO_PLAN.md` for the full plan and the reasoning behind it.
     verifies that the labels still cover everything the retrievers return.
   - `data/`, `labels/`, `results/` — the frozen datasets, the hand labels, and the
     metric output. All committed; `index/` is not.
-- `results/` — artifacts from the **pre-rewrite prototype**, kept only for reference.
-  Its checkpoint JSON files use a state schema this code no longer has, and nothing
-  reads them. Slated for removal.
+- `examples/` — one complete run, with a record of exactly which citation checks
+  were automated and which needed reading (`examples/VERIFICATION.md`).
+- `tests/` — pytest suite; runs with no network access and no API key.
 - `PORTFOLIO_PLAN.md` — roadmap for the current upgrade.
 
 Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` holds
@@ -114,9 +115,10 @@ the run:
 network calls. `resume` restarts at the last incomplete step, so papers that were
 already downloaded, indexed, or analyzed are not processed again.
 
-Exit codes: `0` when a report was produced, `2` for invalid arguments or an
-unknown thread ID. A run that fails part-way currently surfaces as an unhandled
-traceback rather than a deliberate exit code; the thread is still resumable.
+Exit codes: `0` when a report was produced, including `partial` and `empty` runs,
+which still write output; `1` when the run itself could not continue or was
+interrupted; `2` for invalid arguments or an unknown thread ID. A failed run prints
+what went wrong and the thread ID, and the thread stays resumable.
 
 ### Options
 
@@ -136,12 +138,24 @@ traceback rather than a deliberate exit code; the thread is still resumable.
 
 ## Pipeline
 
-```text
-search  ->  screen every candidate in parallel (abstract only, no PDF)
-        ->  rank by score then original search position, select target-papers
-        ->  analyze each selected paper in parallel (download, index, cite)
-        ->  synthesize the report
+```mermaid
+flowchart TD
+    START([start]) --> plan[plan search<br/>1-3 arXiv queries]
+    plan --> search[search arXiv<br/>rate-limited, deduplicated]
+    search -->|no candidates| render
+    search --> screen{{"screen each candidate<br/>Send fan-out, abstract only"}}
+    screen --> select[select papers<br/>score desc, then search position]
+    select -->|none selected| render
+    select --> analyze{{"analyze each paper<br/>Send fan-out: download, chunk,<br/>embed, retrieve per facet"}}
+    analyze --> validate[validate every citation<br/>deterministic, no model call]
+    validate --> synth[synthesize]
+    synth -->|synthesis fails| render
+    synth --> render[render Markdown<br/>written atomically]
+    render --> DONE([end])
 ```
+
+PDFs are downloaded only for papers that survive screening, so a rejected candidate
+costs one abstract-only model call and no download.
 
 Screening reads only title, authors, date, and abstract, so PDFs are downloaded
 only for papers that survive selection. Both stages fan out with LangGraph `Send`
@@ -347,17 +361,18 @@ thin reviews. `--max-results` now defaults to 30 rather than 10 for that reason.
 
 ### Groundedness
 
-Measured over seven papers across two live runs, read from the LangGraph checkpoints
-rather than the rendered Markdown. From `evals/results/groundedness.json`.
+Measured over two live runs at the shipping defaults, read from the LangGraph
+checkpoints rather than the rendered Markdown — the report keeps only page links, but
+the checkpoint keeps the chunk IDs. From `evals/results/groundedness.json`.
 
 <!-- eval:groundedness -->
 | Measure | Value |
 | --- | --- |
-| Papers analyzed | 7 across 2 runs |
-| Claim-support rate | **91.8%** (123 of 134 proposed claims kept) |
-| Citation referential integrity | **92.1%** (128 of 139 proposed citations kept) |
-| Citations per surviving claim | 1.04 |
-| Independent re-validation | 100.0% (128 citations re-checked, 0 failures) |
+| Papers analyzed | 8 across 2 runs |
+| Claim-support rate | **94.4%** (152 of 161 proposed claims kept) |
+| Citation referential integrity | **94.3%** (165 of 175 proposed citations kept) |
+| Citations per surviving claim | 1.09 |
+| Independent re-validation | 100.0% (165 citations re-checked, 0 failures) |
 <!-- /eval:groundedness -->
 
 These are survival rates, not properties of the finished report. Citations that reach
@@ -374,6 +389,10 @@ now folds hyphenation on both sides, which took acceptance from 37% to 97% on th
 captured sample while still rejecting fabricated text, paraphrases, hallucinated chunk
 IDs, and chunks belonging to another paper. The numbers above are from runs after the
 fix. Before it, the pipeline was silently discarding about half of its own valid work.
+
+The example under [`examples/`](examples/) is one of these runs. Every page link it
+renders was traced back to a validated citation, which is worth checking separately:
+synthesis is a language model writing Markdown and could in principle invent one.
 
 ### Pooling, and measuring what it misses
 
@@ -447,20 +466,36 @@ Verified at pool depth 10: 2,000 retrieved chunks checked across 50 questions, 0
 
 ## Verification
 
-There is **no committed test suite yet**. Behavior has been checked with throwaway
-scripts during development, covering: concurrency 1 versus 3 producing identical
-selection and rendered output, selection tie-breaking, injected permanent and
-transient branch failures, retry classification, citation validation against
-hallucinated chunk IDs and paraphrased excerpts, per-paper retrieval scoping,
-concurrent Chroma indexing, and interrupt-then-resume without repeating finished
-work. Turning these into `tests/` is outstanding work.
+```bash
+.venv/bin/python -m pytest
+```
 
-No retriever performance or groundedness numbers appear in this README yet. The
-figures under Evaluation describe the datasets and their measured pooling bias, and
-come from the committed labels and `evals/results/index_coverage.json`. When the
-ablation and groundedness runs land, their tables will be generated from
-`evals/results/*.json` the same way: any number quoted anywhere comes from committed
-output, never from a development run.
+The suite runs with **no network access and no API key**. An autouse fixture fails any
+outbound connection, so a missing fake surfaces as a test error rather than a silent
+real call, and two tests assert that guard still works. Chroma is deliberately *not*
+faked: it runs against a temporary directory with deterministic embeddings, so the
+graph tests exercise real chunking, indexing, per-paper retrieval, and citation
+validation. Only the calls that would leave the machine are stubbed.
+
+What it covers:
+
+- **Graph terminal paths** — no candidates, none selected, full success, a partial run
+  where one branch fails while its siblings finish, and synthesis failing over to the
+  deterministic renderer.
+- **Determinism** — concurrency 1 and 3 must produce identical selection and identical
+  rendered Markdown, since reducers collect in completion order.
+- **Citation validation** — valid citations, hallucinated chunk IDs, chunks from the
+  wrong paper, paraphrases, and the PDF-hyphenation case that once discarded half of
+  every run's valid work.
+- **Persistence** — state survives a round trip through SQLite with structured claims
+  intact, and a finished thread is not re-executed.
+- **Retry classification** — transport errors, retryable and permanent status codes,
+  provider codes, and backoff growth with an injected clock.
+- **Eval guards** — the pool-coverage check that keeps the ablation honest must raise
+  when a retrieved chunk was never judged.
+
+Every number in this README is generated from `evals/results/*.json` by
+`python -m evals.render_tables --write`. Nothing is typed by hand.
 
 ## Limitations
 

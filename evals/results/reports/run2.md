@@ -1,41 +1,44 @@
-# Literature Review: How is mechanistic interpretability used to understand transformer internals?
+# Literature Review: KV cache memory reduction in LLM inference
 
 ## Search Summary
-This review synthesizes findings from current research into mechanistic interpretability (MI), a field dedicated to reverse-engineering the specific algorithms learned by neural networks [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1). The identified papers discuss the methodologies used to probe internal representations, the challenges in interpreting complex behaviors, and the role of specialized tools in bridging the gap between model architecture and transparency.
+The research on KV cache memory optimization focuses on mitigating the memory-bound nature of long-context large language model (LLM) inference. The literature explores techniques ranging from quantization and multi-agent sharing to sophisticated cache merging, eviction, and pyramid-style compression.
 
 ## Method and Limitations Notice
-This review is based exclusively on the provided metadata and validated claims from four research papers. It is important to note that many MI methods rely on proxies (such as reconstruction metrics) that may not fully reflect true feature faithfulness [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1). Furthermore, current interpretability frameworks vary significantly in standardization, and findings derived from smaller models or synthetic datasets may not always scale directly to larger, real-world architectures [p. 4](https://arxiv.org/pdf/2511.14465v2#page=4), [p. 11](https://arxiv.org/pdf/2503.21676v2#page=11).
+This review synthesizes findings from four peer-reviewed papers. A key limitation across the surveyed literature is the inherent trade-off between memory footprint and generation accuracy. While some methods claim "lossless" characteristics, others acknowledge that compression introduces performance degradation or computational overhead. Furthermore, many techniques lack standardized benchmarking for system-level metrics like end-to-end latency or time-to-first-token.
 
 ## Overview
-Mechanistic interpretability seeks to move beyond black-box observations by analyzing the internal components of transformers—including attention heads, MLP layers, and latent feature representations—to reveal how they implement functions such as in-context learning, factual recall, and associative memory [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1), [p. 16](https://arxiv.org/pdf/2503.21676v2#page=16). Current research focuses on decomposing these dense activations into more interpretable units and developing standardized toolsets to ensure these analyses are reproducible across diverse model architectures [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1), [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1).
+As LLM context lengths grow, the KV cache has become a primary memory bottleneck [p. 1](https://arxiv.org/pdf/2604.24971v1#page=1), [p. 3](https://arxiv.org/pdf/2607.17715v1#page=3). Because this cache scales linearly with context length, developers are increasingly turning to three primary optimization categories: 
+1. **Sharing & Reuse**: Exploiting common prefix or context redundancy across agents [p. 1](https://arxiv.org/pdf/2604.24971v1#page=1), [p. 2](https://arxiv.org/pdf/2607.17715v1#page=2).
+2. **Merging & Eviction**: Selectively keeping important tokens or consolidating KV states [p. 1](https://arxiv.org/pdf/2504.09936v2#page=1), [p. 2](https://arxiv.org/pdf/2405.12532v2#page=2).
+3. **Quantization**: Reducing the bit-precision of stored Keys and Values [p. 1](https://arxiv.org/pdf/2604.24971v1#page=1).
 
 ## Key Papers
-*   **[2402.03855v2](https://arxiv.org/pdf/2402.03855v2):** Critically examines the limitations of current MI approaches, arguing that existing linear representation methods often fail to explain complex model behaviors.
-*   **[2511.14465v2](https://arxiv.org/pdf/2511.14465v2):** Introduces `nnterp`, a standardized interface designed to resolve the tradeoff between model fidelity and ease of use in mechanistic analysis.
-*   **[2511.09432v2](https://arxiv.org/pdf/2511.09432v2):** Proposes Equivariant Sparse Autoencoders (SAEs) to better account for data symmetries, addressing the "superposition" problem where concepts are entangled.
-*   **[2503.21676v2](https://arxiv.org/pdf/2503.21676v2):** Investigates the learning dynamics of factual recall, demonstrating that feed-forward layers function as associative key-value memories.
+* **[PolyKV](https://arxiv.org/abs/2604.24971v1)**: Introduces a multi-agent system that shares a single, asymmetrically compressed KV cache pool, achieving up to 97.7% memory reduction for 15 concurrent agents [p. 2](https://arxiv.org/pdf/2604.24971v1#page=2).
+* **[C$^2$KV](https://arxiv.org/abs/2607.17715v1)**: Focuses on non-prefix KV reuse using a lightweight "sidecar" extractor to create a composable, position-agnostic KV cache manifold [p. 2](https://arxiv.org/pdf/2607.17715v1#page=2).
+* **[KeepKV](https://arxiv.org/abs/2504.09936v2)**: Provides a theoretically grounded merging method that uses "Electoral Votes" and "Zero Inference-Perturbation Merging" (ZIP-Merging) to reduce cache size while maintaining output quality [p. 1](https://arxiv.org/pdf/2504.09936v2#page=1).
+* **[PyramidInfer](https://arxiv.org/abs/2405.12532v2)**: Implements layer-wise compression by identifying that the number of crucial tokens decreases as layers progress, saving over 54% of memory [p. 1](https://arxiv.org/pdf/2405.12532v2#page=1).
 
 ## Comparison Table
 
-| Paper | Primary Focus | Key Tool/Method |
-| :--- | :--- | :--- |
-| Golechha & Dao [2402.03855v2](https://arxiv.org/pdf/2402.03855v2) | Challenges in MI | Principal Component Analysis |
-| Dumas [2511.14465v2](https://arxiv.org/pdf/2511.14465v2) | Tool Standardization | `nnterp` (Logit lens, Patchscope) |
-| Erdogan & Lucic [2511.09432v2](https://arxiv.org/pdf/2511.09432v2) | Superposition/Symmetry | Equivariant SAEs |
-| Zucchet et al. [2503.21676v2](https://arxiv.org/pdf/2503.21676v2) | Knowledge Dynamics | Associative Memory Analysis |
+| Technique | Approach Type | Primary Benefit | Notable Metric |
+| :--- | :--- | :--- | :--- |
+| **PolyKV** | Sharing / Compression | Multi-agent efficiency | 97.7% memory reduction [p. 2](https://arxiv.org/pdf/2604.24971v1#page=2) |
+| **C$^2$KV** | Reuse / Compression | Long-context throughput | Up to 17x speedup [p. 1](https://arxiv.org/pdf/2607.17715v1#page=1) |
+| **KeepKV** | Merging | Accuracy preservation | 2x throughput increase [p. 6](https://arxiv.org/pdf/2504.09936v2#page=6) |
+| **PyramidInfer** | Eviction / Pruning | Layer-wise efficiency | 54% memory reduction [p. 1](https://arxiv.org/pdf/2405.12532v2#page=1) |
 
 ## Research Themes
-*   **Decomposing Representations:** Techniques like Sparse Autoencoders (SAEs) are used to disentangle "superposed" concepts within high-dimensional activations [p. 1](https://arxiv.org/pdf/2511.09432v2#page=1).
-*   **Circuit Analysis:** Researchers are mapping the specific roles of transformer components, such as identifying how attention-based circuits support recall or how MLP layers store factual knowledge [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1), [p. 16](https://arxiv.org/pdf/2503.21676v2#page=16).
-*   **Standardization vs. Fidelity:** There is a critical tension between custom implementation hooks (which lack model fidelity) and direct-access tools like NNsight, leading to the development of libraries like `nnterp` to bridge this gap [p. 1](https://arxiv.org/pdf/2511.14465v2#page=1).
+* **Importance-Aware Compression**: Modern research increasingly moves away from uniform pruning toward context-aware selection (e.g., PyramidInfer’s "Pivotal Context" and KeepKV’s adaptive merging) [p. 2](https://arxiv.org/pdf/2405.12532v2#page=2), [p. 1](https://arxiv.org/pdf/2504.09936v2#page=1).
+* **Asymmetric Optimization**: Recognizing that Keys and Values serve different roles, PolyKV applies different quantization depths (int8 for Keys, 3-bit for Values) to maintain stability [p. 2](https://arxiv.org/pdf/2604.24971v1#page=2).
+* **Addressing the Prefill Bottleneck**: While many earlier works focused on generation-time eviction, newer methods like PyramidInfer specifically target the redundant computation occurring during the prefill phase [p. 2](https://arxiv.org/pdf/2405.12532v2#page=2).
 
 ## Research Gaps
-*   **Verifiability:** Current methods for identifying linear representations for complex behaviors do not yet provide fully verifiable interpretations [p. 1](https://arxiv.org/pdf/2402.03855v2#page=1).
-*   **Scalability:** Much of the foundational research is limited to smaller models (e.g., 44M parameters) or synthetic tasks, leaving open questions about how these mechanisms scale to frontier models [p. 11](https://arxiv.org/pdf/2503.21676v2#page=11).
-*   **Tool Completeness:** Existing interpretability libraries still lack comprehensive support for all architectures (e.g., non-causal or encoder-decoder) and struggle with advanced attention implementations like Flash Attention [p. 4](https://arxiv.org/pdf/2511.14465v2#page=4).
+* **Standardized System Benchmarking**: There is a noted lack of reporting for end-to-end latency and time-to-first-token in many studies, deferring these to future work [p. 9](https://arxiv.org/pdf/2604.24971v1#page=9).
+* **Hardware-Specific Constraints**: Techniques like KeepKV face compatibility issues with standard acceleration libraries like FlashAttention because they require access to intermediate attention scores [p. 14](https://arxiv.org/pdf/2504.09936v2#page=14).
+* **Adaptive Strategies**: Most existing methods use uniform compression or static thresholds, lacking fully adaptive, real-time mechanisms that respond to varying document complexity [p. 12](https://arxiv.org/pdf/2607.17715v1#page=12).
 
 ## Suggested Reading Order
-1.  **[2402.03855v2](https://arxiv.org/pdf/2402.03855v2):** Start here to understand the fundamental challenges and the current limitations of linear representations.
-2.  **[2511.14465v2](https://arxiv.org/pdf/2511.14465v2):** Learn about the practical tools required to interact with model internals consistently.
-3.  **[2511.09432v2](https://arxiv.org/pdf/2511.09432v2):** Explore how advanced techniques like SAEs are evolving to handle complex data structures.
-4.  **[2503.21676v2](https://arxiv.org/pdf/2503.21676v2):** Apply these interpretability lenses to the study of how models actually acquire and store knowledge.
+1. **PyramidInfer** [p. 1](https://arxiv.org/pdf/2405.12532v2#page=1): Provides a strong introduction to the concept of layer-wise redundancy.
+2. **KeepKV** [p. 1](https://arxiv.org/pdf/2504.09936v2#page=1): Explains the mathematical and logical challenges of merging KV states.
+3. **PolyKV** [p. 1](https://arxiv.org/pdf/2604.24971v1#page=1): Illustrates the power of sharing common caches in multi-agent environments.
+4. **C$^2$KV** [p. 1](https://arxiv.org/pdf/2607.17715v1#page=1): Covers more advanced concepts of composable and position-agnostic cache manifolds for long-context applications.

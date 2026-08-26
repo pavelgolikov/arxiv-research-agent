@@ -59,6 +59,7 @@ def require_api_key(parser: argparse.ArgumentParser) -> None:
 def command_run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     """Validate arguments and start a new review thread."""
 
+    from arxiv_reviewer.failures import describe
     from arxiv_reviewer.workflow import run_reviewer, thread_exists
 
     if args.max_results < 1:
@@ -78,19 +79,32 @@ def command_run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
     print(f"thread-id: {thread_id}")
     print(f"output:    {args.output}")
 
-    run_reviewer(
-        user_query=args.user_query,
-        max_results=args.max_results,
-        target_papers=args.target_papers,
-        output=args.output,
-        thread_id=thread_id,
-        data_dir=args.data_dir,
-        retriever_kind=args.retriever,
-        top_k=args.top_k,
-        fetch_k=args.fetch_k,
-        multi_query=args.multi_query,
-        max_concurrency=args.max_concurrency,
-    )
+    try:
+        run_reviewer(
+            user_query=args.user_query,
+            max_results=args.max_results,
+            target_papers=args.target_papers,
+            output=args.output,
+            thread_id=thread_id,
+            data_dir=args.data_dir,
+            retriever_kind=args.retriever,
+            top_k=args.top_k,
+            fetch_k=args.fetch_k,
+            multi_query=args.multi_query,
+            max_concurrency=args.max_concurrency,
+        )
+    except KeyboardInterrupt:
+        # The checkpoint already holds whatever finished, so an interrupt is a pause
+        # rather than a loss.
+        print(f"\ninterrupted; resume with: --thread-id {thread_id}")
+        return EXIT_FAILED
+    except Exception as error:
+        # Individual branches record their own failures and the run still reports.
+        # Reaching here means the run itself could not continue, so say what happened
+        # and point at the thread rather than printing a traceback.
+        print(f"run failed: {describe(error)}")
+        print(f"resume with: --thread-id {thread_id}")
+        return EXIT_FAILED
 
     print(f"resume with: --thread-id {thread_id}")
     return EXIT_OK
@@ -112,6 +126,14 @@ def command_resume(args: argparse.Namespace, parser: argparse.ArgumentParser) ->
     except KeyError:
         print(f"Unknown thread: {args.thread_id}")
         return EXIT_INVALID
+    except KeyboardInterrupt:
+        print(f"\ninterrupted; resume with: --thread-id {args.thread_id}")
+        return EXIT_FAILED
+    except Exception as error:
+        from arxiv_reviewer.failures import describe
+
+        print(f"resume failed: {describe(error)}")
+        return EXIT_FAILED
 
     print(f"thread-id: {args.thread_id}")
     return EXIT_OK
