@@ -66,16 +66,16 @@ packaging, CI, web UI.
     evaluation set, and collects both into `labels/`.
   - `build_index.py` — rebuilds the vector index from committed chunks; `--verify`
     checks that the labels cover everything the retrievers return.
-  - `render_tables.py` — regenerates the tables in `README.md` and `DESIGN.md`.
+  - `render_tables.py` — regenerates the tables in `EVALS.md` and `DESIGN.md`.
   - `data/`, `labels/`, `results/` — frozen datasets, hand labels, metric output.
     Committed. `index/` is not.
-  - `results/reports/run2.md` — the rendered report behind the second of the two runs
-    the claim-support labels were drawn from, kept as the raw output those labels point
-    back to. It predates the current synthesis prompt, so its opening notice is the
-    model's own wording rather than the fixed text the program now inserts.
+  - `results/reports/run.md` — the rendered report one of the claim-support label runs
+    produced, kept as the output those labels point back to.
 - `examples/` — one complete run, its verification record, and the sheet the citations
   were graded on.
 - `tests/` — pytest suite.
+- `EVALS.md` — evaluation results: datasets, ablation, screening sweep,
+  groundedness, claim support, judge accuracy.
 - `DESIGN.md` — evaluation methodology, experiments, rejected alternatives.
 
 Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` and
@@ -116,6 +116,10 @@ unknown thread ID. A failed run prints the error and the thread ID, and the thre
 stays resumable.
 
 ### Options
+
+**Options accepted by `run`.** Every flag and the value used when it is omitted; only
+`--query` is required. `resume` takes `--thread-id`, `--data-dir`, and
+`--max-concurrency`; `status` takes `--thread-id` and `--data-dir`.
 
 | Option | Default | Meaning |
 | --- | --- | --- |
@@ -172,6 +176,10 @@ Interrupted runs resume from the last checkpoint.
 Paper text is split into overlapping ~1000-character chunks carrying their page numbers,
 embedded with `models/gemini-embedding-001`, and stored in a persistent Chroma index.
 
+**Retrieval strategies.** The values `--retriever` accepts, and how each one picks the
+chunks a facet question is answered from. Measured against each other in
+[`EVALS.md`](EVALS.md#retrieval-ablation).
+
 | `--retriever` | Strategy |
 | --- | --- |
 | `dense` | Embedding similarity only. |
@@ -207,9 +215,8 @@ reads each claim next to its quote and grades the pair:
 Anything graded `0` is thrown out, and so is any citation the model skipped instead of
 grading. That costs one model call per facet, not one per citation.
 
-Grade `1` is kept. The partial grades measured so far are all one shape: the claim lists
-five things and the quote names two of them, so it supports part of what was written.
-Throwing those out would delete correct work to fix a sentence-phrasing problem.
+Grade `1` is kept. What that costs and why the threshold sits there:
+[`DESIGN.md`](DESIGN.md#scoring-the-support-judge).
 
 Discarded citations take nothing with them except a claim left with no citations at all,
 which is discarded too. The report records both counts. Surviving claims render as
@@ -217,172 +224,36 @@ page-anchored links into the source PDF, carrying the grade they were given.
 
 ## Evaluation
 
-Two hand-labeled datasets under `evals/`, frozen and committed. Tables below are
-generated from `evals/results/*.json` by `python -m evals.render_tables --write`.
-
-| Dataset | Size |
-| --- | --- |
-| Retrieval | 5 papers, 570 chunks, 50 questions, 312 judged-relevant chunks (246 fully answering, 66 partial) |
-| Screening | 7 queries x 12 candidates, each labeled irrelevant / related / central |
-
-Thirty of the fifty retrieval questions are the strings `analysis.py` asks of every
-paper. The other twenty are paper-specific factual questions.
-
-Methodology, experiments, and rejected alternatives: [`DESIGN.md`](DESIGN.md).
+Two hand-labeled datasets — 50 retrieval questions with 312 judged chunks, and 7
+screening queries by 12 candidates — support four measured areas plus a scored support
+judge. Detailed results and tables are in [`EVALS.md`](EVALS.md). Methodology, experiments, and
+rejected alternatives are documented in [`DESIGN.md`](DESIGN.md).
 
 ### Retrieval ablation
 
-Four strategies, fifty questions, scored at pool depth.
-
-<!-- eval:retrieval -->
-| Strategy | MRR | nDCG@10 | recall@5 (specific) | recall@5 (facet) |
-| --- | --- | --- | --- | --- |
-| `dense` | 0.736 | 0.586 | 0.541 | 0.299 |
-| `bm25` | 0.627 | 0.423 | 0.345 | 0.264 |
-| `hybrid` | 0.750 | 0.606 | 0.443 | 0.371 |
-| `hybrid-rerank` | 0.771 | 0.623 | 0.528 | 0.391 |
-| _best achievable_ | — | — | _0.921_ | _0.714_ |
-<!-- /eval:retrieval -->
-
-Paired-bootstrap 95% intervals exclude zero for 5 of 16 pairwise comparisons; full
-intervals in [`DESIGN.md`](DESIGN.md#2-reading-the-ablation-honestly). Recall is split
-by question type and reported against the best score achievable at that cutoff.
-`--multi-query` is not scored: its paraphrases retrieve chunks outside the frozen pools.
+Four retrieval strategies scored over the same 50 questions, with paired-bootstrap
+intervals on every pairwise difference so the comparisons that are indistinguishable from
+noise are marked as such.
 
 ### Screening quality
 
-Threshold sweep over `select_papers_node`, scored against the labels.
-
-<!-- eval:screening -->
-| Threshold | precision@4 (central) | precision@4 (related) | central recall | best achievable | queries under-filled |
-| --- | --- | --- | --- | --- | --- |
-| 1 | 0.786 | 0.964 | 0.683 | _0.730_ | 0 |
-| 2 | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
-| 3 (current, **recommended**) | 0.810 | 1.000 | 0.683 | _0.730_ | 1 |
-| 4 | 0.810 | 1.000 | 0.611 | _0.730_ | 2 |
-| 5 | 0.786 | 0.857 | 0.540 | _0.730_ | 2 |
-
-| Model score | labeled irrelevant | labeled related | labeled central |
-| --- | --- | --- | --- |
-| 1 | 24 | 0 | 0 |
-| 2 | 4 | 1 | 0 |
-| 3 | 0 | 2 | 1 |
-| 4 | 0 | 5 | 4 |
-| 5 | 0 | 4 | 39 |
-<!-- /eval:screening -->
-
-Threshold 3 is the shipped default. Per-query figures are in
-`evals/results/screening.json`. Two search-quality studies —
-[`evals/results/categories.json`](evals/results/categories.json) and
-[`evals/results/search_depth.json`](evals/results/search_depth.json) — set
-`--max-results` to 30 and rejected an arXiv category filter.
+The relevance threshold swept against the labeled candidates. The shipped default was
+chosen from that sweep rather than guessed.
 
 ### Groundedness
 
-One live run at the shipping defaults, read from the LangGraph checkpoints. It is
-the first run made with the support judge in the pipeline, so it is the first whose
-citations were graded as well as resolved.
-
-<!-- eval:groundedness -->
-| Measure | Value |
-| --- | --- |
-| Papers analyzed | 4 across 1 run |
-| Claim-support rate | **96.2%** (75 of 78 proposed claims kept) |
-| Citation referential integrity | **96.2%** (77 of 80 proposed citations resolved) |
-| Citation support integrity | **98.7%** (76 of 77 resolved citations judged to support their claim) |
-| Citations per surviving claim | 1.01 |
-| Independent re-validation | 100.0% (76 citations re-checked, 0 failures) |
-<!-- /eval:groundedness -->
-
-Rates count citations and claims surviving validation out of those the model proposed.
-
-Every citation in the shipped example was also read against its page by hand — 76 of 76,
-no rejections, 90.8% exact agreement with the support judge:
-[`examples/VERIFICATION.md`](examples/VERIFICATION.md).
+Citation survival through both validation stages in a live run, read from the checkpoint
+and independently re-validated against the run's own index.
 
 ### Claim support
 
-Validation runs in two layers: three exact checks prove the quote exists where it says
-it does, then a model grades whether that quote actually supports the claim, and the
-failures are discarded.
+Forty citations drawn at random and graded by hand against the claims built on them,
+which is what the support judge is scored against.
 
-How well that model grades is measured against citations a person graded by hand — 40
-picked at random from the 165 citations of two earlier runs, read one by one against
-their claims. Those runs are not the one measured above: they predate the support check,
-which is exactly what makes their labels usable, since nothing the judge does could have
-shaped them. The draw is recorded with the labels in
-[`evals/labels/claim_support_labels.json`](evals/labels/claim_support_labels.json).
+### Support judge accuracy
 
-<!-- eval:claim_support -->
-| Measure | Rate | 95% CI |
-| --- | --- | --- |
-| Excerpt establishes the claim | **77.5%** (31 of 40) | [62%, 88%] |
-| Excerpt supports it at least partly | **100.0%** (31 + 9 of 40) | [91%, 100%] |
-| Excerpt does not support the claim | 0 of 40 | — |
-<!-- /eval:claim_support -->
-
-Partial grades concentrate in one facet:
-
-<!-- eval:claim_support_facets -->
-| Facet | Partial grades |
-| --- | --- |
-| `experimental_setup` | 6 of 8 |
-| `limitations` | 0 of 7 |
-| `main_findings` | 2 of 9 |
-| `method` | 0 of 5 |
-| `relevance_to_query` | 0 of 4 |
-| `research_problem` | 1 of 7 |
-<!-- /eval:claim_support_facets -->
-
-### Scoring the support judge
-
-Those 40 cannot score the judge on their own, because **not one of them is a `0`**.
-Against a set containing no failures, a model that calls everything "supported" is right
-every single time. To find out whether the judge rejects bad citations, the set has to
-contain some.
-
-So 30 more were graded: 10 further real citations, and 20 where the quote was replaced
-with a different quote from the same paper. That swap is the failure the three
-deterministic checks cannot see — the quote is real, it is in the right paper, it is on
-the page it names. It just belongs to a different sentence.
-
-The 20 swaps sit shuffled among the 10 real ones with nothing marking which is which,
-and they are read and graded like everything else rather than written down as `0` by
-assumption. That assumption would have been wrong on **5 of the 20**: a quote pulled
-from elsewhere in the same paper still supported part of the claim it landed on. Scoring
-those as failures would have marked the judge wrong for keeping them.
-
-<!-- eval:claim_judge -->
-| Measure | Rate | 95% CI |
-| --- | --- | --- |
-| Rejects a citation a reader also rejected (catch rate) | **100.0%** (15 of 15) | [80%, 100%] |
-| Rejects a citation a reader kept (false-drop rate) | **3.6%** (2 of 55) | [1%, 12%] |
-| Exact grade agreement | **87.1%** (61 of 70) | [77%, 93%] |
-<!-- /eval:claim_judge -->
-
-Two numbers come out of this, and they measure opposite mistakes:
-
-- **catch rate** — of the citations a person rejected, how many the judge also rejected.
-  This is what the check is worth.
-- **false-drop rate** — of the citations a person accepted, how many the judge threw out.
-  This is what it costs, in correct work deleted from the report.
-
-A judge that rejects everything scores a perfect catch rate, so neither number means
-anything without the other.
-
-Both false drops landed on swapped citations that turned out to support their new claim
-anyway — two of those five ambiguous items. Against the 50 citations the pipeline
-actually produced, it dropped none: **0 of 50**. The pooled 3.6% is the figure to quote,
-since those five are real disagreements about genuinely borderline quotes, but the two
-error types are not spread evenly and the real citations are what a report is built from.
-
-The 77.5% and 100% figures further up come from the random 40 alone, so the 20
-deliberately broken citations cannot drag them down.
-
-`evals/labels/claim_support_labels.json` carries each grade with its claim and excerpt.
-Regenerate the sheets with `python -m evals.build.claim_support` and
-`python -m evals.build.claim_support --judge-set`, then score the judge with
-`python -m evals.run_claim_judge`.
+The judge replayed against 70 human-graded citations, twenty of them constructed
+failures, reporting catch rate and false-drop rate together.
 
 ## Tests
 

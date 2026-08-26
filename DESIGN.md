@@ -1,6 +1,6 @@
 # Design notes
 
-The README reports what the numbers are. This records how they were produced and why
+`EVALS.md` reports what the numbers are. This records how they were produced and why
 they can be trusted — the methodology behind the benchmark, the experiments that
 settled open questions, and the decisions that were measured and rejected.
 
@@ -305,11 +305,11 @@ partly, `0` no support. The draw landed evenly without stratification: 2 to 6 ci
 from each of those 8 papers, 4 to 9 from each of the 6 facets. It is recorded under
 `sample` in `evals/labels/claim_support_labels.json`.
 
-Those two runs predate the support judge, and the groundedness table no longer reports
-them — it measures the first run made with the judge in place. They remain the right
-source for these labels regardless, because a judged run cannot supply them: the judge
-has already discarded the citations it rejected, so a sample drawn from what survives
-contains none of the failures the judge would need to be scored on.
+Those two runs predate the support judge, and the groundedness table reports a judged
+run instead. They remain the right source for these labels regardless, because a judged
+run cannot supply them: the judge has already discarded the citations it rejected, so a
+sample drawn from what survives contains none of the failures the judge would need to be
+scored on.
 
 <!-- eval:claim_support -->
 | Measure | Rate | 95% CI |
@@ -418,6 +418,11 @@ rejections would have counted as catches when they are really false drops, and t
 keeps would have counted as misses when the judge was right. The measured catch rate
 would have read 85% instead of 100%, and the false-drop rate 0% instead of 3.6% — both
 moving away from the truth.
+
+**The two sets stay separate.** The support rates in the section above come from the
+uniform 40 alone. The twenty deliberately broken citations enter the judge scoring and
+nothing else, so they cannot drag down a figure that describes what the pipeline
+produces.
 
 <!-- eval:claim_judge -->
 | Measure | Rate | 95% CI |

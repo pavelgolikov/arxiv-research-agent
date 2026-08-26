@@ -1,13 +1,13 @@
-"""Render the README's evaluation tables from the committed results files.
+"""Render the evaluation tables from the committed results files.
 
 The repository rule is that any number quoted anywhere comes from a committed results
 file. This script makes that mechanical instead of a matter of discipline: it reads
-`evals/results/*.json` and replaces the marked blocks in the README, so a table can
+`evals/results/*.json` and replaces the marked blocks in the documents, so a table can
 never drift away from the run that produced it.
 
 Blocks are delimited by `<!-- eval:NAME -->` and `<!-- /eval:NAME -->`. Text outside
 those markers is never touched, and a block is written to whichever target files
-contain its markers — the README carries the headline tables, `DESIGN.md` the
+contain its markers — `EVALS.md` carries the results tables, `DESIGN.md` the
 methodology ones, and either may carry both.
 """
 
@@ -20,7 +20,7 @@ from arxiv_reviewer.rag import RETRIEVER_KINDS
 
 from .config import EVALS_DIR, LABELS_DIR, RESULTS_DIR
 
-TARGETS = (EVALS_DIR.parent / "README.md", EVALS_DIR.parent / "DESIGN.md")
+TARGETS = (EVALS_DIR.parent / "EVALS.md", EVALS_DIR.parent / "DESIGN.md")
 
 RETRIEVAL_FILE = RESULTS_DIR / "retrieval.json"
 SCREENING_FILE = RESULTS_DIR / "screening.json"
@@ -94,6 +94,13 @@ def screening_table(data: dict) -> str:
     recommended = data["recommended_threshold"]
 
     lines = [
+        "**Threshold sweep.** Each row is a candidate value of the relevance threshold in",
+        "`select_papers_node`, replayed against the screening labels. precision@4 is the",
+        "share of the four selected papers labeled central, then the share labeled central",
+        "or related. Central recall is the share of all central papers that were selected,",
+        "against the best any selection of four could reach. The last column counts queries",
+        "where fewer than four candidates cleared the threshold.",
+        "",
         "| Threshold | precision@4 (central) | precision@4 (related) | central recall "
         "| best achievable | queries under-filled |",
         "| --- | --- | --- | --- | --- | --- |",
@@ -114,6 +121,10 @@ def screening_table(data: dict) -> str:
         )
 
     lines += [
+        "",
+        "**Model score against label.** How many candidates the model gave each relevance",
+        "score, broken down by the label a person assigned to the same candidate. It shows",
+        "where the threshold can be placed without cutting into central papers.",
         "",
         "| Model score | labeled irrelevant | labeled related | labeled central |",
         "| --- | --- | --- | --- |",
@@ -290,7 +301,7 @@ def inject(text: str, blocks: dict[str, str]) -> tuple[str, list[str]]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--write", action="store_true", help="update the marked blocks in README.md"
+        "--write", action="store_true", help="update the marked blocks in the documents"
     )
     args = parser.parse_args()
 
@@ -301,7 +312,7 @@ def main() -> None:
     if not args.write:
         for name, body in blocks.items():
             print(f"\n<!-- eval:{name} -->\n{body}\n<!-- /eval:{name} -->")
-        print("\n(pass --write to update README.md in place)")
+        print("\n(pass --write to update the documents in place)")
         return
 
     placed: set[str] = set()
