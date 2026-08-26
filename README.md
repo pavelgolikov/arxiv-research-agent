@@ -5,6 +5,8 @@ question, indexes the selected papers into a vector store, extracts claims that 
 the pages they came from, and writes a Markdown literature review with Gemini through
 LangChain.
 
+[![tests](https://github.com/pavelgolikov/arxiv-research-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/pavelgolikov/arxiv-research-agent/actions/workflows/tests.yml)
+
 **Built with:** LangGraph, LangChain, Chroma, BM25, cross-encoder reranking, Gemini,
 Pydantic, SQLite, PyMuPDF, pytest.
 
@@ -36,12 +38,12 @@ re-validation; a hand-labeled claim-support sample, extended with constructed fa
 the support judge can be scored against it; reproducible index rebuild guarded by a
 pool-coverage check.
 
-**Engineering** — 163 tests requiring no network access and no API key; published
-numbers generated from committed JSON; graceful exit codes; a worked example with its
-verification record.
+**Engineering** — 163 tests requiring no network access and no API key, run in CI on
+every push; every published evaluation number generated from committed JSON; graceful
+exit codes; a worked example with its verification record.
 
 Not included: LangSmith tracing, human-in-the-loop `interrupt`, `pyproject.toml`
-packaging, CI, web UI.
+packaging, web UI.
 
 ## Repository layout
 
@@ -83,12 +85,15 @@ Run state lives under `.arxiv-reviewer/` (git-ignored): `checkpoints.sqlite` and
 
 ## Setup
 
+Developed and tested on Python 3.13, which is also the version CI runs.
+
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-Set `GOOGLE_API_KEY` (or `GEMINI_API_KEY`) in a `.env` file at the repository root.
+Set `GOOGLE_API_KEY` (or `GEMINI_API_KEY`) in a `.env` file at the repository root;
+copy [`.env.example`](.env.example) to `.env` and fill in the key.
 
 The cross-encoder reranker requires `sentence-transformers` and `torch`. Other
 `--retriever` values do not load the model at runtime.
@@ -271,6 +276,9 @@ embedding, and the prices used are in [`EVALS.md`](EVALS.md#cost).
 163 tests, no network access and no API key. An autouse fixture fails outbound
 connections. Chroma runs against a temporary directory with deterministic embeddings.
 
+The same suite runs in GitHub Actions on every push, on a runner with no API key
+configured, so the claim above is checked rather than asserted.
+
 Coverage: graph terminal paths (no candidates, none selected, success, partial branch
 failure, synthesis fallback); concurrency 1 versus 3 producing identical output;
 citation validation against hallucinated chunk IDs, wrong-paper chunks, paraphrases,
@@ -304,4 +312,10 @@ arithmetic.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT — see [`LICENSE`](LICENSE). That covers the code, the hand labels, and the metric
+output.
+
+It does not cover the paper text under `evals/data/`, which is extracted from five
+arXiv papers so the retrieval benchmark can be rerun without redownloading them. Those
+papers remain under whatever licenses their authors chose; they are listed in
+[`EVALS.md`](EVALS.md#datasets).

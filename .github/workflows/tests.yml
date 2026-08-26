@@ -1,0 +1,34 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      # The pinned torch on PyPI brings the CUDA libraries with it — roughly 4 GB a
+      # runner with no GPU will never use. Installing the CPU build of the same version
+      # first leaves the pin in requirements.txt already satisfied.
+      - name: Install CPU-only torch
+        run: pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # No secrets are configured for this workflow, so the runner genuinely has no API
+      # key, and an autouse fixture fails outbound connections. A green run is what makes
+      # the suite's "no network access and no API key" claim checkable by a reader rather
+      # than something the README asserts about itself.
+      - name: Run the offline test suite
+        run: python -m pytest -q

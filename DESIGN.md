@@ -464,5 +464,5 @@ not show up in these numbers.
 
 ## Deliberately out of scope
 
-LangSmith tracing, human-in-the-loop `interrupt`, `pyproject.toml` packaging, CI, and
-any web UI or service.
+LangSmith tracing, human-in-the-loop `interrupt`, `pyproject.toml` packaging, and any
+web UI or service.

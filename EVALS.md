@@ -5,7 +5,10 @@ numbers — how the datasets were built, which alternatives were tried and rejec
 how far each result can be pushed — is in [`DESIGN.md`](DESIGN.md).
 
 Every table on this page is generated from `evals/results/*.json` by
-`python -m evals.render_tables --write`. No number here is typed by hand.
+`python -m evals.render_tables --write`, so no evaluation figure is typed by hand. The
+cost section is the one exception: it is a single measurement rather than a re-runnable
+metric, so its numbers were written once and carry the date and prices they were
+calculated from.
 
 ## Datasets
 
@@ -23,6 +26,26 @@ amount of hand-labeling each one represents.
 
 Thirty of the fifty retrieval questions are the strings `analysis.py` asks of every
 paper. The other twenty are paper-specific factual questions.
+
+### Source papers and their licensing
+
+`evals/data/corpus_chunks.jsonl` holds the parsed text of these five arXiv papers,
+committed so the retrieval benchmark can be rerun without redownloading and reparsing
+them — reparsing would move the chunk boundaries the labels are keyed to.
+
+| arXiv ID | Title |
+| --- | --- |
+| [2407.15549v3](https://arxiv.org/abs/2407.15549v3) | Latent Adversarial Training Improves Robustness to Persistent Harmful Behaviors in LLMs |
+| [2505.21444v2](https://arxiv.org/abs/2505.21444v2) | Can Large Reasoning Models Self-Train? |
+| [2510.14973v2](https://arxiv.org/abs/2510.14973v2) | Attention Is All You Need for KV Cache in Diffusion LLMs |
+| [2511.09432v2](https://arxiv.org/abs/2511.09432v2) | Equivariant Sparse Autoencoders: Mechanistic Interpretability of Neural Networks on Symmetric Data |
+| [2606.20023v2](https://arxiv.org/abs/2606.20023v2) | When Lower Privileges Suffice: Investigating Over-Privileged Tool Selection in LLM Agents |
+
+That text belongs to its authors and is not covered by this repository's MIT license,
+which applies to the code, the hand labels, and the metric output. Each paper carries
+whatever license its authors chose on arXiv; check the abstract page above before
+reusing any of it. It is included here for reproducing the measurements on this page,
+and citations in generated reports link to arXiv rather than serving the text.
 
 Methodology, experiments, and rejected alternatives: [`DESIGN.md`](DESIGN.md).
 
