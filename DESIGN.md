@@ -242,13 +242,24 @@ Citations that reach a finished report are valid by construction, because
 the finished output would return 100% every time and demonstrate nothing.
 
 What is measured instead is the **survival rate of what the model proposed**, recorded
-in `GroundedAnalysis` as `dropped_claims` and `dropped_evidence`. Runs are read back
-from the LangGraph checkpoint rather than the rendered Markdown, because the report
-keeps only page links while the checkpoint keeps the chunk IDs.
+in `GroundedAnalysis` as `dropped_claims`, `dropped_evidence`, and `dropped_unsupported`.
+Runs are read back from the LangGraph checkpoint rather than the rendered Markdown,
+because the report keeps only page links while the checkpoint keeps the chunk IDs.
+
+Citations are rejected at two stages and the rates keep them apart. Referential integrity
+is measured against everything the model proposed; support integrity against what
+survived the deterministic checks. Pooling them would charge the referential stage with
+the judge's rejections, and the two stages move for entirely different reasons — the
+hyphenation bug below moved the first and could not have moved the second.
 
 Independent re-validation re-runs the three deterministic checks against the run's own
 index. It is expected to return 100%; its value is catching a future change that
-weakened validation or an index that drifted from the run it belongs to.
+weakened validation or an index that drifted from the run it belongs to. It does not
+re-run the judge. Asking the same model the same question twice measures that model's
+consistency, not the run's soundness, so the judge is checked against hand labels in a
+separate runner instead. A run recorded before the judge existed reports its support
+integrity as "not judged" rather than 100%: nothing was rejected because nothing was
+asked.
 
 ### The hyphenation bug
 
@@ -277,8 +288,10 @@ Before the fix, the pipeline was silently discarding about half of its own valid
 ### What manual verification found
 
 Referential integrity and claim support are different questions. The deterministic
-checks answer the first: does this quote exist, on this page, in this paper. Only a
-reader can answer the second: does the quote establish the sentence built on it.
+checks answer the first: does this quote exist, on this page, in this paper. The second —
+does the quote establish the sentence built on it — is now put to a model on every run,
+but it was answered by a reader first, and it had to be: the labels below are what the
+judge is scored against, and they would be worthless if a model had written them.
 
 **First attempt, and why it was wrong.** Twelve citations of the example report were
 read by hand and 8 were confirmed. That sample was drawn deliberately — spread across
@@ -337,10 +350,57 @@ one item. A fix would have to act on the claim rather than the quote — requiri
 citation per enumerated item, or prompting `experimental_setup` for narrower claims.
 Neither has been tried.
 
-`evals/labels/claim_support_labels.json` stores each grade alongside its claim and
-excerpt, so it is self-contained enough to score an automated claim-support judge
-against. No such judge is implemented: without labeled ground truth a judge is one
-model's opinion of another's output, and this dataset is what would make one checkable.
+### Scoring the support judge
+
+`analyze_facet` now grades every citation on the same rubric before the report is
+written, and discards the `0`s. A model is marking another model's work, so the only
+thing that makes the result worth anything is showing that it marks the way a person
+does. `evals/labels/claim_support_labels.json` stores each hand grade next to its claim
+and excerpt, and `run_claim_judge` replays those citations through the judge to compare.
+
+**Forty positives cannot score a judge.** None of the uniform sample is a `0`, so a
+judge that answers "supported" to everything scores 100% against it. Its catch rate is
+not low on that set; it is undefined. `run_claim_judge` refuses to write a result while
+that is true, rather than publishing an agreement figure that a constant function would
+match.
+
+**Where the negatives come from.** Thirty further citations from the same runs: ten more
+real ones, and twenty whose excerpt was replaced by a different quote from the same
+paper. Same paper on purpose. A quote lifted from an unrelated paper is a negative no
+pipeline would ever produce — the deterministic checks reject it before the judge sees
+it — whereas right-paper-wrong-sentence is exactly what those checks pass through, and
+it is what the sheet has always told the labeler to grade `0`.
+
+**They are labeled, not assumed.** A swapped quote can still support the claim by
+coincidence; scoring the judge for "missing" one would be scoring it against a mistake.
+So the swaps go through the same sheet, mixed unmarked among the real citations with the
+key held in a separate file, and are graded by reading like everything else.
+
+<!-- eval:claim_judge -->
+<!-- /eval:claim_judge -->
+
+Two rates come out, measuring opposite mistakes. The **catch rate** — of the citations a
+person rejected, how many the judge rejected — is what the check buys. The **false-drop
+rate** — of the citations a person accepted, how many the judge threw out — is what it
+costs, in correct work deleted from the report. A judge that rejects everything scores a
+perfect catch rate, so a single accuracy figure would let one hide behind the other.
+
+**What this does not establish.** The constructed swaps are the easy end of the failure
+mode. The failure that actually worries a reader is subtler — a quote that supports most
+of a claim, or supports it without the qualifier the claim attaches — and nothing here
+shows the judge catches those. The `experimental_setup` enumerations above are that
+failure in its mildest form, and they are graded `1`, which the shipped threshold keeps.
+
+**Why the threshold keeps partials.** Dropping grade `1` would discard 9 of 40 citations
+in the measured sample to fix what is a claim-phrasing problem rather than a citation
+problem: the claim aggregates a list and the quote names part of it. `run_claim_judge`
+reports the stricter rule's rates alongside the shipped one so the cost is visible rather
+than argued about, the way the screening threshold sweep does.
+
+One difference from production is worth stating plainly: the runner grades one citation
+per call, while `analyze_facet` grades a whole facet in one call and can read its items
+against each other. Per-item is the leaner condition, but a large batching effect would
+not show up in these numbers.
 
 ---
 

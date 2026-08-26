@@ -102,11 +102,26 @@ class TestDeterminism:
         analysis = final["analysis_outcomes"][0].analysis
         assert analysis.supported_claim_count > 0
         assert analysis.dropped_evidence == 0
+        assert analysis.dropped_unsupported == 0
         for claims in analysis.claims.values():
             for claim in claims:
                 for evidence in claim.evidence:
                     assert evidence.arxiv_id == "a1"
                     assert evidence.chunk_id.startswith("a1:")
+                    assert evidence.support_grade is not None
+
+    def test_a_paper_whose_citations_are_all_unsupported_produces_no_claims(
+        self, run_graph
+    ):
+        # The judge runs inside the analysis branch, so an unsupported citation has to
+        # be gone before anything reaches the report — not filtered at render time.
+        run_graph.model.support_grades = {"a1": 0}
+        final = run_graph([make_paper("a1")], thread_id="unsupported")
+        analysis = final["analysis_outcomes"][0].analysis
+
+        assert analysis.supported_claim_count == 0
+        assert analysis.dropped_unsupported > 0
+        assert analysis.is_partial
 
 
 class TestSelection:

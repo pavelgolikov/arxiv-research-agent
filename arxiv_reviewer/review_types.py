@@ -64,13 +64,33 @@ class FacetDraft(BaseModel):
     claims: list[DraftClaim] = Field(max_length=4)
 
 
+class SupportVerdict(BaseModel):
+    """The judge's grade for one claim and the excerpt cited to support it."""
+
+    # Deliberately unconstrained: an index the model invents is discarded by
+    # `judge_support`, whereas a validation error here would fail the whole facet.
+    index: int
+    grade: int = Field(ge=0, le=2)
+    reason: str
+
+
+class SupportVerdicts(BaseModel):
+    """Every grade returned for one facet's citations."""
+
+    verdicts: list[SupportVerdict]
+
+
 class EvidenceRef(BaseModel):
-    """A citation whose chunk, paper, and excerpt have all been verified."""
+    """A citation whose chunk, paper, excerpt, and support have all been verified."""
 
     chunk_id: str
     arxiv_id: str
     page_number: int = Field(ge=1)
     excerpt: str
+    # `None` means the citation was never put to the support judge, which is true of
+    # every run recorded before the check existed. Those runs deserialize from their
+    # checkpoints as unjudged rather than silently claiming a grade they never got.
+    support_grade: int | None = Field(default=None, ge=0, le=2)
 
 
 class SupportedClaim(BaseModel):
@@ -88,12 +108,15 @@ class GroundedAnalysis(BaseModel):
     claims: dict[str, list[SupportedClaim]]
     dropped_claims: int = 0
     dropped_evidence: int = 0
+    dropped_unsupported: int = 0
 
     @property
     def is_partial(self) -> bool:
         """Report whether any proposed claim or citation failed validation."""
 
-        return bool(self.dropped_claims or self.dropped_evidence)
+        return bool(
+            self.dropped_claims or self.dropped_evidence or self.dropped_unsupported
+        )
 
     @property
     def supported_claim_count(self) -> int:

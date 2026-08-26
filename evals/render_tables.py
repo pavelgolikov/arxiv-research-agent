@@ -26,6 +26,7 @@ RETRIEVAL_FILE = RESULTS_DIR / "retrieval.json"
 SCREENING_FILE = RESULTS_DIR / "screening.json"
 GROUNDEDNESS_FILE = RESULTS_DIR / "groundedness.json"
 COVERAGE_FILE = RESULTS_DIR / "index_coverage.json"
+CLAIM_JUDGE_FILE = RESULTS_DIR / "claim_judge.json"
 CLAIM_SUPPORT_FILE = LABELS_DIR / "claim_support_labels.json"
 
 
@@ -125,11 +126,21 @@ def screening_table(data: dict) -> str:
 
 
 def groundedness_table(data: dict) -> str:
-    """Render the citation survival figures."""
+    """Render the citation survival figures, stage by stage."""
 
     totals = data["totals"]
     proposed_claims = totals["claims_kept"] + totals["claims_dropped"]
-    proposed_evidence = totals["evidence_kept"] + totals["evidence_dropped"]
+    resolved = totals["evidence_kept"] + totals["evidence_unsupported"]
+    proposed_evidence = resolved + totals["evidence_dropped"]
+
+    if totals["support_integrity"] is None:
+        support = "| Citation support integrity | not judged — run predates the check |"
+    else:
+        support = (
+            f"| Citation support integrity | **{totals['support_integrity']:.1%}** "
+            f"({totals['evidence_kept']} of {resolved} resolved citations judged to "
+            "support their claim) |"
+        )
 
     return "\n".join(
         [
@@ -139,7 +150,8 @@ def groundedness_table(data: dict) -> str:
             f"| Claim-support rate | **{totals['claim_support_rate']:.1%}** "
             f"({totals['claims_kept']} of {proposed_claims} proposed claims kept) |",
             f"| Citation referential integrity | **{totals['citation_integrity']:.1%}** "
-            f"({totals['evidence_kept']} of {proposed_evidence} proposed citations kept) |",
+            f"({resolved} of {proposed_evidence} proposed citations resolved) |",
+            support,
             f"| Citations per surviving claim | {totals['citations_per_claim']:.2f} |",
             f"| Independent re-validation | {totals['revalidation_rate']:.1%} "
             f"({totals['revalidated']} citations re-checked, "
@@ -167,6 +179,41 @@ def claim_support_table(data: dict) -> str:
             f"({counts['2']} + {counts['1']} of {sample['size']}) "
             f"| [{lenient_low:.0%}, {lenient_high:.0%}] |",
             f"| Excerpt does not support the claim | {counts['0']} of {sample['size']} | — |",
+        ]
+    )
+
+
+def claim_judge_row(measure: str, entry: dict) -> str:
+    """Render one judge rate, or say plainly that nothing measures it."""
+
+    if entry["rate"] is None:
+        return f"| {measure} | — | no labels in that class |"
+
+    low, high = entry["ci"]
+    return (
+        f"| {measure} | **{entry['rate']:.1%}** ({entry['n']} of {entry['of']}) "
+        f"| [{low:.0%}, {high:.0%}] |"
+    )
+
+
+def claim_judge_table(data: dict) -> str:
+    """Render how the automated support judge scores against the hand labels."""
+
+    shipped = data["shipped"]
+
+    return "\n".join(
+        [
+            "| Measure | Rate | 95% CI |",
+            "| --- | --- | --- |",
+            claim_judge_row(
+                "Rejects a citation a reader also rejected (catch rate)",
+                shipped["catch"],
+            ),
+            claim_judge_row(
+                "Rejects a citation a reader kept (false-drop rate)",
+                shipped["false_drop"],
+            ),
+            claim_judge_row("Exact grade agreement", data["exact_agreement"]),
         ]
     )
 
@@ -199,6 +246,7 @@ def render() -> dict[str, str]:
     groundedness = load(GROUNDEDNESS_FILE)
     coverage = load(COVERAGE_FILE)
     claim_support = load(CLAIM_SUPPORT_FILE)
+    claim_judge = load(CLAIM_JUDGE_FILE)
 
     if retrieval:
         blocks["retrieval"] = retrieval_table(retrieval)
@@ -212,6 +260,8 @@ def render() -> dict[str, str]:
     if claim_support:
         blocks["claim_support"] = claim_support_table(claim_support)
         blocks["claim_support_facets"] = claim_support_facets(claim_support)
+    if claim_judge:
+        blocks["claim_judge"] = claim_judge_table(claim_judge)
 
     return blocks
 

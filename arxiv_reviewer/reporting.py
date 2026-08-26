@@ -131,8 +131,9 @@ def render_markdown_fallback(state: ReviewerState) -> str:
         "## Method and Limitations Notice",
         "",
         "Every claim below was generated from retrieved excerpts of the cited paper "
-        "and kept only when its citation resolved to a real chunk of that paper and "
-        "its quoted excerpt was found in that chunk. Claims failing this check were "
+        "and kept only when its citation resolved to a real chunk of that paper, its "
+        "quoted excerpt was found in that chunk, and that excerpt was judged to "
+        "support the claim it was cited for. Claims failing any of these checks were "
         "discarded rather than reported.",
         "",
         "## Overview",
@@ -180,8 +181,10 @@ def render_markdown_fallback(state: ReviewerState) -> str:
         if analysis.is_partial:
             lines.extend(
                 [
-                    f"_Citation validation dropped {analysis.dropped_claims} claim(s) "
-                    f"and {analysis.dropped_evidence} citation(s) for this paper._",
+                    f"_Citation validation dropped {analysis.dropped_claims} claim(s), "
+                    f"{analysis.dropped_evidence} citation(s) that did not resolve to "
+                    f"the chunk they cited, and {analysis.dropped_unsupported} that "
+                    "did not support their claim, for this paper._",
                     "",
                 ]
             )

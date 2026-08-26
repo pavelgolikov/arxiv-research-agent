@@ -1,21 +1,39 @@
 """Citation validation and chunking.
 
+Validation runs in two layers and these tests cover both.
+
 `validate_claim` is the anti-hallucination guarantee: a claim survives only if it
 cites a chunk that was actually shown, belonging to the paper under analysis, quoting
 text that genuinely occurs there. These tests pin both directions — faithful citations
 must survive, and every way of being unfaithful must not.
+
+`apply_support_judge` answers what no deterministic check can: whether the verified
+quote supports the sentence built on it. Its tests pin the drop rule, and pin that a
+citation cannot reach the report through a gap in the judge's reply.
 """
 
 import pytest
 from langchain_core.documents import Document
 
+from arxiv_reviewer import analysis
 from arxiv_reviewer.analysis import (
+    apply_support_judge,
     EVIDENCE_EXCERPT_CHARS,
+    judge_support,
     normalize,
+    SUPPORT_THRESHOLD,
     validate_claim,
 )
 from arxiv_reviewer.rag import build_chunk_id, chunk_pages
-from arxiv_reviewer.review_types import DraftClaim, DraftEvidence, ParsedPage
+from arxiv_reviewer.review_types import (
+    DraftClaim,
+    DraftEvidence,
+    EvidenceRef,
+    ParsedPage,
+    SupportedClaim,
+    SupportVerdict,
+    SupportVerdicts,
+)
 
 PAPER = "2411.00750v2"
 CHUNK_TEXT = (
@@ -36,6 +54,29 @@ def claim_citing(chunk_id: str, excerpt: str) -> DraftClaim:
         text="A claim about sampling",
         evidence=[DraftEvidence(chunk_id=chunk_id, excerpt=excerpt)],
     )
+
+
+def supported_claim(*excerpts: str, text: str = "A claim about sampling") -> SupportedClaim:
+    """Build a claim that has already passed the three deterministic checks."""
+
+    return SupportedClaim(
+        text=text,
+        evidence=[
+            EvidenceRef(
+                chunk_id=f"c{index}",
+                arxiv_id=PAPER,
+                page_number=4,
+                excerpt=excerpt,
+            )
+            for index, excerpt in enumerate(excerpts, start=1)
+        ],
+    )
+
+
+def grading(*grades: int | None):
+    """Return a `judge_support` stand-in answering these grades in order."""
+
+    return lambda items: list(grades)
 
 
 class TestValidateClaim:
@@ -166,3 +207,104 @@ class TestChunking:
         pages = [ParsedPage(page_number=n, text="sentence. " * 300) for n in (1, 2, 3)]
         ids = [d.metadata["chunk_id"] for d in chunk_pages(PAPER, pages)]
         assert len(ids) == len(set(ids))
+
+
+class TestSupportJudge:
+    def test_unsupported_citation_is_dropped(self, monkeypatch):
+        monkeypatch.setattr(analysis, "judge_support", grading(0))
+        kept, dropped_claims, unsupported = apply_support_judge(
+            [supported_claim("over-sample easy queries")]
+        )
+        assert kept == [] and dropped_claims == 1 and unsupported == 1
+
+    def test_partial_support_survives(self, monkeypatch):
+        # 9 of the 40 hand-labeled citations are partials, all of them enumerations
+        # where the claim lists more than the quote names. Dropping those would
+        # discard mostly-correct work, so the threshold keeps them.
+        monkeypatch.setattr(analysis, "judge_support", grading(1))
+        kept, dropped_claims, unsupported = apply_support_judge(
+            [supported_claim("over-sample easy queries")]
+        )
+        assert len(kept) == 1 and dropped_claims == 0 and unsupported == 0
+        assert SUPPORT_THRESHOLD == 1
+
+    def test_grade_is_recorded_on_the_surviving_citation(self, monkeypatch):
+        monkeypatch.setattr(analysis, "judge_support", grading(2))
+        kept, _dropped, _unsupported = apply_support_judge(
+            [supported_claim("over-sample easy queries")]
+        )
+        assert kept[0].evidence[0].support_grade == 2
+
+    def test_claim_keeps_its_supported_citation_and_drops_the_other(self, monkeypatch):
+        monkeypatch.setattr(analysis, "judge_support", grading(2, 0))
+        kept, dropped_claims, unsupported = apply_support_judge(
+            [supported_claim("the supported quote", "the unsupported quote")]
+        )
+        assert len(kept) == 1 and len(kept[0].evidence) == 1
+        assert kept[0].evidence[0].excerpt == "the supported quote"
+        assert dropped_claims == 0 and unsupported == 1
+
+    def test_a_missing_verdict_fails_closed(self, monkeypatch):
+        # An unjudged citation must not reach the report because the reply had a hole
+        # in it. Silence is not support.
+        monkeypatch.setattr(analysis, "judge_support", grading(None))
+        kept, dropped_claims, unsupported = apply_support_judge(
+            [supported_claim("over-sample easy queries")]
+        )
+        assert kept == [] and dropped_claims == 1 and unsupported == 1
+
+    def test_grades_are_consumed_in_citation_order_across_claims(self, monkeypatch):
+        monkeypatch.setattr(analysis, "judge_support", grading(0, 2))
+        kept, _dropped, _unsupported = apply_support_judge(
+            [
+                supported_claim("first quote", text="first claim"),
+                supported_claim("second quote", text="second claim"),
+            ]
+        )
+        assert [claim.text for claim in kept] == ["second claim"]
+
+    def test_no_claims_means_no_model_call(self, monkeypatch):
+        def explode(items):
+            raise AssertionError("the judge must not be called with nothing to grade")
+
+        monkeypatch.setattr(analysis, "judge_support", explode)
+        assert apply_support_judge([]) == ([], 0, 0)
+
+
+class TestJudgeReplyHandling:
+    """`judge_support` reads one batched reply, so it has to survive a ragged one."""
+
+    def reply(self, monkeypatch, *verdicts: SupportVerdict) -> None:
+        graded = SupportVerdicts(verdicts=list(verdicts))
+        monkeypatch.setattr(
+            analysis, "generate_structured", lambda prompt, result_type: graded
+        )
+
+    def test_verdicts_are_matched_by_index_not_reply_order(self, monkeypatch):
+        self.reply(
+            monkeypatch,
+            SupportVerdict(index=2, grade=0, reason="wrong sentence"),
+            SupportVerdict(index=1, grade=2, reason="states the claim"),
+        )
+        assert judge_support([("claim one", "quote one"), ("claim two", "quote two")]) == [2, 0]
+
+    def test_an_index_that_was_never_sent_is_ignored(self, monkeypatch):
+        self.reply(monkeypatch, SupportVerdict(index=7, grade=2, reason="invented"))
+        assert judge_support([("claim", "quote")]) == [None]
+
+    def test_an_omitted_item_comes_back_unjudged(self, monkeypatch):
+        self.reply(monkeypatch, SupportVerdict(index=1, grade=2, reason="only one"))
+        assert judge_support([("claim one", "quote one"), ("claim two", "quote two")]) == [2, None]
+
+    def test_every_item_is_numbered_in_the_prompt(self, monkeypatch):
+        seen = {}
+
+        def capture(prompt, result_type):
+            seen["prompt"] = prompt
+            return SupportVerdicts(verdicts=[])
+
+        monkeypatch.setattr(analysis, "generate_structured", capture)
+        judge_support([("claim one", "quote one"), ("claim two", "quote two")])
+
+        assert "1.\nClaim: claim one\nExcerpt: quote one" in seen["prompt"]
+        assert "2.\nClaim: claim two\nExcerpt: quote two" in seen["prompt"]

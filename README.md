@@ -24,17 +24,19 @@ SQLite checkpointing behind `run` / `resume` / `status`; typed per-branch failur
 retry classification and partial reports.
 
 **Grounding and citation validation** — per-facet retrieval scoped to one paper; claims
-that must carry chunk-level evidence; deterministic three-check validation with no model
-call; page-anchored citations into the source PDF.
+that must carry chunk-level evidence; three deterministic checks that the quote exists
+where it says it does, then a support judge that discards quotes which do not support the
+claim; page-anchored citations into the source PDF.
 
 **Evaluation and benchmarking** — two hand-labeled datasets (50 retrieval questions with
 312 judged chunks; 7 screening queries × 12 candidates); TREC-style pooling with measured
 pooling bias; four-way retrieval ablation with paired-bootstrap confidence intervals;
 threshold sweep over the real selection rule; groundedness metrics with independent
-re-validation; a hand-labeled claim-support sample; reproducible index rebuild guarded
-by a pool-coverage check.
+re-validation; a hand-labeled claim-support sample, extended with constructed failures so
+the support judge can be scored against it; reproducible index rebuild guarded by a
+pool-coverage check.
 
-**Engineering** — 121 tests requiring no network access and no API key; published
+**Engineering** — 151 tests requiring no network access and no API key; published
 numbers generated from committed JSON; graceful exit codes; a worked example with its
 verification record.
 
@@ -57,10 +59,11 @@ packaging, CI, web UI.
   - `build/` — dataset construction: arXiv search, corpus parsing, question generation,
     candidate pooling, offline labeling page.
   - `metrics.py` — MRR, nDCG, recall, paired bootstrap.
-  - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py` — metric runners.
+  - `run_retrieval.py`, `run_screening.py`, `run_groundedness.py`,
+    `run_claim_judge.py` — metric runners.
   - `measure_categories.py`, `measure_depth.py` — search-quality studies.
-  - `build/claim_support.py` — samples citations for hand-grading and collects the
-    result into `labels/`.
+  - `build/claim_support.py` — samples citations for hand-grading, builds the judge
+    evaluation set, and collects both into `labels/`.
   - `build_index.py` — rebuilds the vector index from committed chunks; `--verify`
     checks that the labels cover everything the retrievers return.
   - `render_tables.py` — regenerates the tables in `README.md` and `DESIGN.md`.
@@ -134,7 +137,7 @@ flowchart TD
     screen --> select[select papers<br/>score desc, then search position]
     select -->|none selected| render
     select --> analyze{{"analyze each paper<br/>Send fan-out: download, chunk,<br/>embed, retrieve per facet"}}
-    analyze --> validate[validate every citation<br/>deterministic, no model call]
+    analyze --> validate[validate every citation<br/>3 deterministic checks,<br/>then a support judge]
     validate --> synth[synthesize]
     synth -->|synthesis fails| render
     synth --> render[render Markdown<br/>written atomically]
@@ -182,14 +185,30 @@ experimental setup, main findings, limitations, relevance to the query — from 
 retrieved for that facet and scoped to that paper.
 
 Every statement is returned as a claim carrying at least one citation: a `chunk_id` plus
-an excerpt quoted from that chunk. Each citation is checked without a model call:
+an excerpt quoted from that chunk. Three checks run first, without a model call:
 
 1. the cited chunk exists among the chunks the model was shown,
 2. it belongs to the paper being analyzed, and
 3. the quoted excerpt occurs in that chunk, ignoring case, whitespace, and hyphenation.
 
-Failing citations are discarded; a claim left with none is discarded with it. The report
-records the counts. Surviving claims render as page-anchored links into the source PDF.
+Those three prove the quote is real. None of them can tell whether the quote actually
+backs up the sentence it was attached to, so a fourth check asks exactly that. A model
+reads each claim next to its quote and grades the pair:
+
+- `2` — the quote establishes the claim,
+- `1` — the quote supports part of it,
+- `0` — the quote does not support it.
+
+Anything graded `0` is thrown out, and so is any citation the model skipped instead of
+grading. That costs one model call per facet, not one per citation.
+
+Grade `1` is kept. The partial grades measured so far are all one shape: the claim lists
+five things and the quote names two of them, so it supports part of what was written.
+Throwing those out would delete correct work to fix a sentence-phrasing problem.
+
+Discarded citations take nothing with them except a claim left with no citations at all,
+which is discarded too. The report records both counts. Surviving claims render as
+page-anchored links into the source PDF, carrying the grade they were given.
 
 ## Evaluation
 
@@ -262,7 +281,8 @@ Two live runs at the shipping defaults, read from the LangGraph checkpoints.
 | --- | --- |
 | Papers analyzed | 8 across 2 runs |
 | Claim-support rate | **94.4%** (152 of 161 proposed claims kept) |
-| Citation referential integrity | **94.3%** (165 of 175 proposed citations kept) |
+| Citation referential integrity | **94.3%** (165 of 175 proposed citations resolved) |
+| Citation support integrity | not judged — run predates the check |
 | Citations per surviving claim | 1.09 |
 | Independent re-validation | 100.0% (165 citations re-checked, 0 failures) |
 <!-- /eval:groundedness -->
@@ -271,10 +291,19 @@ Rates count citations and claims surviving validation out of those the model pro
 
 ### Claim support
 
-Validation is referential: it proves an excerpt exists on the page it cites, not that it
-supports the claim. That judgment is hand-labeled — 40 of 165 citations drawn uniformly
-at random from the runs above, graded 2 (establishes the claim), 1 (supports it partly),
-or 0 (no support).
+A citation can be word-for-word correct and still prove nothing. The example run has
+one that quotes the paper's own title to support a claim about what its authors propose:
+right paper, right page, quoted exactly — and it restates the claim instead of
+evidencing it. All three checks above pass it. It took a person reading the page to
+notice.
+
+That is what the fourth check is for, and it is a model marking another model's
+homework, so the question is how well it marks. The answer comes from citations a person
+graded by hand.
+
+Start with 40 of the 165 citations above, picked at random and read one by one against
+their claims. They were graded before the support check existed, so nothing the judge
+does could have shaped them.
 
 <!-- eval:claim_support -->
 | Measure | Rate | 95% CI |
@@ -297,8 +326,42 @@ Partial grades concentrate in one facet:
 | `research_problem` | 1 of 7 |
 <!-- /eval:claim_support_facets -->
 
+### Scoring the support judge
+
+Those 40 cannot score the judge on their own, because **not one of them is a `0`**.
+Against a set containing no failures, a model that calls everything "supported" is right
+every single time. To find out whether the judge rejects bad citations, the set has to
+contain some.
+
+So 30 more were graded: 10 further real citations, and 20 where the quote was replaced
+with a different quote from the same paper. That swap is the failure the three
+deterministic checks cannot see — the quote is real, it is in the right paper, it is on
+the page it names. It just belongs to a different sentence.
+
+The 20 swaps sit shuffled among the 10 real ones with nothing marking which is which,
+and they are read and graded like everything else rather than written down as `0` by
+assumption. Assuming would be wrong often enough to matter: a quote pulled from
+elsewhere in the same paper sometimes supports the claim anyway, and scoring the judge
+for "missing" one would penalize it for being right.
+
+<!-- eval:claim_judge -->
+<!-- /eval:claim_judge -->
+
+Two numbers come out of this, and they measure opposite mistakes:
+
+- **catch rate** — of the citations a person rejected, how many the judge also rejected.
+  This is what the check is worth.
+- **false-drop rate** — of the citations a person accepted, how many the judge threw out.
+  This is what it costs, in correct work deleted from the report.
+
+A judge that rejects everything scores a perfect catch rate, so neither number means
+anything without the other. The 77.5% and 100% figures above come from the random 40
+alone, so the 20 deliberately broken citations cannot drag them down.
+
 `evals/labels/claim_support_labels.json` carries each grade with its claim and excerpt.
-Regenerate the sheet with `python -m evals.build.claim_support`.
+Regenerate the sheets with `python -m evals.build.claim_support` and
+`python -m evals.build.claim_support --judge-set`, then score the judge with
+`python -m evals.run_claim_judge`.
 
 ## Tests
 
@@ -306,14 +369,16 @@ Regenerate the sheet with `python -m evals.build.claim_support`.
 .venv/bin/python -m pytest
 ```
 
-121 tests, no network access and no API key. An autouse fixture fails outbound
+151 tests, no network access and no API key. An autouse fixture fails outbound
 connections. Chroma runs against a temporary directory with deterministic embeddings.
 
 Coverage: graph terminal paths (no candidates, none selected, success, partial branch
 failure, synthesis fallback); concurrency 1 versus 3 producing identical output;
 citation validation against hallucinated chunk IDs, wrong-paper chunks, paraphrases,
-and PDF hyphenation; SQLite round trip and resume; retry classification and backoff;
-the eval pool-coverage guard.
+and PDF hyphenation; the support judge dropping unsupported citations, keeping partial
+ones, and failing closed on a verdict it never received; SQLite round trip and resume;
+retry classification and backoff; the eval pool-coverage guard and the judge's scoring
+arithmetic.
 
 ## Limitations
 
@@ -323,9 +388,10 @@ the eval pool-coverage guard.
 - `--max-results` is divided across the planned queries.
 - The retrieval ablation has 50 questions.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
-- Citation validation is referential, not semantic: it proves an excerpt exists on the
-  cited page. Claim support is hand-labeled instead — 77.5% of a 40-citation random
-  sample fully establish their claim, 100% support it at least partly.
+- The support check is a model grading another model's work, so it is only as good as
+  its measured agreement with a person. The failures it was tested against are quotes
+  swapped between claims — the obvious kind. Nothing here shows it catches a quote that
+  supports most of a claim but not the qualifier attached to it.
 - arXiv results are not peer reviewed.
-- Runs cost one model call per candidate screened (30 by default) plus six per selected
-  paper.
+- Runs cost one model call per candidate screened (30 by default) plus twelve per
+  selected paper: six to analyze its facets, six to judge the citations they produced.

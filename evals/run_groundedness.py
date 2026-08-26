@@ -12,10 +12,20 @@ every time and demonstrate nothing. What is worth measuring is the survival rate
 what the model originally proposed, which `GroundedAnalysis` records in its
 `dropped_claims` and `dropped_evidence` counters.
 
+Citations are dropped at two stages and the counters keep them apart. The deterministic
+checks reject a citation that does not resolve; the support judge then rejects one whose
+excerpt does not support the claim built on it. Referential integrity is therefore
+measured against everything the model proposed, and support integrity against what
+survived the deterministic checks — pooling the two would blame one stage for the
+other's rejections.
+
 Re-validation is the exception, and it is a regression check rather than a finding.
-It re-runs the same deterministic checks against the stored chunks and is expected to
+It re-runs the three deterministic checks against the stored chunks and is expected to
 return 100%. A lower number means the index drifted away from the run it belongs to,
-or that validation was not applied.
+or that validation was not applied. It does not re-run the judge: support grades are
+reported as the run recorded them, since a second opinion from the same model would
+measure that model's consistency rather than the run's. `evals.run_claim_judge` scores
+the judge against hand labels instead.
 """
 
 import argparse
@@ -78,24 +88,59 @@ def revalidate(analysis, thread_id: str, data_dir: Path) -> dict:
     return {"checked": checked, "failures": failures}
 
 
+def integrity(kept: int, referential_drops: int, support_drops: int, judged: int) -> dict:
+    """Split citation survival across the two stages that can reject a citation.
+
+    `judged` is how many surviving citations carry a support grade. A run recorded
+    before the judge existed has none, and its support integrity is reported as `None`
+    rather than 100%: nothing was rejected because nothing was asked.
+    """
+
+    unjudged_run = judged == 0 and support_drops == 0
+
+    return {
+        # A citation the judge rejected still passed the deterministic checks, so it
+        # counts as referentially sound. Leaving it out would credit the referential
+        # stage with the judge's rejections.
+        "citation_integrity": ratio(kept + support_drops, referential_drops),
+        "support_integrity": None if unjudged_run else ratio(kept, support_drops),
+        "overall_integrity": ratio(kept, referential_drops + support_drops),
+        "evidence_judged": judged,
+    }
+
+
 def measure_paper(analysis, thread_id: str, data_dir: Path) -> dict:
     """Compute survival and re-validation figures for one analyzed paper."""
 
     kept_claims = analysis.supported_claim_count
-    kept_evidence = sum(
-        len(claim.evidence) for claims in analysis.claims.values() for claim in claims
-    )
+    evidence = [
+        item
+        for claims in analysis.claims.values()
+        for claim in claims
+        for item in claim.evidence
+    ]
+    kept_evidence = len(evidence)
+    judged = sum(1 for item in evidence if item.support_grade is not None)
     checks = revalidate(analysis, thread_id, data_dir)
 
     return {
         "arxiv_id": analysis.arxiv_id,
         "title": analysis.title,
         "claims_kept": kept_claims,
+        # Merged on purpose: a claim is dropped when it has no citation left, and by
+        # then which stage took the last one no longer changes the outcome. The split
+        # that matters is kept per citation, below.
         "claims_dropped": analysis.dropped_claims,
         "evidence_kept": kept_evidence,
         "evidence_dropped": analysis.dropped_evidence,
+        "evidence_unsupported": analysis.dropped_unsupported,
         "claim_support_rate": ratio(kept_claims, analysis.dropped_claims),
-        "citation_integrity": ratio(kept_evidence, analysis.dropped_evidence),
+        **integrity(
+            kept_evidence,
+            analysis.dropped_evidence,
+            analysis.dropped_unsupported,
+            judged,
+        ),
         "revalidated": checks["checked"],
         "revalidation_failures": checks["failures"],
         # Drops are accumulated per paper, not per facet, so only the surviving
@@ -140,6 +185,8 @@ def totals(runs: list[dict]) -> dict:
 
     kept_claims, dropped_claims = field("claims_kept"), field("claims_dropped")
     kept_evidence, dropped_evidence = field("evidence_kept"), field("evidence_dropped")
+    unsupported = field("evidence_unsupported")
+    judged = field("evidence_judged")
     revalidated = field("revalidated")
     failures = [f for paper in papers for f in paper["revalidation_failures"]]
 
@@ -156,7 +203,8 @@ def totals(runs: list[dict]) -> dict:
         "claim_support_rate": ratio(kept_claims, dropped_claims),
         "evidence_kept": kept_evidence,
         "evidence_dropped": dropped_evidence,
-        "citation_integrity": ratio(kept_evidence, dropped_evidence),
+        "evidence_unsupported": unsupported,
+        **integrity(kept_evidence, dropped_evidence, unsupported, judged),
         "citations_per_claim": kept_evidence / kept_claims if kept_claims else 0.0,
         "revalidated": revalidated,
         "revalidation_failures": len(failures),
@@ -174,9 +222,19 @@ def print_report(payload: dict) -> None:
     print(f"  claims kept / proposed : {pooled['claims_kept']} / "
           f"{pooled['claims_kept'] + pooled['claims_dropped']}"
           f"   -> claim-support rate {pooled['claim_support_rate']:.1%}")
-    print(f"  citations kept / prop. : {pooled['evidence_kept']} / "
-          f"{pooled['evidence_kept'] + pooled['evidence_dropped']}"
-          f"   -> citation integrity {pooled['citation_integrity']:.1%}")
+    proposed = (
+        pooled["evidence_kept"]
+        + pooled["evidence_dropped"]
+        + pooled["evidence_unsupported"]
+    )
+    print(f"  citations kept / prop. : {pooled['evidence_kept']} / {proposed}"
+          f"   -> overall integrity {pooled['overall_integrity']:.1%}")
+    print(f"    referential          : {pooled['evidence_dropped']} rejected"
+          f"   -> {pooled['citation_integrity']:.1%}")
+    support = pooled["support_integrity"]
+    print(f"    support judge        : {pooled['evidence_unsupported']} rejected"
+          + (f"   -> {support:.1%}" if support is not None
+             else "   -> not judged (run predates the support check)"))
     print(f"  citations per claim    : {pooled['citations_per_claim']:.2f}")
     print(f"  re-validated           : {pooled['revalidated']} citations, "
           f"{pooled['revalidation_failures']} failure(s) -> {pooled['revalidation_rate']:.1%}")
@@ -213,7 +271,10 @@ def main() -> None:
                 "Citations in a finished report are valid by construction, so measuring "
                 "the report itself would trivially return 100%."
             ),
-            "revalidation": "deterministic re-check of every committed citation",
+            "revalidation": (
+                "deterministic re-check of every committed citation; the support "
+                "judge is not re-run, see evals.run_claim_judge"
+            ),
         },
         "totals": totals(runs),
         "runs": runs,

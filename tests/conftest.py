@@ -28,6 +28,8 @@ from arxiv_reviewer.review_types import (
     ParsedPaper,
     RelevanceDecision,
     SearchPlan,
+    SupportVerdict,
+    SupportVerdicts,
 )
 
 # Chroma's telemetry client would otherwise try to phone home and trip the socket guard.
@@ -38,6 +40,13 @@ LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost"}
 
 # Matches one rendered block from `analysis.format_context`.
 CONTEXT_BLOCK = re.compile(r"\[([^\]\s]+)\] \(page (\d+)\)\n(.+?)(?=\n\n\[|\Z)", re.DOTALL)
+
+# Matches one numbered item from `analysis.judge_support`.
+JUDGE_ITEM = re.compile(r"^(\d+)\.\nClaim: (.+)$", re.MULTILINE)
+
+# What the fake judge answers unless a test says otherwise, so every existing graph
+# test keeps the citations it always had.
+FULL_SUPPORT = 2
 
 
 @pytest.fixture(autouse=True)
@@ -115,6 +124,10 @@ class FakeModel:
 
     def __init__(self, scores: dict[str, int] | None = None):
         self.scores = scores or {}
+        # Maps a substring of the claim to the grade the judge should return for it.
+        # A `None` grade omits the verdict entirely, standing in for a reply with a
+        # hole in it. Keyed by content rather than call order, like the other fakes.
+        self.support_grades: dict[str, int | None] = {}
         self.calls: dict[str, int] = {}
         self.seen_papers: list[str] = []
         self.fail_screening_for: set[str] = set()
@@ -138,6 +151,9 @@ class FakeModel:
 
         if result_type is FacetDraft:
             return self._analyze(prompt)
+
+        if result_type is SupportVerdicts:
+            return self._judge(prompt)
 
         raise AssertionError(f"unexpected structured request for {result_type!r}")
 
@@ -181,6 +197,25 @@ class FakeModel:
                 )
             ]
         )
+
+    def _judge(self, prompt: str) -> SupportVerdicts:
+        """Grade every numbered item, supporting the claim fully unless told not to."""
+
+        self._record("support_judge")
+        verdicts = []
+
+        for index, claim in JUDGE_ITEM.findall(prompt):
+            grade = next(
+                (value for key, value in self.support_grades.items() if key in claim),
+                FULL_SUPPORT,
+            )
+            if grade is None:
+                continue
+            verdicts.append(
+                SupportVerdict(index=int(index), grade=grade, reason="fake verdict")
+            )
+
+        return SupportVerdicts(verdicts=verdicts)
 
     def text(self, prompt: str) -> str:
         """Stand in for synthesis."""

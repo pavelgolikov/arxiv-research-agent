@@ -1,0 +1,40 @@
+{
+  "seed": 20260826,
+  "source_threads": [
+    "verified-example",
+    "shipping-defaults-2"
+  ],
+  "first_item": 41,
+  "pairs": {
+    "41": "mismatched",
+    "42": "real",
+    "43": "real",
+    "44": "mismatched",
+    "45": "real",
+    "46": "mismatched",
+    "47": "mismatched",
+    "48": "mismatched",
+    "49": "real",
+    "50": "mismatched",
+    "51": "mismatched",
+    "52": "mismatched",
+    "53": "real",
+    "54": "mismatched",
+    "55": "mismatched",
+    "56": "real",
+    "57": "mismatched",
+    "58": "mismatched",
+    "59": "mismatched",
+    "60": "real",
+    "61": "real",
+    "62": "mismatched",
+    "63": "mismatched",
+    "64": "mismatched",
+    "65": "mismatched",
+    "66": "mismatched",
+    "67": "real",
+    "68": "real",
+    "69": "mismatched",
+    "70": "mismatched"
+  }
+}
