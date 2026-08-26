@@ -8,9 +8,9 @@ through LangChain.
 **Built with:** LangGraph, LangChain, Chroma, BM25, cross-encoder reranking, Gemini,
 Pydantic, SQLite, PyMuPDF, pytest.
 
-See [`examples/example_review.md`](examples/example_review.md) for a complete run, and
-[`examples/VERIFICATION.md`](examples/VERIFICATION.md) for exactly which of its 79
-citations were checked by code and which needed reading.
+See [`examples/example_review.md`](examples/example_review.md) for a complete run. Its
+79 citations were machine-checked and then **manually verified** by hand — with a
+result worth reading: [`examples/VERIFICATION.md`](examples/VERIFICATION.md).
 
 ## Project status
 
@@ -394,6 +394,16 @@ The example under [`examples/`](examples/) is one of these runs. Every page link
 renders was traced back to a validated citation, which is worth checking separately:
 synthesis is a language model writing Markdown and could in principle invent one.
 
+**Manual verification found the limit of these numbers.** Twelve of the example's
+citations were checked by hand against the pages they cite, and **8 of 12 were
+confirmed while 4 were rejected** — not as fabrications, but as real quotes asked to
+carry more than they say. One excerpt was truncated at 300 characters just before the
+clause that would have supported the claim; one relied on a pronoun whose referent sat
+outside the quoted span; two attached a qualifier the quote did not contain. A
+deterministic check cannot see any of this, which is why 94.3% referential integrity
+and a human-judged support rate of 8/12 belong side by side. The failure modes are
+itemized in [`examples/VERIFICATION.md`](examples/VERIFICATION.md).
+
 ### Pooling, and measuring what it misses
 
 Judging every chunk against every question would be 5,700 decisions. Instead the
@@ -510,7 +520,8 @@ Every number in this README is generated from `evals/results/*.json` by
   the rest and not enough to resolve differences of two or three points.
 - PDF text extraction quality varies, especially for tables, figures, and formulae.
 - Citation validation proves an excerpt exists on the cited page. It does not prove
-  the excerpt supports the claim built on it.
+  the excerpt supports the claim built on it — hand-checking 12 citations of the
+  example confirmed 8 and rejected 4, against 94.3% machine-checked integrity.
 - arXiv results are not peer reviewed.
 - Runs cost model calls: one per candidate screened (30 by default), plus six per
   selected paper. Screening reads abstracts only, so a rejected candidate costs one

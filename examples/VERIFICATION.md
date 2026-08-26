@@ -27,8 +27,9 @@ the excerpt *supports* the claim built on it, which needs reading. All
 
 - **74 of 78 unique claim/citation pairs are soundly supported.** The excerpt states
   what the claim says, without extrapolation.
-- **Two are weak** and are included in the spot-check list below so they get human
-  eyes rather than being quietly dropped:
+- **Two are weak.** The first is item 1 in the spot-check list below; the second
+  (`2402.03855v2:p12:c1`) did not make the sample, so it remains reviewed by Claude
+  only:
   - `2402.03855v2:p12:c1` — the excerpt begins mid-sentence at "correlation with
     dishonesty", so the claim's qualifier "limited" is not itself evidenced by the
     quoted text, only by the sentence it was cut from.
@@ -132,6 +133,29 @@ families.”
 
 ## Result
 
-Once the boxes above are ticked, the README may say the example was manually
-verified. Until then it says the citations were machine-checked and the claim
-support was reviewed by Claude, which is what has actually happened.
+Spot-checked by hand on 2026-08-25: **8 of 12 confirmed, 4 rejected** (items 1, 3, 9,
+and 11). The human reviewer disagreed that those four excerpts support the claims
+built on them.
+
+That gap is the point of doing this. The automated checks pass at 100% because they
+ask a narrower question — does this quote exist, on this page, in this paper — and a
+quote can be entirely real without establishing the sentence it is attached to. The
+four rejections share three causes, none of which a deterministic check can see:
+
+- **Truncation cuts the supporting half.** Item 3's excerpt stops mid-word at 300
+  characters (`EVIDENCE_EXCERPT_CHARS`), just before the clause that would have
+  supported the second half of the claim.
+- **The quote's referent lies outside the quote.** Item 11 says "the difference of
+  these vectors" — the claim calls them activation vectors, which is correct in the
+  paper but not established by the quoted span alone.
+- **The claim adds a word the quote does not carry.** Item 9's excerpt supports
+  "crucial for understanding models"; the claim says "understanding *and
+  controlling*". Item 1 quotes the paper's title rather than a passage.
+
+None of these are fabrications, and no rejected citation points at the wrong paper or
+a chunk that does not exist. They are cases of a real quote being asked to carry more
+than it says, which is exactly the limitation the README states: citation validation
+proves an excerpt exists where it is claimed to, not that it supports the claim.
+
+A human-judged support rate of 8/12 on a small sample sits well below the 94.3%
+machine-checked referential integrity, and both numbers are worth reading together.
