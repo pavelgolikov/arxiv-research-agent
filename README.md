@@ -36,7 +36,7 @@ re-validation; a hand-labeled claim-support sample, extended with constructed fa
 the support judge can be scored against it; reproducible index rebuild guarded by a
 pool-coverage check.
 
-**Engineering** — 157 tests requiring no network access and no API key; published
+**Engineering** — 163 tests requiring no network access and no API key; published
 numbers generated from committed JSON; graceful exit codes; a worked example with its
 verification record.
 
@@ -255,13 +255,20 @@ which is what the support judge is scored against.
 The judge replayed against 70 human-graded citations, twenty of them constructed
 failures, reporting catch rate and false-drop rate together.
 
+## Cost
+
+Answering one research question costs about **$0.05** at the shipping defaults, measured
+across ten runs on 2026-08-26 and ranging from $0.051 to $0.061 depending on how long the
+selected papers turn out to be. The per-run figures, the split between generation and
+embedding, and the prices used are in [`EVALS.md`](EVALS.md#cost).
+
 ## Tests
 
 ```bash
 .venv/bin/python -m pytest
 ```
 
-157 tests, no network access and no API key. An autouse fixture fails outbound
+163 tests, no network access and no API key. An autouse fixture fails outbound
 connections. Chroma runs against a temporary directory with deterministic embeddings.
 
 Coverage: graph terminal paths (no candidates, none selected, success, partial branch
@@ -288,8 +295,12 @@ arithmetic.
 - arXiv carries preprints and papers already published in peer-reviewed venues
   alike. The pipeline does not record which a given paper is, so a report makes no
   claim either way.
-- Runs cost one model call per candidate screened (30 by default) plus twelve per
-  selected paper: six to analyze its facets, six to judge the citations they produced.
+- A run at the defaults makes 74 to 80 model calls: two fixed ones to plan the search
+  and write the report, one per candidate screened, and up to twelve per selected paper
+  — six to analyze its facets, six to judge the citations they produced. Both variable
+  parts can come in under their ceiling: arXiv may return fewer than `--max-results`
+  candidates, and a facet that produces no citations skips its judge call. One measured
+  run that selected only two papers made 56 calls.
 
 ## License
 

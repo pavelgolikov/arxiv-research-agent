@@ -170,6 +170,49 @@ Regenerate the sheets with `python -m evals.build.claim_support` and
 `python -m evals.build.claim_support --judge-set`, then score the judge with
 `python -m evals.run_claim_judge`.
 
+## Cost
+
+What it costs to answer one research question, measured across ten runs at the shipping
+defaults on 2026-08-26.
+
+| Measure | Value |
+| --- | --- |
+| Cost per question, median | **$0.054** |
+| Range across the nine runs that selected four papers | $0.051 – $0.061 |
+| A run that found only two papers worth selecting | $0.033 |
+| Generation share of the median run | 80% |
+| Embedding share of the median run | 19% |
+| All ten runs together | $0.52 |
+
+Ten research questions were each run once, phrased the way a person would ask them and
+spread across interpretability, inference efficiency, alignment, privacy, and agent
+evaluation. Together they made 754 model calls consuming 592,657 input and 174,898 output
+tokens, and indexed 3,384 chunks totalling 2,948,354 characters.
+
+**Generation is measured; embedding is estimated.** Every call to `gemini-3.1-flash-lite`
+reports its own input and output token counts, so that side is exact. LangChain's
+embeddings interface returns vectors and no usage data, so embedding volume is derived
+from the characters actually indexed, converted at four characters per token. The
+embedding figure should be read as an estimate and the generation figure as a
+measurement.
+
+**Prices** were read from [Google's pricing page](https://ai.google.dev/gemini-api/docs/pricing)
+on 2026-08-26: `gemini-3.1-flash-lite` at $0.25 per million input tokens and $1.50 per
+million output tokens, `gemini-embedding-001` at $0.15 per million. These figures need
+recalculating if those prices change; nothing regenerates them automatically.
+
+**Output tokens dominate despite being the smaller half.** Across the ten runs the
+pipeline consumed 3.4 times more input than output, but output costs six times more per
+token, so it accounts for 64% of the generation bill. Anything that shortens model
+responses is worth more than the same saving on prompts.
+
+**What drives the spread.** Call volume barely moves: 74 to 80 calls for every run that
+filled all four paper slots. The variation is almost entirely embedding, which scales
+with how long the selected papers happen to be — chunk counts ranged from 249 to 536
+across those nine runs. The one cheap run is cheap for a different reason: only two
+candidates cleared the relevance threshold, so eight analysis and judge calls never
+happened.
+
 ## Reproducing
 
 ```bash
