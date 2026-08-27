@@ -4,17 +4,9 @@ What was measured, on what data, and what came out of it. The methodology behind
 numbers — how the datasets were built, which alternatives were tried and rejected, and
 how far each result can be pushed — is in [`DESIGN.md`](DESIGN.md).
 
-Every table on this page is generated from `evals/results/*.json` by
-`python -m evals.render_tables --write`, so no evaluation figure is typed by hand. The
-cost section is the one exception: it is a single measurement rather than a re-runnable
-metric, so its numbers were written once and carry the date and prices they were
-calculated from.
-
 ## Datasets
 
-Two hand-labeled datasets under `evals/`, frozen and committed. Every table in this
-section is generated from `evals/results/*.json` by `python -m evals.render_tables
---write`.
+Two hand-labeled datasets under `evals/`, frozen and committed.
 
 **Labeled datasets.** The ground truth every metric below is scored against, and the
 amount of hand-labeling each one represents.
@@ -244,5 +236,5 @@ python -m evals.run_retrieval                 # ablation
 python -m evals.run_screening                 # threshold sweep
 python -m evals.run_groundedness --thread-id THREAD_ID
 python -m evals.run_claim_judge               # judge against the hand labels
-python -m evals.render_tables --write         # regenerate every table above
+python -m evals.render_tables --write         # regenerate the metric tables
 ```

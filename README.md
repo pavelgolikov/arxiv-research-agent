@@ -39,8 +39,7 @@ the support judge can be scored against it; reproducible index rebuild guarded b
 pool-coverage check.
 
 **Engineering** — 163 tests requiring no network access and no API key, run in CI on
-every push; every published evaluation number generated from committed JSON; graceful
-exit codes; a worked example with its verification record.
+every push; graceful exit codes; a worked example with its verification record.
 
 Not included: LangSmith tracing, human-in-the-loop `interrupt`, `pyproject.toml`
 packaging, web UI.
